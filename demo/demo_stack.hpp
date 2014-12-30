@@ -8,9 +8,6 @@
 #ifndef DEMO_DEMO_STACK_HPP_
 #define DEMO_DEMO_STACK_HPP_
 
-
-void ManyProducersManyConsumersStack();
-
-
+void DemoStack();
 
 #endif /* DEMO_DEMO_STACK_HPP_ */

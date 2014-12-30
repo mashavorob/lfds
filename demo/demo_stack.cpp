@@ -15,50 +15,49 @@
 #include "benchmark.hpp"
 #include "stack.hpp"
 
-void ManyProducersManyConsumersStack()
-{
-	std::cout << "Benchmarking of many producers many consumers stacks: "
-			<< std::endl << std::endl;
+void DemoStack() {
+	static const std::chrono::seconds 	duration(10);
+	static const std::size_t 			capacity = 100;
+	static const std::size_t 			num_producers=2;
+	static const std::size_t 			num_consumers=2;
+
 
 	typedef std_stack_wrapper< std::stack<int> > ref_collection_type;
 	typedef lfds::stack<int, true>				 fixed_collection_type;
 	typedef lfds::stack<int, false>				 dynamic_collection_type;
 
-	typedef counted_collection_wrapper< ref_collection_type > 		ref_counted_collection_type;
-	typedef counted_collection_wrapper< fixed_collection_type > 	fixed_counted_collection_type;
-	typedef counted_collection_wrapper< dynamic_collection_type > 	dynamic_counted_collection_type;
-
-	typedef std::chrono::seconds seconds_type;
-
-	static const seconds_type	duration(10);
-	static const std::size_t	capacity = 100;
-	static const unsigned		numproducers = 2;
-	static const unsigned		numconsumers = 2;
-
-	ref_counted_collection_type 	ref_coll(capacity);
-	fixed_counted_collection_type 	fixed_coll(capacity);
-	dynamic_counted_collection_type dynamic_coll(capacity);
+	ref_collection_type ref_coll(capacity);
+	fixed_collection_type fixed_coll(capacity);
+	dynamic_collection_type dynamic_coll(capacity);
 
 	std::cout << "std::stack:" << std::endl;
-	std::size_t ref_perf = benchmark(ref_coll, duration, numproducers, numconsumers);
-	std::cout << std::endl;
+	double ref_perf = benchmark(ref_coll, duration, num_producers,
+			num_consumers);
+	std::cout << "size at exit: " << ref_coll.size() << std::endl
+			<< std::endl;
 
 	std::cout << "lock free fixed size stack:" << std::endl;
-	std::size_t fixed_perf = benchmark(fixed_coll, duration, numproducers, numconsumers);
-	std::cout << std::endl;
+	double fixed_perf = benchmark(fixed_coll, duration, num_producers,
+			num_consumers);
+	std::cout << "size at exit: " << fixed_coll.size() << std::endl
+			<< std::endl;
 
 	std::cout << "lock free dynamic size stack:" << std::endl;
-	std::size_t dynamic_perf = benchmark(dynamic_coll, duration, numproducers, 5);
+	double dynamic_perf = benchmark(dynamic_coll, duration, num_producers,
+			num_consumers);
+	std::cout << "size at exit: " << dynamic_coll.size() << std::endl
+			<< std::endl;
+
+	std::streamsize prec = std::cout.precision(3);
+	std::cout << "Reference performance: " << static_cast<int>(1e9/ref_perf)
+			<< " ns per item " << std::endl;
+	std::cout << "     Fixed size stack: " << static_cast<int>(1e9/fixed_perf)
+			<< " ns per item " << fixed_perf / ref_perf
+			<< " of reference performance" << std::endl;
+	std::cout << "   Dynamic size stack: " << static_cast<int>(1e9/dynamic_perf)
+			<< " ns per item " << dynamic_perf / ref_perf
+			<< " of reference performance " << std::endl;
 	std::cout << std::endl;
+	std::cout.precision(prec);
 
-	std::cout << "Reference performance: " << ref_perf << std::endl;
-	std::cout << "     Fixed size stack: " << fixed_perf << " "
-			<< static_cast<double>(fixed_perf)/static_cast<double>(ref_perf)
-			<< " of reference performance" << std::endl;
-	std::cout << "     Dynamic size stack: " << dynamic_perf << " "
-			<< static_cast<double>(dynamic_perf)/static_cast<double>(ref_perf)
-			<< " of reference performance" << std::endl;
 }
-
-
-

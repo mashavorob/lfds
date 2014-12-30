@@ -15,7 +15,12 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 	add_definitions(-std=c++11 -pthread)
 endif()
 
+enable_testing()
 add_subdirectory(tests)
 add_subdirectory(demo)
+set(CMAKE_CTEST_COMMAND ctest -V) 
+add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
+add_test( LockFreeUnitTests bin/tests )
+add_dependencies(check tests)
 
 

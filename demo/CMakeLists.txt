@@ -12,6 +12,7 @@ add_executable( demo
 	demo_queue.cpp 
 	demo_stack.cpp 
 	casbenchmark.cpp
+	virtualbenchmark.cpp
 	)
 
 target_link_libraries (demo ${CMAKE_THREAD_LIBS_INIT})

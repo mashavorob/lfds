@@ -14,6 +14,7 @@
 #include "demo_stack.hpp"
 #include "demo_queue.hpp"
 #include "casbenchmark.hpp"
+#include "virtualbenchmark.hpp"
 
 
 const char* usage =
@@ -36,7 +37,8 @@ const char* usage =
 		"--profile-queue-dyn-mp-sc     run profile for dynamic size many producers single consumer queue\n"
 		"--profile-queue-dyn-sp-mc     run profile for dynamic size single producer many consumers queue\n"
 		"--profile-queue-dyn-sp-sc     run profile for dynamic size single producer single consumer queue\n"
-		"--profile-cas                 run profile for compare and swap operations\n";
+		"--profile-cas                 run profile for compare and swap operations\n"
+		"--profile-virtual-func        run profile for virtual function\n";
 
 int main(int argc, char** argv)
 {
@@ -52,6 +54,7 @@ int main(int argc, char** argv)
 	bool doCASBenchmark = false;
 	bool doWaitFreeQueuesDemo = false;
 	bool doDemoStack = false;
+	bool doVirtualFunc = false;
 	std::set<int>	queueDemos;
 	std::set<int>	queueProfiles;
 
@@ -102,6 +105,8 @@ int main(int argc, char** argv)
 			doWaitFreeQueuesDemo = true;
 		} else if ( strcmp(argv[i], "--demo-stack") == 0 ) {
 			doDemoStack = true;
+		} else if ( strcmp(argv[i], "--profile-virtual-func") == 0 ) {
+			doVirtualFunc = true;
 		} else if (strcmp(argv[i], "--help") == 0 ) {
 			showCommandLineOptions = true;
 		} else if (strcmp(argv[i], "-?") == 0 ) {
@@ -122,6 +127,9 @@ int main(int argc, char** argv)
 
 	if ( doCASBenchmark ) {
 		CASBenchMark();
+	}
+	if ( doVirtualFunc ) {
+		BenchmarkVirtualFunction();
 	}
 	if ( doWaitFreeQueuesDemo ) {
 		WaitFreeVsLockFreeQueues();

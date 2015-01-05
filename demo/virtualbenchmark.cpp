@@ -25,7 +25,7 @@ IArithmeticOperation::~IArithmeticOperation() {
 
 class COperationPlus: public IArithmeticOperation {
 private:
-	friend class CArythmetricFabric;
+	friend class CArithmetricFactory;
 
 	COperationPlus() {
 	}
@@ -40,7 +40,7 @@ public:
 
 class COperationMinus: public IArithmeticOperation {
 private:
-	friend class CArythmetricFabric;
+	friend class CArithmetricFactory;
 
 	COperationMinus() {
 	}
@@ -53,10 +53,10 @@ public:
 	}
 };
 
-class CArythmetricFabric {
+class CArithmetricFactory {
 public:
 
-	CArythmetricFabric() {
+	CArithmetricFactory() {
 	}
 
 	IArithmeticOperation* Create(const Operation code) const {
@@ -69,6 +69,70 @@ public:
 			return &minus;
 		}
 		assert(false);
+		return nullptr;
+	}
+};
+
+class CDynCastBaseClass {
+protected:
+	CDynCastBaseClass() {
+	}
+public:
+	virtual ~CDynCastBaseClass() {
+
+	}
+
+	int op(int a, int b) const;
+};
+
+class CDynCastMinus : public CDynCastBaseClass {
+	friend class CDynCastFactory;
+private:
+	CDynCastMinus() {
+
+	}
+public:
+	int operationImpl(int a, int b) const {
+		return a - b;
+	}
+};
+
+class CDynCastPlus : public CDynCastBaseClass {
+	friend class CDynCastFactory;
+private:
+	CDynCastPlus() {
+
+	}
+public:
+	int operationImpl(int a, int b) const {
+		return a + b;
+	}
+};
+
+int CDynCastBaseClass::op(int a, int b) const {
+	const CDynCastPlus* pPlus = dynamic_cast<const CDynCastPlus*>(this);
+	if ( pPlus ) {
+		return pPlus->operationImpl(a, b);
+	}
+	const CDynCastMinus* pMinus = dynamic_cast<const CDynCastMinus*>(this);
+	if ( pMinus ) {
+		return pMinus->operationImpl(a, b);
+	}
+	return 0;
+}
+
+class CDynCastFactory {
+public:
+	const CDynCastBaseClass* Create(Operation code) const {
+		static const CDynCastPlus 	plus;
+		static const CDynCastMinus 	minus;
+
+		switch (code) {
+		case Plus:
+			return &plus;
+		case Minus:
+			return &minus;
+		}
 		return nullptr;
 	}
 };
@@ -94,17 +158,33 @@ struct CArithmeticOperationImpl<Minus> {
 
 struct VirtualRunner {
 	int operator()(const Operation code, std::size_t repetitions, int a, int b) const {
-		static const CArythmetricFabric fabric;
-		IArithmeticOperation* p = fabric.Create(code);
+		static const CArithmetricFactory factory;
+		IArithmeticOperation* p = factory.Create(code);
 
 		int summ = 0;
 		do {
-			summ += p->op(++a, ++b);
+			summ += p->op(++a, b);
 		} while (--repetitions);
 		return summ;
 	}
 	static const char* name() {
 		return "Virtual Function Runner";
+	}
+};
+
+struct DynCastRunner {
+	int operator()(const Operation code, std::size_t repetitions, int a, int b) const {
+		static const CDynCastFactory factory;
+		const CDynCastBaseClass* p = factory.Create(code);
+
+		int summ = 0;
+		do {
+			summ += p->op(++a, b);
+		} while (--repetitions);
+		return summ;
+	}
+	static const char* name() {
+		return "Dynamic Cast Runner";
 	}
 };
 
@@ -114,7 +194,7 @@ struct TemplateRunnerImpl {
 		CArithmeticOperationImpl<code> operation;
 		int summ = 0;
 		do {
-			summ += operation(++a, ++b);
+			summ += operation(++a, b);
 		} while (--repetitions);
 		return summ;
 	}
@@ -172,22 +252,25 @@ struct Benchmark {
 		duration = std::chrono::duration_cast<seconds_type>(hiresDuration);
 		std::cout << "duration: " << duration.count() << " secs" << std::endl;
 		std::cout << duration.count()*1.0e9/static_cast<double>(repcount)
-				<< " ns per operation" << std::endl;
+				<< " ns per op" << std::endl;
 		return r;
 	}
 
 };
 
 void BenchmarkVirtualFunction() {
-	Benchmark<VirtualRunner> vr;
-	Benchmark<TemplateRunner> tr;
+	Benchmark<VirtualRunner> 	vr;
+	Benchmark<DynCastRunner> 	dr;
+	Benchmark<TemplateRunner>   tr;
 
 	std::cout << "Compare virtual function peformance vs template one" << std::endl;
 	srand(time(nullptr));
 	int a = rand();
 	int b = rand();
 	int r1 = vr(a, b);
-	int r2 = tr(a, b);
-	std::cout << "Result calculated by virtual functions: " << r1 << std::endl;
-	std::cout << "Result calculated by template functions: " << r2 << std::endl;
+	int r2 = dr(a, b);
+	int r3 = tr(a, b);
+	std::cout << " Result calculated by algorithm based on virtual functions: " << r1 << std::endl;
+	std::cout << "    Result calculated by algorithm based on dynamic_cast<>: " << r2 << std::endl;
+	std::cout << "Result calculated by algorithm based on template functions: " << r3 << std::endl;
 }

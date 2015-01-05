@@ -1,0 +1,5 @@
+The License Agreement is under construction.
+Until it is finished any use of this code is prohibited.
+You may read, compile, run and modify this code only for your
+personal studuing of Lock Free Data Structures.
+

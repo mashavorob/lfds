@@ -18,7 +18,7 @@
 
 
 const char* usage =
-		"Use: demo <parameter1> [parameter2]...\n"
+		"Usage: demo <parameter1> [parameter2]...\n"
 		"where parameterN is one of:\n"
 		"--demo-queue                  run all demos for queues\n"
 		"--demo-queue-mp               run all demos for many producers queues\n"
@@ -38,7 +38,9 @@ const char* usage =
 		"--profile-queue-dyn-sp-mc     run profile for dynamic size single producer many consumers queue\n"
 		"--profile-queue-dyn-sp-sc     run profile for dynamic size single producer single consumer queue\n"
 		"--profile-cas                 run profile for compare and swap operations\n"
-		"--profile-virtual-func        run profile for virtual function\n";
+		"--profile-virtual-func        run profile for virtual function\n"
+		"--help        				   shows this message\n"
+		;
 
 int main(int argc, char** argv)
 {

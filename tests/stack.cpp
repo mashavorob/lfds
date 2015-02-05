@@ -11,94 +11,94 @@
 
 TEST(FixedSizeStack, pop)
 {
-	int val;
-	typedef lfds::stack<int, true> stack_type;
+    int val;
+    typedef lfds::stack<int, true> stack_type;
 
-	stack_type s(1);
+    stack_type s(1);
 
-	EXPECT_FALSE(s.pop(val));
+    EXPECT_FALSE(s.pop(val));
 }
 
 TEST(FixedSizeStack, pushpoppop)
 {
-	int val = 0;
-	typedef lfds::stack<int, true> stack_type;
+    int val = 0;
+    typedef lfds::stack<int, true> stack_type;
 
-	stack_type s(1);
+    stack_type s(1);
 
-	EXPECT_TRUE(s.push(1));
-	EXPECT_FALSE(s.push(2));
-	EXPECT_TRUE(s.pop(val));
-	EXPECT_FALSE(s.pop(val));
-	EXPECT_EQ(val, 1);
+    EXPECT_TRUE(s.push(1));
+    EXPECT_FALSE(s.push(2));
+    EXPECT_TRUE(s.pop(val));
+    EXPECT_FALSE(s.pop(val));
+    EXPECT_EQ(val, 1);
 }
 
 TEST(FixedSizeStack, sequence)
 {
-	int val = 0;
-	typedef lfds::stack<int, true> stack_type;
+    int val = 0;
+    typedef lfds::stack<int, true> stack_type;
 
-	stack_type s(3);
+    stack_type s(3);
 
-	EXPECT_TRUE(s.push(1));
-	EXPECT_TRUE(s.push(2));
-	EXPECT_TRUE(s.push(3));
-	EXPECT_FALSE(s.push(4));
+    EXPECT_TRUE(s.push(1));
+    EXPECT_TRUE(s.push(2));
+    EXPECT_TRUE(s.push(3));
+    EXPECT_FALSE(s.push(4));
 
-	EXPECT_TRUE(s.pop(val));
-	EXPECT_EQ(val, 3);
-	EXPECT_TRUE(s.pop(val));
-	EXPECT_EQ(val, 2);
-	EXPECT_TRUE(s.pop(val));
-	EXPECT_EQ(val, 1);
+    EXPECT_TRUE(s.pop(val));
+    EXPECT_EQ(val, 3);
+    EXPECT_TRUE(s.pop(val));
+    EXPECT_EQ(val, 2);
+    EXPECT_TRUE(s.pop(val));
+    EXPECT_EQ(val, 1);
 
-	EXPECT_FALSE(s.pop(val));
+    EXPECT_FALSE(s.pop(val));
 }
 
 TEST(DynamicSizeStack, pop)
 {
-	int val;
-	typedef lfds::stack<int, false> stack_type;
+    int val;
+    typedef lfds::stack<int, false> stack_type;
 
-	stack_type s(1);
+    stack_type s(1);
 
-	EXPECT_FALSE(s.pop(val));
+    EXPECT_FALSE(s.pop(val));
 }
 
 TEST(DynamicSizeStack, pushpoppop)
 {
-	int val = 0;
-	typedef lfds::stack<int, false> stack_type;
+    int val = 0;
+    typedef lfds::stack<int, false> stack_type;
 
-	stack_type s(1);
+    stack_type s(1);
 
-	EXPECT_TRUE(s.push(1));
-	EXPECT_TRUE(s.pop(val));
-	EXPECT_FALSE(s.pop(val));
-	EXPECT_EQ(val, 1);
+    EXPECT_TRUE(s.push(1));
+    EXPECT_TRUE(s.pop(val));
+    EXPECT_FALSE(s.pop(val));
+    EXPECT_EQ(val, 1);
 }
 
 TEST(DynamicSizeStack, sequence)
 {
-	int val = 0;
-	typedef lfds::stack<int, false> stack_type;
+    int val = 0;
+    typedef lfds::stack<int, false> stack_type;
 
-	stack_type s(3);
+    stack_type s(3);
 
-	EXPECT_TRUE(s.push(1));
-	EXPECT_TRUE(s.push(2));
-	EXPECT_TRUE(s.push(3));
-	EXPECT_TRUE(s.push(4));
+    EXPECT_TRUE(s.push(1));
+    EXPECT_TRUE(s.push(2));
+    EXPECT_TRUE(s.push(3));
+    EXPECT_TRUE(s.push(4));
 
-	EXPECT_TRUE(s.pop(val));
-	EXPECT_EQ(val, 4);
-	EXPECT_TRUE(s.pop(val));
-	EXPECT_EQ(val, 3);
-	EXPECT_TRUE(s.pop(val));
-	EXPECT_EQ(val, 2);
-	EXPECT_TRUE(s.pop(val));
-	EXPECT_EQ(val, 1);
+    EXPECT_TRUE(s.pop(val));
+    EXPECT_EQ(val, 4);
+    EXPECT_TRUE(s.pop(val));
+    EXPECT_EQ(val, 3);
+    EXPECT_TRUE(s.pop(val));
+    EXPECT_EQ(val, 2);
+    EXPECT_TRUE(s.pop(val));
+    EXPECT_EQ(val, 1);
 
-	EXPECT_FALSE(s.pop(val));
+    EXPECT_FALSE(s.pop(val));
 }
 

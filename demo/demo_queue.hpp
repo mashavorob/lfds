@@ -14,7 +14,4 @@ void ProfileQueue(bool FixedSize, bool ManyProducers, bool ManyConsumers);
 
 void WaitFreeVsLockFreeQueues();
 
-
-
-
 #endif /* DEMO_MP_MC_QUEUE_HPP_ */

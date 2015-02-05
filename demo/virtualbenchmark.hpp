@@ -8,8 +8,6 @@
 #ifndef DEMO_VIRTUALBENCHMARK_HPP_
 #define DEMO_VIRTUALBENCHMARK_HPP_
 
-
 void BenchmarkVirtualFunction();
-
 
 #endif /* DEMO_VIRTUALBENCHMARK_HPP_ */

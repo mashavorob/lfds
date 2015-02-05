@@ -9,11 +9,12 @@ find_package (Threads)
 
 add_executable( demo
     demo.cpp 
-	demo_queue.cpp 
-	demo_stack.cpp 
-	casbenchmark.cpp
-	virtualbenchmark.cpp
-	)
+    demo_queue.cpp 
+    demo_stack.cpp 
+    casbenchmark.cpp
+    virtualbenchmark.cpp
+    demo_hash_map.cpp
+    )
 
 target_link_libraries (demo ${CMAKE_THREAD_LIBS_INIT})
 

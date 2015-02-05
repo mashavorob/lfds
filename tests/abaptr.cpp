@@ -7,34 +7,33 @@
 
 #include "gtest/gtest.h"
 
-
 #include "abaptr.hpp"
 
 TEST(abaptr, Negative)
 {
-	int val[] = { 0, 0 };
+    int val[] =
+    { 0, 0 };
 
-	lfds::abaptr<int> a(val);
+    lfds::abaptr<int> a(val);
 
-	lfds::abaptr<int> expected = a;
-	++a.m_counter;
+    lfds::abaptr<int> expected = a;
+    ++a.m_counter;
 
-	lfds::abaptr<int> b(val + 1);
-	EXPECT_FALSE(a.atomic_cas(expected, b));
-	EXPECT_EQ(a.m_ptr, val);
+    lfds::abaptr<int> b(val + 1);
+    EXPECT_FALSE(a.atomic_cas(expected, b));
+    EXPECT_EQ(a.m_ptr, val);
 }
 
 TEST(abaptr, Positive)
 {
-	int val[] = { 0, 0 };
+    int val[] =
+    { 0, 0 };
 
-	lfds::abaptr<int> a(val);
+    lfds::abaptr<int> a(val);
 
-	lfds::abaptr<int> expected = a;
-	lfds::abaptr<int> b(val + 1);
-	EXPECT_TRUE(a.atomic_cas(expected, b));
-	EXPECT_EQ(a.m_ptr, val + 1);
+    lfds::abaptr<int> expected = a;
+    lfds::abaptr<int> b(val + 1);
+    EXPECT_TRUE(a.atomic_cas(expected, b));
+    EXPECT_EQ(a.m_ptr, val + 1);
 }
-
-
 

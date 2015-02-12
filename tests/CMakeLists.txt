@@ -17,8 +17,9 @@ add_executable( tests
     stack.cpp
     queue.cpp
     hash_map.cpp
+    hash_map_integral_key.cpp
+    hash_map_integral_pair.cpp
     )
 
 # Link test executable against gtest & gtest_main
 target_link_libraries(tests gtest gtest_main)
-

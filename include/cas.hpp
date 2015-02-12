@@ -8,18 +8,50 @@
 #ifndef INCLUDE_CAS_HPP_
 #define INCLUDE_CAS_HPP_
 
+#include <cstdint>
+
 namespace lfds
 {
 
 namespace
 {
 
+template<int>
+struct get_type_by_size;
+
+template<>
+struct get_type_by_size<1>
+{
+    typedef int8_t type;
+};
+template<>
+struct get_type_by_size<2>
+{
+    typedef int16_t type;
+};
+template<>
+struct get_type_by_size<4>
+{
+    typedef int32_t type;
+};
+template<>
+struct get_type_by_size<8>
+{
+    typedef int64_t type;
+};
+
 template<class T, int = sizeof(T)>
 struct CAS
 {
-    bool operator()(volatile T& var, const T oldVal, const T newVal) const
+    bool operator()(volatile T& var, const T & oldVal, const T & newVal) const
     {
-        return __sync_bool_compare_and_swap(&var, oldVal, newVal);
+        typedef typename get_type_by_size<sizeof(T)>::type data_type;
+
+        volatile data_type* pVar = reinterpret_cast<volatile data_type*>(&var);
+        const data_type * pOldVal = reinterpret_cast<const data_type*>(&oldVal);
+        const data_type * pNewVal = reinterpret_cast<const data_type*>(&newVal);
+
+        return __sync_bool_compare_and_swap(pVar, *pOldVal, *pNewVal);
     }
 };
 

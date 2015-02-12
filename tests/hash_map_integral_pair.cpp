@@ -1,33 +1,39 @@
 /*
- * hash_map.cpp
+ * hash_map_integral_pair.cpp
  *
- *  Created on: Jan 28, 2015
+ *  Created on: Feb 11, 2015
  *      Author: masha
  */
 
 #include <gtest/gtest.h>
 
-#include <hash_map.hpp>
-
 #include "hash_map_data_adapter.hpp"
+
+#include <hash_map.hpp>
 
 #include <ctime>
 #include <cstdlib>
+#include <cstdint>
 
-TEST(HashMap, type_traits)
+
+/////////////////////////////////////////////////////////////////
+// integral key
+TEST(HashMap_integral_pair, type_traits)
 {
-    typedef lfds::testing::adapter<int> value_type; // prevent optimization
-    typedef lfds::hash_map<value_type, value_type> hash_map;
+    typedef int key_type;
+    typedef int value_type;
+    typedef lfds::hash_map<key_type, value_type> hash_map;
 
-    EXPECT_FALSE(hash_map::INTEGRAL_KEY);
-    EXPECT_FALSE(hash_map::INTEGRAL_KEYVALUE);
+    EXPECT_TRUE(hash_map::INTEGRAL_KEY);
+    EXPECT_TRUE(hash_map::INTEGRAL_KEYVALUE);
 }
 
 
-TEST(HashMap, empty)
+TEST(HashMap_integral_pair, empty)
 {
-    typedef lfds::testing::adapter<int> value_type; // prevent optimization
-    typedef lfds::hash_map<value_type, value_type> hash_map;
+    typedef int key_type;
+    typedef int value_type;
+    typedef lfds::hash_map<key_type, value_type> hash_map;
     typedef hash_map::size_type size_type;
 
     hash_map hm;
@@ -46,10 +52,60 @@ TEST(HashMap, empty)
     EXPECT_FALSE(res);
 }
 
-TEST(HashMap, insert)
+// just unsure that it is compilable
+template<class Key, class Value>
+struct compile_tester
 {
-    typedef lfds::testing::adapter<int> value_type; // prevent optimization
-    typedef lfds::hash_map<value_type, value_type> hash_map;
+    typedef Key key_type;
+    typedef Value value_type;
+    typedef lfds::hash_map<key_type, value_type> hash_map_type;
+    typedef typename hash_map_type::size_type size_type;
+
+    void operator()() const
+    {
+        hash_map_type hm;
+
+        size_type size = 0;
+        value_type val;
+
+        hm.insert(1, -1);
+        hm.find(1, val);
+        hm.erase(1);
+        hm.size();
+    }
+};
+
+TEST(HashMap_integral_pair, DataTypes)
+{
+    compile_tester<int8_t, int8_t>()();
+    compile_tester<int8_t, int16_t>()();
+    compile_tester<int8_t, int32_t>()();
+    compile_tester<int8_t, int64_t>()();
+    compile_tester<int16_t, int8_t>()();
+    compile_tester<int16_t, int16_t>()();
+    compile_tester<int16_t, int32_t>()();
+    compile_tester<int16_t, int64_t>()();
+    compile_tester<int32_t, int8_t>()();
+    compile_tester<int32_t, int16_t>()();
+    compile_tester<int32_t, int32_t>()();
+    compile_tester<int32_t, int64_t>()();
+    compile_tester<int64_t, int8_t>()();
+    compile_tester<int64_t, int16_t>()();
+    compile_tester<int64_t, int32_t>()();
+}
+
+TEST(HashMap_integral_pair, OutOfLimit)
+{
+    typedef compile_tester<int64_t, int64_t>::hash_map_type hash_map;
+    EXPECT_TRUE(hash_map::INTEGRAL_KEY);
+    EXPECT_FALSE(hash_map::INTEGRAL_KEYVALUE);
+}
+
+TEST(HashMap_integral_pair, insert)
+{
+    typedef int key_type;
+    typedef int value_type;
+    typedef lfds::hash_map<key_type, value_type> hash_map;
     typedef hash_map::size_type size_type;
 
     hash_map hm;
@@ -64,10 +120,11 @@ TEST(HashMap, insert)
     EXPECT_EQ(size, 1);
 }
 
-TEST(HashMap, find)
+TEST(HashMap_integral_pair, find)
 {
-    typedef lfds::testing::adapter<int> value_type; // prevent optimization
-    typedef lfds::hash_map<value_type, value_type> hash_map;
+    typedef int key_type;
+    typedef int value_type;
+    typedef lfds::hash_map<key_type, value_type> hash_map;
     typedef hash_map::size_type size_type;
 
     hash_map hm;
@@ -94,10 +151,11 @@ TEST(HashMap, find)
     EXPECT_FALSE(res);
 }
 
-TEST(HashMap, erase)
+TEST(HashMap_integral_pair, erase)
 {
-    typedef lfds::testing::adapter<int> value_type; // prevent optimization
-    typedef lfds::hash_map<value_type, value_type> hash_map;
+    typedef int key_type;
+    typedef int value_type;
+    typedef lfds::hash_map<key_type, value_type> hash_map;
     typedef hash_map::size_type size_type;
 
     hash_map hm;
@@ -146,10 +204,10 @@ TEST(HashMap, erase)
     EXPECT_FALSE(res);
 }
 
-TEST(HashMap, collision)
+TEST(HashMap_integral_pair, collision)
 {
-    typedef lfds::testing::adapter<int> key_type; // prevent optimization
-    typedef lfds::testing::adapter<int> value_type; // prevent optimization
+    typedef int key_type;
+    typedef int value_type;
     typedef lfds::hash_map<key_type, value_type, bad_hash<key_type>> hash_map; // same hash for all
     typedef hash_map::size_type size_type;
 
@@ -202,10 +260,11 @@ TEST(HashMap, collision)
     EXPECT_FALSE(res);
 }
 
-TEST(HashMap, reusekey)
+TEST(HashMap_integral_pair, reusekey)
 {
-    typedef lfds::testing::adapter<int> value_type; // prevent optimization
-    typedef lfds::hash_map<value_type, value_type> hash_map;
+    typedef int key_type;
+    typedef int value_type;
+    typedef lfds::hash_map<key_type, value_type> hash_map;
     typedef hash_map::size_type size_type;
 
     hash_map hm;
@@ -277,10 +336,11 @@ TEST(HashMap, reusekey)
     EXPECT_FALSE(res);
 }
 
-TEST(HashMap, rehash)
+TEST(HashMap_integral_pair, rehash)
 {
-    typedef lfds::testing::adapter<int> value_type; // prevent optimization
-    typedef lfds::hash_map<value_type, value_type> hash_map;
+    typedef int key_type;
+    typedef int value_type;
+    typedef lfds::hash_map<key_type, value_type> hash_map;
     typedef hash_map::size_type size_type;
 
     hash_map hm;
@@ -298,7 +358,7 @@ TEST(HashMap, rehash)
         EXPECT_TRUE(result);
         result = hm.find(i, val);
         EXPECT_TRUE(result);
-        EXPECT_EQ(i + 100, val.m_t);
+        EXPECT_EQ(i + 100, val);
     }
 
     count = hm.capacity();
@@ -313,17 +373,18 @@ TEST(HashMap, rehash)
         EXPECT_TRUE(result);
         if ( result )
         {
-            EXPECT_EQ(i + 100, val.m_t);
+            EXPECT_EQ(i + 100, val);
         }
         result = hm.find(-i, val);
         EXPECT_FALSE(result);
     }
 }
 
-TEST(HashMap, random)
+TEST(HashMap_integral_pair, random)
 {
-    typedef lfds::testing::adapter<int> value_type; // prevent optimization
-    typedef lfds::hash_map<value_type, value_type> hash_map;
+    typedef int key_type;
+    typedef int value_type;
+    typedef lfds::hash_map<key_type, value_type> hash_map;
     typedef hash_map::size_type size_type;
 
     srand(time(nullptr));
@@ -345,12 +406,15 @@ TEST(HashMap, random)
     value_type v;
     for (int i = 0; i <= maxval; ++i)
     {
-        value_type k = i;
+        key_type k = i;
         if (hm.find(k, v))
         {
             ++count_found;
-            EXPECT_EQ(v.m_t, -k.m_t);
+            EXPECT_EQ(v, -k);
         }
     }
     EXPECT_EQ(count_inserted, count_found);
 }
+
+
+

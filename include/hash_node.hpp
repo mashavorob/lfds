@@ -10,6 +10,7 @@
 
 #include "cas.hpp"
 #include <atomic>
+#include <cstdint>
 
 namespace lfds
 {
@@ -88,27 +89,6 @@ struct __attribute__((aligned(sizeof(void*)*2))) hash_item
     }
 };
 
-template<class T>
-class ref_lock
-{
-public:
-    ref_lock(const T& obj) : m_obj(obj)
-    {
-        m_obj.add_ref();
-    }
-    ~ref_lock()
-    {
-        m_obj.release();
-    }
-private:
-    typedef ref_lock<T> this_type;
-
-    ref_lock(const this_type&);
-    this_type& operator=(const this_type&);
-
-private:
-    const T & m_obj;
-};
 
 template<class Key, class Value>
 class hash_node
@@ -120,8 +100,8 @@ public:
     typedef hash_item hash_item_type;
 
 private:
-    hash_node(const this_class&);
-    this_class& operator=(const this_class&);
+    hash_node(const this_class&) = delete;
+    this_class& operator=(const this_class&) = delete;
 public:
     hash_node() : m_hash(), m_refCount(0)
     {

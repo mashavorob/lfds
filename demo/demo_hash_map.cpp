@@ -17,12 +17,15 @@
 #include <mutex>
 #include <cassert>
 #include <vector>
-#include <future>
 #include <functional>
 #include <chrono>
 #include <thread>
 #include <iostream>
 #include <set>
+
+static const unsigned MAP_TEST_SIZE = 4000;
+static const unsigned MAP_TEST_NUM_THREADS = 2;
+static const bool ALLOW_CONCURENT_MODIFICZTIONS = true;
 
 template<class Data>
 struct get_random_data
@@ -85,8 +88,8 @@ public:
     typedef fill_queue<queue_type, randomizer_type> filler_type;
     typedef std::size_t size_type;
 
-    const static unsigned int SIZE_LOW = 85000;
-    const static unsigned int SIZE_HIGH = 100000;
+    const static unsigned int SIZE_HIGH = MAP_TEST_SIZE;
+    const static unsigned int SIZE_LOW = SIZE_HIGH*17/20; // (85%=85/100=17/20)
 
     static void reset()
     {
@@ -162,8 +165,6 @@ public:
         queue_type & inserted = base_type::getInsertedQueue();
         size_type count = 0;
 
-        while (!base_type::isStarted())
-            ;
         while (!base_type::isStopped())
         {
             Data data;
@@ -300,7 +301,10 @@ public:
 
         std::vector<std::thread> threads;
 
-        threads.push_back(std::thread(std::ref(deleter), std::ref(m)));
+        if ( ALLOW_CONCURENT_MODIFICZTIONS )
+        {
+            threads.push_back(std::thread(std::ref(deleter), std::ref(m)));
+        }
         threads.push_back(std::thread(std::ref(inserter), std::ref(m)));
 
         for (finder_type & finder : finders)
@@ -350,24 +354,40 @@ void BenchmarkGeneric()
     typedef data_adapter<int> key_type;
     typedef data_adapter<int> value_type;
 
+    typedef lfds::hash_map<int, int> lf_map_type_integral_pair;
+    typedef lfds::hash_map<int, value_type> lf_map_type_integral_key;
     typedef lfds::hash_map<key_type, value_type> lf_map_type;
     typedef std_map_wrapper<key_type, value_type> std_map_type;
     typedef std_unordered_map_wrapper<key_type, value_type> std_unordered_map_type;
 
+    typedef Benchmark<data_type, lf_map_type_integral_pair> lf_map_benchmark_type_integral_pair;
+    typedef Benchmark<data_type, lf_map_type_integral_key> lf_map_benchmark_type_integral_key;
     typedef Benchmark<data_type, lf_map_type> lf_map_benchmark_type;
     typedef Benchmark<data_type, std_map_type> std_map_benchmark_type;
     typedef Benchmark<data_type, std_unordered_map_type> std_unorderd_benchmark_type;
 
-    const std::size_t num_threads = 2;
+    const std::size_t num_threads = MAP_TEST_NUM_THREADS;
 
+    lf_map_benchmark_type_integral_pair bm1_integral_pair;
+    lf_map_benchmark_type_integral_key bm1_integral_key;
     lf_map_benchmark_type bm1;
     std_map_benchmark_type bm2;
     std_unorderd_benchmark_type bm3;
 
-    std::cout << "benchmark lock free hash map: ";
+    std::cout << "benchmark lock free hash map (integral key-value pair): ";
     std::cout.flush();
-    double r1 = bm1(num_threads);
+    double r1 = bm1_integral_pair(num_threads);
     std::cout << static_cast<int>(r1 * 1e9) << " ns per find" << std::endl;
+
+    std::cout << "benchmark lock free hash map (integral key): ";
+    std::cout.flush();
+    double r1_integral_key = bm1_integral_key(num_threads);
+    std::cout << static_cast<int>(r1_integral_key * 1e9) << " ns per find" << std::endl;
+
+    std::cout << "benchmark lock free hash map (generic): ";
+    std::cout.flush();
+    double r1_generic = bm1(num_threads);
+    std::cout << static_cast<int>(r1_generic * 1e9) << " ns per find" << std::endl;
 
     std::cout << "           benchmark std map: ";
     std::cout.flush();

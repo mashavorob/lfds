@@ -70,7 +70,7 @@ struct __attribute__((aligned(sizeof(void*)*2))) hash_item
             m_hash(0), m_state(unused)
     {
     }
-    hash_item(std::size_t code, std::size_t flags) :
+    hash_item(const std::size_t code, const std::size_t flags) :
             m_hash(code), m_state(flags)
     {
     }
@@ -82,7 +82,18 @@ struct __attribute__((aligned(sizeof(void*)*2))) hash_item
             m_hash(other.m_hash), m_state(other.m_state)
     {
     }
-
+    hash_item & operator=(const hash_item & other)
+    {
+        m_hash = other.m_hash;
+        m_state = other.m_state;
+        return *this;
+    }
+    hash_item & operator=(const volatile hash_item & other)
+    {
+        m_hash = other.m_hash;
+        m_state = other.m_state;
+        return *this;
+    }
     bool operator==(const hash_item& other) const
     {
         return m_hash == other.m_hash && m_state == other.m_state;

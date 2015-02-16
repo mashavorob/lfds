@@ -1,65 +1,63 @@
 /*
- * hash_table_integral_key.hpp
+ * hash_set_table.hpp
  *
- *  Created on: Feb 6, 2015
+ *  Created on: Feb 13, 2015
  *      Author: masha
  */
 
-#ifndef INCLUDE_HASH_TABLE_INTEGRAL_KEY_HPP_
-#define INCLUDE_HASH_TABLE_INTEGRAL_KEY_HPP_
+#ifndef INCLUDE_HASH_SET_TABLE_HPP_
+#define INCLUDE_HASH_SET_TABLE_HPP_
 
-#include "hash_table_base.hpp"
-#include "hash_node_integral_key.hpp"
+#include "hash_set_node.hpp"
 #include "hash_table_base.hpp"
 #include "ref_lock.hpp"
+#include "cas.hpp"
 
-#include <utility>
-#include <algorithm>
-#include <atomic>
 #include <cassert>
-#include <iostream>
-#include <functional>
 
-// thread-safe implementation of hash table with open addressing
+// thread-safe implementation of hash table without value (hash_set) based
+// on open addressing algorithm for resolving collisions
 //
 // generic hash table is not "true lock free" object
 // it implements two kinds of operations:
 //        * lock free lookup
 //        * lock free insert when resizing is not required
 //        * resize with exclusive access
-//        * deleting items with exclusive access
+//        * lock free delete
 namespace lfds
 {
 
-template<class Key, class Value, class Hash, class Pred, class Allocator>
-class hash_table_integral_key: private hash_table_base
+template<class Key, class Hash, class Pred, class Allocator>
+class hash_set_table: private hash_table_base
 {
 public:
     typedef hash_table_base base_type;
-    typedef hash_table_integral_key<Key, Value, Hash, Pred, Allocator> this_type;
+    typedef hash_set_table<Key, Hash, Pred, Allocator> this_type;
     typedef Key key_type;
-    typedef Value value_type;
     typedef Hash hash_type;
     typedef Pred equal_predicate_type;
-    typedef hash_node_integral_key<key_type, value_type> node_type;
-    typedef typename base_type::size_type size_type;
-    typedef Allocator value_allocator_type;
+    typedef std::size_t size_type;
+    typedef hash_set_node<key_type> node_type;
+    typedef typename Allocator::template rebind<key_type>::other key_allocator_type;
     typedef typename Allocator::template rebind<node_type>::other node_allocator_type;
 
-    static const bool INTEGRAL_KEY = true;
-    static const bool INTEGRAL_KEYVALUE = false;
+    static constexpr bool INTEGRAL = false;
 
+//
+// template<class CompatibleKey, Key>
+// struct CompatiblePredicate : public binary_function<CompatibleKey, Key, bool>
+// {
+//      bool operator()(const CompatibleKey & key, const Key & value) const;
+//      ...
+// };
 private:
-
-    typedef typename node_type::key_item_type key_item_type;
-    typedef typename node_type::state_type state_type;
+    typedef typename node_type::hash_item_type hash_item_type;
     typedef ref_lock<node_type> scoped_ref_lock;
 
 public:
-    hash_table_integral_key(const size_type reserve,
-            value_allocator_type& value_allocator,
+    hash_set_table(const size_type reserve, key_allocator_type& key_allocator,
             node_allocator_type& node_allocator) :
-            base_type(reserve), m_value_allocator(value_allocator), m_node_allocator(
+            base_type(reserve), m_key_allocator(key_allocator), m_node_allocator(
                     node_allocator)
     {
         m_table = m_node_allocator.allocate(m_capacity);
@@ -69,27 +67,26 @@ public:
             m_node_allocator.construct(&m_table[i]);
         }
     }
-    ~hash_table_integral_key()
+    ~hash_set_table()
     {
         for (size_type i = 0; i < m_capacity; ++i)
         {
             node_type& node = m_table[i];
-            key_item_type item = node.key();
+            hash_item_type item = node.m_hash;
             // pending and pending2 states are not allowed here
             assert(
-                    item.m_state == key_item_type::allocated
-                            || item.m_state == key_item_type::touched
-                            || item.m_state == key_item_type::unused);
-            if (item.m_state == key_item_type::allocated)
+                    item.m_state == hash_item_type::allocated
+                            || item.m_state == hash_item_type::touched
+                            || item.m_state == hash_item_type::unused);
+            if (item.m_state == hash_item_type::touched)
             {
-                m_value_allocator.destroy(node.value());
-                item.m_state = key_item_type::touched;
+                m_key_allocator.destroy(node.key());
             }
         }
         m_node_allocator.deallocate(m_table, m_capacity);
     }
 
-    bool find(const key_type key, value_type & value) const
+    bool find(const key_type & key) const
     {
         hash_type hash_func;
         equal_predicate_type eq_func;
@@ -109,42 +106,33 @@ public:
         do
         {
             const node_type& node = m_table[i];
-            const key_item_type item = node.key();
+            const hash_item_type item = node.m_hash;
 
             switch (item.m_state)
             {
-            case key_item_type::unused:
+            case hash_item_type::unused:
                 // the search finished
                 return false;
-            case key_item_type::pending:
-                if (eq_func(key, item.m_key))
+            case hash_item_type::pending:
+                if (item.m_hash == hash)
                 {
-                    // the item is being processed now, there is no reason to wait
-                    return false;
+                    // the first insert is in progress
+                    // cannot continue until it is finished
+                    // so start all over again
+                    continue;
                 }
                 break;
-            case key_item_type::touched:
-                if (eq_func(key, item.m_key))
+            case hash_item_type::touched:
+                if (eq_func(key, *node.key()))
                 {
                     // the item was erased recently
                     return false;
                 }
                 break;
-            case key_item_type::allocated:
-                if (eq_func(key, item.m_key))
+            case hash_item_type::allocated:
+                if (eq_func(key, *node.key()))
                 {
-                    scoped_ref_lock guard(node);
-                    state_type state = node.state();
-                    if (state == key_item_type::allocated)
-                    {
-                        value = *node.value();
-                        return true;
-                    }
-                    else
-                    {
-                        // the item is being updated, there is no reason to wait
-                        return false;
-                    }
+                    return true;
                 }
                 break;
             default:
@@ -156,10 +144,10 @@ public:
         return false;
     }
 
-    template<class ... Args>
-    bool insert(const key_type key, Args&&... val)
+    bool insert(const key_type & key)
     {
-        check_watermark(std::bind(&this_type::rehash, this, std::placeholders::_1));
+        check_watermark(
+                std::bind(&this_type::rehash, this, std::placeholders::_1));
 
         hash_type hash_func;
         equal_predicate_type eq_func;
@@ -179,60 +167,55 @@ public:
         do
         {
             node_type& node = m_table[i];
-            const key_item_type item = node.key();
+            const hash_item_type item = node.m_hash;
 
             switch (item.m_state)
             {
-            case key_item_type::unused:
+            case hash_item_type::unused:
             {
                 // the slot is empty so try to use it
-                key_item_type new_item =
-                { key, key_item_type::pending };
+                hash_item_type new_item =
+                { hash, hash_item_type::pending };
 
-                if (node.atomic_cas_hash(item, new_item))
+                if (atomic_cas(node.m_hash, item, new_item))
                 {
-                    m_node_allocator.construct(node.value(),
-                            std::forward<Args>(val)...);
+                    m_key_allocator.construct(node.key(), key);
 
                     m_size.fetch_add(1, std::memory_order_relaxed);
                     m_used.fetch_add(1, std::memory_order_relaxed);
 
-                    node.state(key_item_type::allocated);
+                    node.m_hash.m_state = hash_item_type::allocated;
                     std::atomic_thread_fence(std::memory_order_release);
                     return true;
                 }
                 // the slot has been updated by other thread so we have to start all over again
                 continue;
             }
-            case key_item_type::pending:
-                if (eq_func(key, item.m_key))
+            case hash_item_type::pending:
+                if (item.m_hash == hash)
                 {
-                    // insert operation is in progress
+                    // the first insert is in progress
                     // cannot continue until it is finished
                     // so start all over again
                     continue;
                 }
                 break;
-            case key_item_type::allocated:
-                if (eq_func(key, item.m_key))
+            case hash_item_type::allocated:
+                if (eq_func(key, *node.key()))
                 {
                     // the item is allocated or concurrent insert/delete operation is in progress
                     return false;
                 }
                 break;
-            case key_item_type::touched:
-                if (eq_func(key, item.m_key))
+            case hash_item_type::touched:
+                if (eq_func(key, *node.key()))
                 {
-                    key_item_type new_item =
-                    { key, key_item_type::pending };
+                    static constexpr std::size_t touched = hash_item_type::touched;
+                    static constexpr std::size_t allocated = hash_item_type::allocated;
 
-                    if (node.atomic_cas_hash(item, new_item))
+                    if (atomic_cas(node.m_hash.m_state, touched, allocated))
                     {
-                        m_node_allocator.construct(node.value(),
-                                std::forward<Args>(val)...);
                         m_size.fetch_add(1, std::memory_order_relaxed);
-                        node.state(key_item_type::allocated);
-                        std::atomic_thread_fence(std::memory_order_release);
                         return true;
                     }
                     // the slot has been updated by other thread
@@ -249,7 +232,7 @@ public:
         return false;
     }
 
-    bool erase(const key_type key)
+    bool erase(const key_type & key)
     {
         hash_type hash_func;
         equal_predicate_type eq_func;
@@ -269,46 +252,42 @@ public:
         do
         {
             node_type& node = m_table[i];
-            const key_item_type item = node.key();
+            const hash_item_type item = node.m_hash;
 
             switch (item.m_state)
             {
-            case key_item_type::unused:
+            case hash_item_type::unused:
                 // the search finished
                 return false;
-            case key_item_type::pending:
-                if (eq_func(key, item.m_key))
+            case hash_item_type::pending:
+                if (item.m_hash == hash)
                 {
-                    // the item is being processed now, there is no reason to wait
-                    return false;
+                    // the first insert is in progress
+                    // cannot continue until it is finished
+                    // so start all over again
+                    continue;
                 }
                 break;
-            case key_item_type::touched:
-                if (eq_func(key, item.m_key))
+            case hash_item_type::touched:
+                if (eq_func(key, *node.key()))
                 {
                     // the item was erased recently
                     return false;
                 }
                 break;
-            case key_item_type::allocated:
-                if (eq_func(key, item.m_key))
+            case hash_item_type::allocated:
+                if (eq_func(key, *node.key()))
                 {
-                    // reset readiness
-                    key_item_type new_item =
-                    { key, key_item_type::pending };
+                    static constexpr std::size_t touched = hash_item_type::touched;
+                    static constexpr std::size_t allocated = hash_item_type::allocated;
 
-                    if (node.atomic_cas_hash(item, new_item))
+                    // reset readiness
+                    if (atomic_cas(node.m_hash.m_state, allocated, touched))
                     {
-                        // wait for pending finds
-                        node.wait_for_release();
-                        // destroy the node
-                        m_value_allocator.destroy(node.value());
-                        node.state(key_item_type::touched);
                         m_size.fetch_sub(1, std::memory_order_relaxed);
-                        std::atomic_thread_fence(std::memory_order_release);
                         return true;
                     }
-                    // the item found but it is being erased in another thread;
+                    // the item found but it is being erased in an other thread;
                     return false;
                 }
                 break;
@@ -331,20 +310,20 @@ public:
     }
 private:
     // the function assumes exclusive access
-    void rehash(const size_type new_size)
+    void rehash(const size_type new_capacity)
     {
-        this_type buffer(new_size, m_value_allocator, m_node_allocator);
+        this_type buffer(new_capacity, m_key_allocator, m_node_allocator);
 
         for (size_type i = 0; i < m_capacity; ++i)
         {
             node_type& node = m_table[i];
-            const key_item_type item = node.key();
+            const hash_item_type item = node.m_hash;
 
-            if (item.m_state == key_item_type::allocated)
+            if (item.m_state == hash_item_type::allocated)
             {
-                value_type & val = *node.value();
-                buffer.insert_unique_key(item.m_key,
-                        std::forward<value_type>(val));
+                key_type & key = *node.key();
+                buffer.insert_unique_key(item.m_hash,
+                        std::forward<key_type>(key));
             }
         }
         assert(buffer.size() == size());
@@ -357,23 +336,22 @@ private:
     //    * exclusive access to the container
     //    * new key is unique
     //    * table has enough capacity to insert specified element
-    void insert_unique_key(key_type key, value_type && val)
+    void insert_unique_key(const size_type hash, key_type && key)
     {
-        hash_type hash_func;
-        size_type hash = hash_func(key);
         size_type start = hash % m_capacity;
         size_type i = start;
 
         do
         {
             node_type& node = m_table[i];
-            key_item_type item = node.key();
-            if (item.m_state == key_item_type::unused)
+            const hash_item_type item = node.m_hash;
+            if (item.m_state == hash_item_type::unused)
             {
-                node.key(key, key_item_type::allocated);
+                node.m_hash.m_hash = hash;
+                node.m_hash.m_state = hash_item_type::allocated;
 
-                m_value_allocator.construct(node.value(),
-                        std::forward<value_type>(val));
+                m_key_allocator.construct(node.key(),
+                        std::forward<key_type>(key));
 
                 m_size.fetch_add(1, std::memory_order_relaxed);
                 m_used.fetch_add(1, std::memory_order_relaxed);
@@ -390,10 +368,10 @@ private:
 private:
     node_type* m_table;
     // fields below do not participate in swap() operation
-    value_allocator_type& m_value_allocator;
+    key_allocator_type& m_key_allocator;
     node_allocator_type& m_node_allocator;
 };
 
 }
 
-#endif /* INCLUDE_HASH_TABLE_INTEGRAL_KEY_HPP_ */
+#endif /* INCLUDE_HASH_SET_TABLE_HPP_ */

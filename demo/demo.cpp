@@ -13,8 +13,9 @@
 #include "demo_stack.hpp"
 #include "demo_queue.hpp"
 #include "casbenchmark.hpp"
+#include "demo_map.hpp"
+#include "demo_set.hpp"
 #include "virtualbenchmark.hpp"
-#include "demo_hash_map.hpp"
 
 const char* usage =
         "Usage: demo <parameter1> [parameter2]...\n"
@@ -29,6 +30,7 @@ const char* usage =
         "--demo-wait-free-queue        run demo for wait free queue\n"
         "--demo-stack                  run demo for lock free stack\n"
         "--demo-map                    run demo for lock free hash map\n"
+        "--demo-set                    run demo for lock free hash set\n"
         "--profile-queue-fixed-mp-mc   run profile for fixed size many producers many consumers queue\n"
         "--profile-queue-fixed-mp-sc   run profile for fixed size many producers single consumer queue\n"
         "--profile-queue-fixed-sp-mc   run profile for fixed size single producer many consumers queue\n"
@@ -55,6 +57,7 @@ int main(int argc, char** argv)
     bool doDemoStack = false;
     bool doVirtualFunc = false;
     bool doDemoMap = false;
+    bool doDemoSet = false;
     std::set<int> queueDemos;
     std::set<int> queueProfiles;
 
@@ -145,6 +148,10 @@ int main(int argc, char** argv)
         {
             doDemoMap = true;
         }
+        else if (strcmp(argv[i], "--demo-set") == 0)
+        {
+            doDemoSet = true;
+        }
         else if (strcmp(argv[i], "--profile-virtual-func") == 0)
         {
             doVirtualFunc = true;
@@ -202,7 +209,11 @@ int main(int argc, char** argv)
     }
     if (doDemoMap)
     {
-        BenchmarkGeneric();
+        DemoMap();
+    }
+    if (doDemoSet)
+    {
+        DemoSet();
     }
 
     return 0;

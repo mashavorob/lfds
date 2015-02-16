@@ -366,3 +366,49 @@ TEST(HashMap_integral_key, random)
     EXPECT_EQ(count_inserted, count_found);
 }
 
+// just unsure that it is compilable
+template<class Key, class Value>
+struct compile_tester
+{
+    typedef Key key_type;
+    typedef lfds::testing::adapter<Value> value_type; // prevent optimization
+    typedef lfds::hash_map<key_type, value_type> hash_map_type;
+    typedef typename hash_map_type::size_type size_type;
+
+    void operator()() const
+    {
+        hash_map_type hm;
+
+        size_type size = 0;
+        value_type val;
+
+        hm.insert(1, -1);
+        hm.find(1, val);
+        hm.erase(1);
+        hm.size();
+
+        EXPECT_TRUE(hash_map_type::INTEGRAL_KEY);
+        EXPECT_FALSE(hash_map_type::INTEGRAL_KEYVALUE);
+    }
+};
+
+TEST(HashMap_integral_key, DataTypes)
+{
+
+    compile_tester<int8_t, int8_t>()();
+    compile_tester<int8_t, int16_t>()();
+    compile_tester<int8_t, int32_t>()();
+    compile_tester<int8_t, int64_t>()();
+    compile_tester<int16_t, int8_t>()();
+    compile_tester<int16_t, int16_t>()();
+    compile_tester<int16_t, int32_t>()();
+    compile_tester<int16_t, int64_t>()();
+    compile_tester<int32_t, int8_t>()();
+    compile_tester<int32_t, int16_t>()();
+    compile_tester<int32_t, int32_t>()();
+    compile_tester<int32_t, int64_t>()();
+    compile_tester<int64_t, int8_t>()();
+    compile_tester<int64_t, int16_t>()();
+    compile_tester<int64_t, int32_t>()();
+}
+

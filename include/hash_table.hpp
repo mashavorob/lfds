@@ -8,7 +8,6 @@
 #ifndef INCLUDE_HASH_TABLE_HPP_
 #define INCLUDE_HASH_TABLE_HPP_
 
-#include "two_level_lock.hpp"
 #include "hash_node.hpp"
 #include "hash_table_base.hpp"
 #include "ref_lock.hpp"
@@ -210,7 +209,7 @@ public:
 
                 if (node.atomic_cas_hash(item, new_item))
                 {
-                    m_node_allocator.construct(node.value(),
+                    m_value_allocator.construct(node.value(),
                             std::forward<Args>(val)...);
                     m_key_allocator.construct(node.key(), key);
 
@@ -249,7 +248,7 @@ public:
 
                     if (node.atomic_cas_hash(item, new_item))
                     {
-                        m_node_allocator.construct(node.value(),
+                        m_value_allocator.construct(node.value(),
                                 std::forward<Args>(val)...);
                         m_size.fetch_add(1, std::memory_order_relaxed);
                         node.set_state(hash_item_type::allocated);

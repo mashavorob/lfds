@@ -22,10 +22,10 @@ namespace
 {
 
 template<class HashTable>
-class hash_map_wrapper
+class hash_map_bridge
 {
 public:
-    typedef hash_map_wrapper<HashTable> this_type;
+    typedef hash_map_bridge<HashTable> this_type;
 
     typedef HashTable hash_table_type;
 
@@ -37,7 +37,7 @@ public:
     typedef typename hash_table_type::node_allocator_type node_allocator_type;
 
 public:
-    hash_map_wrapper(size_type initialCapacity) :
+    hash_map_bridge(size_type initialCapacity) :
             m_key_allocator(), m_value_allocator(), m_node_allocator(), m_hash_table(
                     initialCapacity, m_key_allocator, m_value_allocator,
                     m_node_allocator)
@@ -53,7 +53,7 @@ public:
         return m_hash_table;
     }
 private:
-    hash_map_wrapper(const this_type&) = delete;
+    hash_map_bridge(const this_type&) = delete;
     this_type& operator=(const this_type&) = delete;
 
 private:
@@ -64,10 +64,10 @@ private:
 };
 
 template<class HashTable>
-class hash_map_wrapper_integral_key
+class hash_map_bridge_integral_key
 {
 public:
-    typedef hash_map_wrapper_integral_key<HashTable> this_type;
+    typedef hash_map_bridge_integral_key<HashTable> this_type;
 
     typedef HashTable hash_table_type;
 
@@ -78,7 +78,7 @@ public:
     typedef typename hash_table_type::node_allocator_type node_allocator_type;
 
 public:
-    hash_map_wrapper_integral_key(size_type initialCapacity) :
+    hash_map_bridge_integral_key(size_type initialCapacity) :
             m_value_allocator(), m_node_allocator(), m_hash_table(
                     initialCapacity, m_value_allocator, m_node_allocator)
     {
@@ -93,7 +93,7 @@ public:
         return m_hash_table;
     }
 private:
-    hash_map_wrapper_integral_key(const this_type&) = delete;
+    hash_map_bridge_integral_key(const this_type&) = delete;
     this_type& operator=(const this_type&) = delete;
 
 private:
@@ -103,10 +103,10 @@ private:
 };
 
 template<class HashTable>
-class hash_map_wrapper_integral_pair
+class hash_map_bridge_integral_pair
 {
 public:
-    typedef hash_map_wrapper_integral_pair<HashTable> this_type;
+    typedef hash_map_bridge_integral_pair<HashTable> this_type;
 
     typedef HashTable hash_table_type;
 
@@ -116,7 +116,7 @@ public:
     typedef typename hash_table_type::node_allocator_type node_allocator_type;
 
 public:
-    hash_map_wrapper_integral_pair(size_type initialCapacity) :
+    hash_map_bridge_integral_pair(size_type initialCapacity) :
             m_node_allocator(), m_hash_table(initialCapacity, m_node_allocator)
     {
 
@@ -130,7 +130,7 @@ public:
         return m_hash_table;
     }
 private:
-    hash_map_wrapper_integral_pair(const this_type&) = delete;
+    hash_map_bridge_integral_pair(const this_type&) = delete;
     this_type& operator=(const this_type&) = delete;
 
 private:
@@ -142,7 +142,6 @@ template<class Key, class Value>
 struct dummy_hash_tuple
 {
     Key m_key;
-    char m_dummy;
     Value m_value;
 };
 
@@ -151,7 +150,7 @@ struct is_interal_pair
 {
     static const bool value = std::is_integral<Key>::value
             && std::is_integral<Value>::value
-            && sizeof(dummy_hash_tuple<Key, Value> ) <= 16;
+            && sizeof(dummy_hash_tuple<Key, Value> ) < 16;
 };
 
 template<class Key, class Value, class Hash = std::hash<Key>,
@@ -165,14 +164,14 @@ template<class Key, class Value, class Hash, class Pred, class Allocator>
 struct hash_table_traits<Key, Value, Hash, Pred, Allocator, false, false>
 {
     typedef lfds::hash_table<Key, Value, Hash, Pred, Allocator> hash_table_type;
-    typedef hash_map_wrapper<hash_table_type> hash_table_wrapper_type;
+    typedef hash_map_bridge<hash_table_type> hash_table_wrapper_type;
 };
 
 template<class Key, class Value, class Hash, class Pred, class Allocator>
 struct hash_table_traits<Key, Value, Hash, Pred, Allocator, true, false>
 {
     typedef lfds::hash_table_integral_key<Key, Value, Hash, Pred, Allocator> hash_table_type;
-    typedef hash_map_wrapper_integral_key<hash_table_type> hash_table_wrapper_type;
+    typedef hash_map_bridge_integral_key<hash_table_type> hash_table_wrapper_type;
 };
 
 template<class Key, class Value, class Hash, class Pred, class Allocator>
@@ -180,7 +179,7 @@ struct hash_table_traits<Key, Value, Hash, Pred, Allocator, true, true>
 {
     // TODO: implement
     typedef lfds::hash_table_integral_pair<Key, Value, Hash, Pred, Allocator> hash_table_type;
-    typedef hash_map_wrapper_integral_pair<hash_table_type> hash_table_wrapper_type;
+    typedef hash_map_bridge_integral_pair<hash_table_type> hash_table_wrapper_type;
 };
 
 }
@@ -200,8 +199,8 @@ public:
     typedef typename hash_table_type::value_type value_type;
     typedef typename hash_table_type::size_type size_type;
 
-    static const bool INTEGRAL_KEY = hash_table_type::INTEGRAL_KEY;
-    static const bool INTEGRAL_KEYVALUE = hash_table_type::INTEGRAL_KEYVALUE;
+    static constexpr bool INTEGRAL_KEY = hash_table_type::INTEGRAL_KEY;
+    static constexpr bool INTEGRAL_KEYVALUE = hash_table_type::INTEGRAL_KEYVALUE;
 private:
     hash_map(const this_type&) = delete;
     this_type& operator=(const this_type&) = delete;

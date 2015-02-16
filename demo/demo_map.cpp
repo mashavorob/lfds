@@ -348,7 +348,7 @@ public:
     }
 };
 
-void BenchmarkGeneric()
+void DemoMap()
 {
     typedef std::pair<int, int> data_type;
     typedef data_adapter<int> key_type;

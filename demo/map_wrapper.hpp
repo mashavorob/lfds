@@ -112,11 +112,11 @@ template<class Key, class T, class Hash = std::hash<Key>,
 class std_unordered_map_wrapper
 {
 public:
-    typedef std::unordered_map<Key, T, Hash, Pred, Allocator> map_type;
-    typedef map_wrapper<map_type> wrapped_map_type;
-    typedef typename wrapped_map_type::key_type key_type;
-    typedef typename wrapped_map_type::value_type value_type;
-    typedef typename wrapped_map_type::size_type size_type;
+    typedef std::unordered_map<Key, T, Hash, Pred, Allocator> set_type;
+    typedef map_wrapper<set_type> wrapped_set_type;
+    typedef typename wrapped_set_type::key_type key_type;
+    typedef typename wrapped_set_type::value_type value_type;
+    typedef typename wrapped_set_type::size_type size_type;
 public:
     std_unordered_map_wrapper(size_type = 0)
     {
@@ -141,7 +141,7 @@ public:
     }
 
 private:
-    wrapped_map_type m_map;
+    wrapped_set_type m_map;
 };
 
 #endif /* DEMO_MAP_WRAPPER_HPP_ */

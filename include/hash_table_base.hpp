@@ -8,6 +8,8 @@
 #ifndef INCLUDE_HASH_TABLE_BASE_HPP_
 #define INCLUDE_HASH_TABLE_BASE_HPP_
 
+#include "two_level_lock.hpp"
+
 #include <algorithm>
 #include <cassert>
 

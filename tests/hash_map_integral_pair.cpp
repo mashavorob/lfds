@@ -72,6 +72,8 @@ struct compile_tester
         hm.find(1, val);
         hm.erase(1);
         hm.size();
+
+        EXPECT_TRUE(hash_map_type::INTEGRAL_KEYVALUE);
     }
 };
 

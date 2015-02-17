@@ -25,7 +25,7 @@
 
 static const unsigned SET_TEST_SIZE = 4000;
 static const unsigned SET_TEST_NUM_THREADS = 2;
-static const bool ALLOW_CONCURENT_MODIFICZTIONS = true;
+static const bool ALLOW_CONCURENT_MODIFICATIONS = true;
 
 template<class Data>
 struct get_random_data
@@ -298,7 +298,7 @@ public:
 
         std::vector<std::thread> threads;
 
-        if (ALLOW_CONCURENT_MODIFICZTIONS)
+        if (ALLOW_CONCURENT_MODIFICATIONS)
         {
             threads.push_back(std::thread(std::ref(deleter), std::ref(m)));
         }

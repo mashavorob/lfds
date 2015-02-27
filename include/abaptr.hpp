@@ -42,7 +42,11 @@ class __attribute__((aligned(sizeof(void*)*2))) abaptr
 public:
     typedef std::size_t counter_type;
 
-    abaptr(T* ptr = nullptr) : m_ptr(ptr), m_counter(0)
+    abaptr() : m_ptr(nullptr), m_counter(0)
+    {}
+    abaptr(T* ptr) : m_ptr(ptr), m_counter(0)
+    {}
+    abaptr(T* ptr, counter_type counter) : m_ptr(ptr), m_counter(counter)
     {}
     abaptr(const abaptr<T>& other)
     {

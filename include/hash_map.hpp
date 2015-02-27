@@ -143,6 +143,7 @@ struct dummy_hash_tuple
 {
     Key m_key;
     Value m_value;
+    int8_t m_dummy;
 };
 
 template<class Key, class Value>
@@ -150,7 +151,7 @@ struct is_interal_pair
 {
     static const bool value = std::is_integral<Key>::value
             && std::is_integral<Value>::value
-            && sizeof(dummy_hash_tuple<Key, Value> ) < 16;
+            && sizeof(dummy_hash_tuple<Key, Value> ) <= 16;
 };
 
 template<class Key, class Value, class Hash = std::hash<Key>,

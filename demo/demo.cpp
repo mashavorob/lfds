@@ -15,6 +15,7 @@
 #include "casbenchmark.hpp"
 #include "demo_map.hpp"
 #include "demo_set.hpp"
+#include "demo_trie_set.hpp"
 #include "virtualbenchmark.hpp"
 
 const char* usage =
@@ -31,6 +32,7 @@ const char* usage =
         "--demo-stack                  run demo for lock free stack\n"
         "--demo-map                    run demo for lock free hash map\n"
         "--demo-set                    run demo for lock free hash set\n"
+        "--demo-trie-set               run demo for lock free trie set\n"
         "--profile-queue-fixed-mp-mc   run profile for fixed size many producers many consumers queue\n"
         "--profile-queue-fixed-mp-sc   run profile for fixed size many producers single consumer queue\n"
         "--profile-queue-fixed-sp-mc   run profile for fixed size single producer many consumers queue\n"
@@ -58,6 +60,7 @@ int main(int argc, char** argv)
     bool doVirtualFunc = false;
     bool doDemoMap = false;
     bool doDemoSet = false;
+    bool doDemoTrieSet = false;
     std::set<int> queueDemos;
     std::set<int> queueProfiles;
 
@@ -152,6 +155,10 @@ int main(int argc, char** argv)
         {
             doDemoSet = true;
         }
+        else if (strcmp(argv[i], "--demo-trie-set") == 0)
+        {
+            doDemoTrieSet = true;
+        }
         else if (strcmp(argv[i], "--profile-virtual-func") == 0)
         {
             doVirtualFunc = true;
@@ -214,6 +221,10 @@ int main(int argc, char** argv)
     if (doDemoSet)
     {
         DemoSet();
+    }
+    if ( doDemoTrieSet )
+    {
+        DemoTrieSet();
     }
 
     return 0;

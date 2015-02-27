@@ -28,7 +28,6 @@ TEST(HashMap_integral_pair, type_traits)
     EXPECT_TRUE(hash_map::INTEGRAL_KEYVALUE);
 }
 
-
 TEST(HashMap_integral_pair, empty)
 {
     typedef int key_type;
@@ -94,6 +93,7 @@ TEST(HashMap_integral_pair, DataTypes)
     compile_tester<int64_t, int8_t>()();
     compile_tester<int64_t, int16_t>()();
     compile_tester<int64_t, int32_t>()();
+    EXPECT_TRUE(true);
 }
 
 TEST(HashMap_integral_pair, OutOfLimit)

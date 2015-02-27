@@ -25,19 +25,24 @@ public:
     // weak lock, allows access from multiple clients
     void lock_weak()
     {
+        ++m_acc_count;
+        if (m_del_count.load(std::memory_order_relaxed) == 0)
+        {
+            return;
+        }
         bool success = false;
         do
         {
             if (m_del_count.load(std::memory_order_relaxed) == 0)
             {
-                m_acc_count.fetch_add(1, std::memory_order_acquire);
+                ++m_acc_count;
                 if (m_del_count.load(std::memory_order_relaxed) == 0)
                 {
                     success = true;
                 }
                 else
                 {
-                    m_acc_count.fetch_sub(1, std::memory_order_relaxed);
+                    --m_acc_count;
                 }
             }
         } while (!success);

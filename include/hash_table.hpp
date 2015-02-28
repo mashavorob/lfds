@@ -100,6 +100,8 @@ public:
 
     bool find(const key_type & key, value_type & value) const
     {
+        // attempt to make a wait free find
+
         hash_type hash_func;
         equal_predicate_type eq_func;
 

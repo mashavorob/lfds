@@ -163,7 +163,6 @@ private:
     buffer_type m_buffer;
     node_type* m_head;
     std::atomic<size_type> m_size;
-    mutable two_level_lock m_lock;
 };
 
 }

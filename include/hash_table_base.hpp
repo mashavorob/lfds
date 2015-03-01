@@ -57,7 +57,11 @@ protected:
     }
     void advance_index(size_type & i) const
     {
-        if (++i >= m_capacity)
+        advance_index(i, m_capacity);
+    }
+    static void advance_index(size_type & i, const size_type capacity)
+    {
+        if (++i >= capacity)
         {
             i = 0;
         }

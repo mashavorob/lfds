@@ -35,6 +35,7 @@ public:
     typedef typename hash_table_type::allocator_type allocator_type;
     typedef typename hash_table_type::size_type size_type;
     typedef typename hash_table_type::table_type table_type; // aka raw_hash_table<node_type>
+    typedef typename hash_table_type::snapshot_type snapshot_type;
 
     typedef ref_ptr<table_type> table_ref_ptr_type;
     typedef typename table_ref_ptr_type::size_type counter_type;
@@ -108,6 +109,20 @@ public:
         destroy_table(ptr);
     }
 public:
+    void getSnapshot(snapshot_type & snapshot) const
+    {
+        snapshot_type tmp;
+        {
+            // attempt to make a wait free find
+            scoped_lock_type guard(m_constTable);
+            const table_type* ptr = m_constTable.m_ptr.load(
+                    std::memory_order_relaxed);
+
+            tmp.reserve(ptr->m_size.load(std::memory_order_relaxed));
+            m_hashTable.getSnapshot_imp(*ptr, tmp);
+        }
+        snapshot.swap(tmp);
+    }
     bool erase(const key_type & key)
     {
         table_type* ptr = acquire_table(m_mutableTable);
@@ -241,7 +256,8 @@ public:
         scoped_lock_type guard(m_constTable);
         const table_type* ptr = m_constTable.m_ptr.load(
                 std::memory_order_relaxed);
-        return (ptr->m_used + m_concurrentInsertions.get()) >= ptr->m_highWatermark;
+        return (ptr->m_used + m_concurrentInsertions.get())
+                >= ptr->m_highWatermark;
     }
 protected:
     table_ref_ptr_type m_constTable;

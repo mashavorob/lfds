@@ -17,6 +17,7 @@
 #include <cassert>
 #include <iostream>
 #include <functional>
+#include <vector>
 
 // thread-safe implementation of hash table with open addressing
 //
@@ -46,6 +47,9 @@ public:
     typedef typename allocator_type::template rebind<mapped_type>::other value_allocator_type;
     typedef typename allocator_type::template rebind<key_type>::other key_allocator_type;
 
+    typedef std::pair<key_type, mapped_type> value_type;
+    typedef std::vector<value_type> snapshot_type;
+
     static const bool INTEGRAL_KEY = false;
     static const bool INTEGRAL_KEYVALUE = false;
 
@@ -64,7 +68,29 @@ public:
     hash_map_table()
     {
     }
-    bool find_impl(const table_type& raw_table, const key_type & key, mapped_type & value) const
+    void getSnapshot_imp(const table_type& raw_table, snapshot_type & snapshot) const
+    {
+        const node_type* table = raw_table.m_table;
+        const size_type capacity = raw_table.m_capacity;
+
+        for (size_type i = 0; i < capacity; ++i)
+        {
+            const node_type& node = table[i];
+            const hash_item_type item = node.get_hash();
+
+            if (item.m_state == hash_item_type::allocated)
+            {
+                scoped_ref_lock guard(node);
+                std::size_t state = node.get_state();
+                if (state == hash_item_type::allocated)
+                {
+                    snapshot.push_back(value_type(*node.key(), *node.value()));
+                }
+            }
+        }
+    }
+    bool find_impl(const table_type& raw_table, const key_type & key,
+            mapped_type & value) const
     {
         hash_func_type hash_func;
         equal_predicate_type eq_func;
@@ -76,7 +102,7 @@ public:
 
         for (size_type i = hash % capacity;; ++i)
         {
-            if ( i == capacity )
+            if (i == capacity)
             {
                 i = 0;
             }
@@ -150,7 +176,7 @@ public:
 
         for (size_type i = hash % capacity;; ++i)
         {
-            if ( i == capacity )
+            if (i == capacity)
             {
                 i = 0;
             }
@@ -235,7 +261,7 @@ public:
 
         for (size_type i = hash % capacity;; ++i)
         {
-            if ( i == capacity )
+            if (i == capacity)
             {
                 i = 0;
             }
@@ -347,7 +373,7 @@ public:
 
         for (size_type i = hash % capacity;; ++i)
         {
-            if ( i == capacity )
+            if (i == capacity)
             {
                 i = 0;
             }

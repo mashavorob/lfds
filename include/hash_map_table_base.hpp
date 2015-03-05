@@ -10,6 +10,9 @@
 
 #include "hash_table_base.hpp"
 
+#include <vector>
+#include <utility>
+
 namespace lfds
 {
 
@@ -30,6 +33,9 @@ public:
     typedef typename hash_table_type::allocator_type allocator_type;
     typedef typename hash_table_type::size_type size_type;
     typedef typename hash_table_type::table_type table_type; // aka raw_hash_table<node_type>
+
+    typedef std::pair<key_type, mapped_type> value_type;
+    typedef std::vector<value_type> snapshot_type;
 
 public:
     hash_map_table_base(hash_table_type & hashTable, size_type reserve) :

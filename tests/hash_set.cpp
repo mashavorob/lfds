@@ -320,3 +320,41 @@ TEST(HashSet, random)
     }
     EXPECT_EQ(count_inserted, count_found);
 }
+
+TEST(HashSet, snapshot_empty)
+{
+    typedef lfds::testing::adapter<int> key_type; // prevent optimization
+    typedef lfds::hash_set<key_type> hash_set;
+    typedef hash_set::size_type size_type;
+    typedef hash_set::snapshot_type snapshot_type;
+
+    snapshot_type snapshot;
+    hash_set hs;
+
+    snapshot.push_back(1);
+
+    hs.getSnapshot(snapshot);
+
+    EXPECT_EQ(snapshot.size(), 0);
+
+}
+
+TEST(HashSet, snapshot)
+{
+    typedef lfds::testing::adapter<int> key_type; // prevent optimization
+    typedef lfds::hash_set<key_type> hash_set;
+    typedef hash_set::size_type size_type;
+    typedef hash_set::snapshot_type snapshot_type;
+
+    snapshot_type snapshot;
+    hash_set hs;
+
+    hs.insert(1);
+
+    hs.getSnapshot(snapshot);
+
+    EXPECT_EQ(snapshot.size(), 1);
+
+    EXPECT_EQ(snapshot.front(), 1);
+}
+

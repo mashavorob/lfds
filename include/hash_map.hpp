@@ -84,6 +84,8 @@ public:
     typedef typename hash_table_type::key_type key_type;
     typedef typename hash_table_type::mapped_type mapped_type;
     typedef typename hash_table_type::size_type size_type;
+    typedef typename hash_table_type::value_type value_type;
+    typedef typename hash_table_type::snapshot_type snapshot_type;
 
     static constexpr bool INTEGRAL_KEY = hash_table_type::INTEGRAL_KEY;
     static constexpr bool INTEGRAL_KEYVALUE = hash_table_type::INTEGRAL_KEYVALUE;
@@ -96,6 +98,10 @@ public:
             m_hash_table(), m_hash_table_base(m_hash_table, initialCapacity)
     {
 
+    }
+    void getSnapshot(snapshot_type & snapshot) const
+    {
+        m_hash_table_base.getSnapshot(snapshot);
     }
     bool find(const key_type & key, mapped_type & value) const
     {

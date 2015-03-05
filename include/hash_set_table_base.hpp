@@ -10,6 +10,8 @@
 
 #include "hash_table_base.hpp"
 
+#include <vector>
+
 namespace lfds
 {
 template<class HashTable>
@@ -28,6 +30,9 @@ public:
     typedef typename hash_table_type::allocator_type allocator_type;
     typedef typename hash_table_type::size_type size_type;
     typedef typename hash_table_type::table_type table_type; // aka raw_hash_table<node_type>
+
+    typedef std::vector<key_type> snapshot_type;
+
 
 public:
     hash_set_table_base(hash_table_type & hashTable, size_type reserve) :

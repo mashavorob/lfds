@@ -13,6 +13,7 @@
 #include <cassert>
 #include <atomic>
 #include <functional>
+#include <vector>
 
 namespace lfds
 {
@@ -30,6 +31,7 @@ public:
     typedef hash_data_table<node_type> table_type;
 
     typedef typename table_type::size_type size_type;
+    typedef std::vector<key_type> snapshot_type;
 
     static constexpr bool INTEGRAL = true;
 
@@ -39,6 +41,21 @@ private:
 public:
     hash_set_table_integral_key()
     {
+    }
+    void getSnapshot_imp(const table_type& raw_table, snapshot_type & snapshot) const
+    {
+        const node_type* table = raw_table.m_table;
+        const size_type capacity = raw_table.m_capacity;
+
+        for (size_type i = 0; i < capacity; ++i)
+        {
+            const node_type& node = table[i];
+
+            if (node.m_state == node_type::allocated)
+            {
+                snapshot.push_back(node.m_key);
+            }
+        }
     }
     bool find_impl(const table_type& raw_table, const key_type key) const
     {
@@ -52,7 +69,7 @@ public:
 
         for (size_type i = hash % capacity;; ++i)
         {
-            if ( i == capacity )
+            if (i == capacity)
             {
                 i = 0;
             }
@@ -94,7 +111,7 @@ public:
 
         for (size_type i = hash % capacity;; ++i)
         {
-            if ( i == capacity )
+            if (i == capacity)
             {
                 i = 0;
             }
@@ -159,7 +176,7 @@ public:
 
         for (size_type i = hash % capacity;; ++i)
         {
-            if ( i == capacity )
+            if (i == capacity)
             {
                 i = 0;
             }
@@ -233,7 +250,7 @@ public:
 
         for (size_type i = hash % capacity;; ++i)
         {
-            if ( i == capacity )
+            if (i == capacity)
             {
                 i = 0;
             }

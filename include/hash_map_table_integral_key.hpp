@@ -19,6 +19,7 @@
 #include <cassert>
 #include <iostream>
 #include <functional>
+#include <vector>
 
 // thread-safe implementation of hash table with open addressing
 //
@@ -48,6 +49,9 @@ public:
     typedef typename table_type::size_type size_type;
     typedef typename allocator_type::template rebind<mapped_type>::other value_allocator_type;
 
+    typedef std::pair<key_type, mapped_type> value_type;
+    typedef std::vector<value_type> snapshot_type;
+
     static constexpr bool INTEGRAL_KEY = true;
     static constexpr bool INTEGRAL_KEYVALUE = false;
 
@@ -62,6 +66,27 @@ public:
     {
     }
 
+    void getSnapshot_imp(const table_type& raw_table, snapshot_type & snapshot) const
+    {
+        const node_type* table = raw_table.m_table;
+        const size_type capacity = raw_table.m_capacity;
+
+        for (size_type i = 0; i < capacity; ++i)
+        {
+            const node_type& node = table[i];
+            const key_item_type item = node.key();
+
+            if (item.m_state == key_item_type::allocated)
+            {
+                scoped_node_ref_lock guard(node);
+                state_type state = node.state();
+                if (state == key_item_type::allocated)
+                {
+                    snapshot.push_back(value_type(*node.key(), *node.value()));
+                }
+            }
+        }
+    }
     bool find_impl(const table_type& raw_table, const key_type key, mapped_type & value) const
     {
         hash_func_type hash_func;

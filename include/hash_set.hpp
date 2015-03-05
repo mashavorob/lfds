@@ -51,12 +51,17 @@ public:
     typedef typename hash_table_type::hash_func_type hash_func_type;
     typedef typename hash_table_type::equal_predicate_type equal_predicate_type;
     typedef typename hash_table_type::allocator_type allocator_type;
+    typedef typename hash_table_type::snapshot_type snapshot_type;
 
     static constexpr int INTEGRAL = hash_table_type::INTEGRAL;
 
     hash_set(size_type initialCapacity = 0) :
         m_hash_table(), m_hash_table_base(m_hash_table, initialCapacity)
     {
+    }
+    void getSnapshot(snapshot_type & snapshot) const
+    {
+        m_hash_table_base.getSnapshot(snapshot);
     }
     bool find(const key_type & key) const
     {

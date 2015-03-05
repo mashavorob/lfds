@@ -15,6 +15,7 @@
 #include "cas.hpp"
 
 #include <cassert>
+#include <vector>
 
 // thread-safe implementation of hash table without value (hash_set) based
 // on open addressing algorithm for resolving collisions
@@ -43,6 +44,7 @@ public:
 
     typedef typename table_type::size_type size_type;
     typedef typename Allocator::template rebind<key_type>::other key_allocator_type;
+    typedef std::vector<key_type> snapshot_type;
 
     static constexpr bool INTEGRAL = false;
 
@@ -62,6 +64,22 @@ public:
     {
     }
 
+    void getSnapshot_imp(const table_type& raw_table, snapshot_type & snapshot) const
+    {
+        const node_type* table = raw_table.m_table;
+        const size_type capacity = raw_table.m_capacity;
+
+        for (size_type i = 0; i < capacity; ++i)
+        {
+            const node_type& node = table[i];
+            const hash_item_type item = node.m_hash;
+
+            if (item.m_state == hash_item_type::allocated)
+            {
+                snapshot.push_back(*node.key());
+            }
+        }
+    }
     bool find_impl(const table_type& raw_table, const key_type & key) const
     {
         hash_func_type hash_func;

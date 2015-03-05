@@ -19,7 +19,7 @@ public:
     typedef map_wrapper<Map> this_type;
     typedef Map map_type;
     typedef typename map_type::key_type key_type;
-    typedef typename map_type::mapped_type value_type;
+    typedef typename map_type::mapped_type mapped_type;
     typedef typename map_type::size_type size_type;
     typedef typename map_type::iterator iterator;
     typedef typename map_type::const_iterator const_iterator;
@@ -34,7 +34,7 @@ public:
     {
 
     }
-    bool find(const key_type & key, value_type & value) const
+    bool find(const key_type & key, mapped_type & value) const
     {
         lock_type lock(m_mutex);
         const_iterator i = m_map.find(key);
@@ -51,7 +51,7 @@ public:
     {
         lock_type lock(m_mutex);
         return m_map.insert(
-                std::make_pair(key, value_type(std::forward<Args>(val)...))).second;
+                std::make_pair(key, mapped_type(std::forward<Args>(val)...))).second;
     }
     bool erase(const key_type & key)
     {
@@ -77,14 +77,14 @@ public:
     typedef std::map<Key, T, Less, Allocator> map_type;
     typedef map_wrapper<map_type> wrapped_map_type;
     typedef typename wrapped_map_type::key_type key_type;
-    typedef typename wrapped_map_type::value_type value_type;
+    typedef typename wrapped_map_type::mapped_type mapped_type;
     typedef typename wrapped_map_type::size_type size_type;
 public:
     std_map_wrapper(size_type = 0)
     {
 
     }
-    bool find(const key_type & key, value_type & value) const
+    bool find(const key_type & key, mapped_type & value) const
     {
         return m_map.find(key, value);
     }
@@ -115,14 +115,14 @@ public:
     typedef std::unordered_map<Key, T, Hash, Pred, Allocator> set_type;
     typedef map_wrapper<set_type> wrapped_set_type;
     typedef typename wrapped_set_type::key_type key_type;
-    typedef typename wrapped_set_type::value_type value_type;
+    typedef typename wrapped_set_type::mapped_type mapped_type;
     typedef typename wrapped_set_type::size_type size_type;
 public:
     std_unordered_map_wrapper(size_type = 0)
     {
 
     }
-    bool find(const key_type & key, value_type & value) const
+    bool find(const key_type & key, mapped_type & value) const
     {
         return m_map.find(key, value);
     }

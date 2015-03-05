@@ -5,8 +5,8 @@
  *      Author: masha
  */
 
-#ifndef INCLUDE_HASH_NODE_INTEGRAL_PAIR_HPP_
-#define INCLUDE_HASH_NODE_INTEGRAL_PAIR_HPP_
+#ifndef INCLUDE_HASH_MAP_NODE_INTEGRAL_PAIR_HPP_
+#define INCLUDE_HASH_MAP_NODE_INTEGRAL_PAIR_HPP_
 
 #include "meta_utils.hpp"
 #include "paddings.hpp"
@@ -217,9 +217,9 @@ struct hash_node_integral_pair
 public:
     typedef hash_node_integral_pair<Key, Value> this_type;
     typedef Key key_type;
-    typedef Value value_type;
-    typedef typename get_state_type<key_type, value_type>::type state_type;
-    typedef integral_item_data_fields<key_type, value_type, state_type> data_type;
+    typedef Value mapped_type;
+    typedef typename get_state_type<key_type, mapped_type>::type state_type;
+    typedef integral_item_data_fields<key_type, mapped_type, state_type> data_type;
 
 public:
     enum
@@ -258,7 +258,7 @@ public:
 
     }
     hash_node_integral_pair(const state_type state, const key_type key,
-            const value_type value) :
+            const mapped_type value) :
             m_data(state, key, value)
     {
 
@@ -266,17 +266,17 @@ public:
 
 #else
     hash_node_integral_pair() :
-    m_data(unused, key_type(), value_type())
+    m_data(unused, key_type(), mapped_type())
     {   l
 
     }
     hash_node_integral_pair(const state_type state, const key_type key) :
-    m_data(state, key, value_type())
+    m_data(state, key, mapped_type())
     {
 
     }
     hash_node_integral_pair(const state_type state, const key_type key,
-            const value_type value) :
+            const mapped_type value) :
     m_data(state, key, value)
     {
 
@@ -320,4 +320,4 @@ public:
 }
 
 #pragma pack(pop)
-#endif /* INCLUDE_HASH_NODE_INTEGRAL_PAIR_HPP_ */
+#endif /* INCLUDE_HASH_MAP_NODE_INTEGRAL_PAIR_HPP_ */

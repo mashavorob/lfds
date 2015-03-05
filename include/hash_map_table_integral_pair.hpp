@@ -5,10 +5,10 @@
  *      Author: masha
  */
 
-#ifndef INCLUDE_HASH_TABLE_INTEGRAL_PAIR_HPP_
-#define INCLUDE_HASH_TABLE_INTEGRAL_PAIR_HPP_
+#ifndef INCLUDE_HASH_MAP_TABLE_INTEGRAL_PAIR_HPP_
+#define INCLUDE_HASH_MAP_TABLE_INTEGRAL_PAIR_HPP_
 
-#include "hash_node_integral_pair.hpp"
+#include "hash_map_node_integral_pair.hpp"
 #include "cas.hpp"
 
 #include <cassert>
@@ -18,18 +18,18 @@
 namespace lfds
 {
 template<class Key, class Value, class Hash, class Pred, class Allocator>
-class hash_table_integral_pair
+class hash_map_table_integral_pair
 {
 public:
-    typedef hash_table_integral_pair<Key, Value, Hash, Pred, Allocator> this_type;
+    typedef hash_map_table_integral_pair<Key, Value, Hash, Pred, Allocator> this_type;
 
     typedef Key key_type;
-    typedef Value value_type;
+    typedef Value mapped_type;
     typedef Hash hash_func_type;
     typedef Pred equal_predicate_type;
     typedef Allocator allocator_type;
 
-    typedef hash_node_integral_pair<key_type, value_type> node_type;
+    typedef hash_node_integral_pair<key_type, mapped_type> node_type;
     typedef hash_data_table<node_type> table_type;
     typedef typename table_type::size_type size_type;
 
@@ -40,10 +40,10 @@ private:
     typedef typename node_type::state_type state_type;
 
 public:
-    hash_table_integral_pair()
+    hash_map_table_integral_pair()
     {
     }
-    bool find_impl(const table_type& raw_table, const key_type key, value_type & value) const
+    bool find_impl(const table_type& raw_table, const key_type key, mapped_type & value) const
     {
         hash_func_type hash_func;
         equal_predicate_type eq_func;
@@ -87,7 +87,7 @@ public:
 
         return false;
     }
-    bool insert_impl(table_type& raw_table, const key_type key, const value_type val)
+    bool insert_impl(table_type& raw_table, const key_type key, const mapped_type val)
     {
         hash_func_type hash_func;
         equal_predicate_type eq_func;
@@ -254,4 +254,4 @@ public:
 
 }
 
-#endif /* INCLUDE_HASH_TABLE_INTEGRAL_PAIR_HPP_ */
+#endif /* INCLUDE_HASH_MAP_TABLE_INTEGRAL_PAIR_HPP_ */

@@ -25,7 +25,7 @@ public:
     typedef typename base_type::scoped_lock_type scoped_lock_type;
     typedef typename base_type::scoped_reserver_type scoped_reserver_type;
     typedef typename hash_table_type::key_type key_type;
-    typedef typename hash_table_type::value_type value_type;
+    typedef typename hash_table_type::mapped_type mapped_type;
     typedef typename hash_table_type::node_type node_type;
     typedef typename hash_table_type::allocator_type allocator_type;
     typedef typename hash_table_type::size_type size_type;
@@ -37,7 +37,7 @@ public:
     {
     }
 public:
-    bool find(const key_type & key, value_type & value) const
+    bool find(const key_type & key, mapped_type & value) const
     {
         // attempt to make a wait free find
         scoped_lock_type guard(base_type::m_constTable);

@@ -5,8 +5,8 @@
  *      Author: masha
  */
 
-#ifndef INCLUDE_HASH_NODE_INTEGRAL_KEY_HPP_
-#define INCLUDE_HASH_NODE_INTEGRAL_KEY_HPP_
+#ifndef INCLUDE_HASH_MAP_NODE_INTEGRAL_KEY_HPP_
+#define INCLUDE_HASH_MAP_NODE_INTEGRAL_KEY_HPP_
 
 #include "meta_utils.hpp"
 
@@ -91,8 +91,8 @@ class hash_node_integral_key
 {
 public:
     typedef Key key_type;
-    typedef Value value_type;
-    typedef hash_node<key_type, value_type> this_class;
+    typedef Value mapped_type;
+    typedef hash_node<key_type, mapped_type> this_class;
     typedef key_item<Key> key_item_type;
     typedef typename key_item_type::state_type state_type;
 
@@ -122,13 +122,13 @@ public:
     {
         m_key.m_state = val;
     }
-    value_type* value()
+    mapped_type* value()
     {
-        return reinterpret_cast<value_type*>(m_value);
+        return reinterpret_cast<mapped_type*>(m_value);
     }
-    const value_type* value() const
+    const mapped_type* value() const
     {
-        return reinterpret_cast<const value_type*>(m_value);
+        return reinterpret_cast<const mapped_type*>(m_value);
     }
     bool atomic_cas_hash(const key_item_type & expected,
             const key_item_type & newkey)
@@ -151,10 +151,10 @@ public:
 
 private:
     volatile key_item_type m_key;
-    char m_value[sizeof(value_type)];
+    char m_value[sizeof(mapped_type)];
     mutable std::atomic<int> m_refCount;
 };
 
 }
 
-#endif /* INCLUDE_HASH_NODE_INTEGRAL_KEY_HPP_ */
+#endif /* INCLUDE_HASH_MAP_NODE_INTEGRAL_KEY_HPP_ */

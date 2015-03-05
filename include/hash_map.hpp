@@ -8,10 +8,10 @@
 #ifndef INCLUDE_HASH_MAP_HPP_
 #define INCLUDE_HASH_MAP_HPP_
 
-#include "hash_table.hpp"
+#include "hash_map_table.hpp"
+#include "hash_map_table_integral_pair.hpp"
 #include "hash_map_table_base.hpp"
-#include "hash_table_integral_key.hpp"
-#include "hash_table_integral_pair.hpp"
+#include "hash_map_table_integral_key.hpp"
 
 #include <functional>
 #include <type_traits>
@@ -51,19 +51,19 @@ struct hash_table_traits;
 template<class Key, class Value, class Hash, class Pred, class Allocator>
 struct hash_table_traits<Key, Value, Hash, Pred, Allocator, false, false>
 {
-    typedef lfds::hash_table<Key, Value, Hash, Pred, Allocator> type;
+    typedef lfds::hash_map_table<Key, Value, Hash, Pred, Allocator> type;
 };
 
 template<class Key, class Value, class Hash, class Pred, class Allocator>
 struct hash_table_traits<Key, Value, Hash, Pred, Allocator, true, false>
 {
-    typedef lfds::hash_table_integral_key<Key, Value, Hash, Pred, Allocator> type;
+    typedef lfds::hash_map_table_integral_key<Key, Value, Hash, Pred, Allocator> type;
 };
 
 template<class Key, class Value, class Hash, class Pred, class Allocator>
 struct hash_table_traits<Key, Value, Hash, Pred, Allocator, true, true>
 {
-    typedef lfds::hash_table_integral_pair<Key, Value, Hash, Pred, Allocator> type;
+    typedef lfds::hash_map_table_integral_pair<Key, Value, Hash, Pred, Allocator> type;
 };
 
 }
@@ -82,7 +82,7 @@ public:
 
     typedef typename hash_table_traits_type::type hash_table_type;
     typedef typename hash_table_type::key_type key_type;
-    typedef typename hash_table_type::value_type value_type;
+    typedef typename hash_table_type::mapped_type mapped_type;
     typedef typename hash_table_type::size_type size_type;
 
     static constexpr bool INTEGRAL_KEY = hash_table_type::INTEGRAL_KEY;
@@ -97,7 +97,7 @@ public:
     {
 
     }
-    bool find(const key_type & key, value_type & value) const
+    bool find(const key_type & key, mapped_type & value) const
     {
         return m_hash_table_base.find(key, value);
     }

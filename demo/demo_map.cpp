@@ -83,7 +83,7 @@ public:
     typedef lfds::queue<Data, true, true, true> queue_type;
     typedef Map map_type;
     typedef typename map_type::key_type key_type;
-    typedef typename map_type::value_type value_type;
+    typedef typename map_type::mapped_type mapped_type;
     typedef get_random_data<Data> randomizer_type;
     typedef fill_queue<queue_type, randomizer_type> filler_type;
     typedef std::size_t size_type;
@@ -223,7 +223,7 @@ public:
     typedef BenchmarkBase<Data, Map> base_type;
     typedef typename base_type::map_type map_type;
     typedef typename base_type::key_type key_type;
-    typedef typename base_type::value_type value_type;
+    typedef typename base_type::mapped_type mapped_type;
     typedef typename base_type::randomizer_type randomizer_type;
     typedef std::vector<key_type> collection_type;
     typedef typename collection_type::const_iterator const_iterator;
@@ -250,7 +250,7 @@ public:
         const_iterator beg = m_keys.begin();
         const_iterator end = m_keys.end();
         const_iterator iter = beg;
-        value_type val;
+        mapped_type val;
 
         while (!base_type::isStarted())
             ;
@@ -352,13 +352,13 @@ void DemoMap()
 {
     typedef std::pair<int, int> data_type;
     typedef data_adapter<int> key_type;
-    typedef data_adapter<int> value_type;
+    typedef data_adapter<int> mapped_type;
 
     typedef lfds::hash_map<int, int> lf_map_type_integral_pair;
-    typedef lfds::hash_map<int, value_type> lf_map_type_integral_key;
-    typedef lfds::hash_map<key_type, value_type> lf_map_type;
-    typedef std_map_wrapper<key_type, value_type> std_map_type;
-    typedef std_unordered_map_wrapper<key_type, value_type> std_unordered_map_type;
+    typedef lfds::hash_map<int, mapped_type> lf_map_type_integral_key;
+    typedef lfds::hash_map<key_type, mapped_type> lf_map_type;
+    typedef std_map_wrapper<key_type, mapped_type> std_map_type;
+    typedef std_unordered_map_wrapper<key_type, mapped_type> std_unordered_map_type;
 
     typedef Benchmark<data_type, lf_map_type_integral_pair> lf_map_benchmark_type_integral_pair;
     typedef Benchmark<data_type, lf_map_type_integral_key> lf_map_benchmark_type_integral_key;

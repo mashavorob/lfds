@@ -14,9 +14,12 @@ template<class T>
 class ref_lock
 {
 public:
-    ref_lock(const T& obj) : m_obj(obj)
+    ref_lock(const T& obj, const bool initialAddRef = true) : m_obj(obj)
     {
-        m_obj.add_ref();
+        if ( initialAddRef )
+        {
+            m_obj.add_ref();
+        }
     }
     ~ref_lock()
     {

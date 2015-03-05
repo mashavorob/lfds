@@ -17,6 +17,7 @@ namespace lfds
 template<class T>
 struct __attribute__((aligned(sizeof(void*)*2))) ref_ptr
 {
+    typedef ref_ptr<T> this_type;
     typedef std::size_t size_type;
     typedef T value_type;
     typedef std::atomic<value_type*> atomic_ptr;
@@ -49,9 +50,17 @@ struct __attribute__((aligned(sizeof(void*)*2))) ref_ptr
         return *this;
     }
 
-    bool atomic_cas(const ref_ptr & expected, const ref_ptr & val)
+    bool atomic_cas(const this_type & expected, const this_type & val)
     {
         return lfds::atomic_cas(*this, expected, val);
+    }
+    size_type add_ref() const
+    {
+        return ++m_refCount;
+    }
+    size_type release() const
+    {
+        return --m_refCount;
     }
 };
 

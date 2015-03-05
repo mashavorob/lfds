@@ -5,8 +5,8 @@
  *      Author: masha
  */
 
-#ifndef INCLUDE_HASH_NODE_HPP_
-#define INCLUDE_HASH_NODE_HPP_
+#ifndef INCLUDE_HASH_MAP_NODE_HPP_
+#define INCLUDE_HASH_MAP_NODE_HPP_
 
 #include "cas.hpp"
 #include <atomic>
@@ -106,8 +106,8 @@ class hash_node
 {
 public:
     typedef Key key_type;
-    typedef Value value_type;
-    typedef hash_node<key_type, value_type> this_class;
+    typedef Value mapped_type;
+    typedef hash_node<key_type, mapped_type> this_class;
     typedef hash_item hash_item_type;
 
 private:
@@ -126,13 +126,13 @@ public:
     {
         return reinterpret_cast<const key_type*>(m_key);
     }
-    value_type* value()
+    mapped_type* value()
     {
-        return reinterpret_cast<value_type*>(m_value);
+        return reinterpret_cast<mapped_type*>(m_value);
     }
-    const value_type* value() const
+    const mapped_type* value() const
     {
-        return reinterpret_cast<const value_type*>(m_value);
+        return reinterpret_cast<const mapped_type*>(m_value);
     }
     hash_item_type get_hash() const
     {
@@ -170,11 +170,11 @@ public:
 
 private:
     char m_key[sizeof(key_type)];
-    char m_value[sizeof(value_type)];
+    char m_value[sizeof(mapped_type)];
     volatile hash_item_type m_hash;
     mutable std::atomic<int> m_refCount;
 };
 
 }
 
-#endif /* INCLUDE_HASH_NODE_HPP_ */
+#endif /* INCLUDE_HASH_MAP_NODE_HPP_ */

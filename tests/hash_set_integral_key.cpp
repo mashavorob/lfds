@@ -138,7 +138,7 @@ TEST(HashSetIntegralKey, erase)
 
 TEST(HashSetIntegralKey, collision)
 {
-    typedef int key_type; // prevent optimization
+    typedef int key_type;
     typedef int key_type; // prevent optimization
     typedef lfds::hash_set<key_type, bad_hash<key_type>> hash_set; // same hash for all
     typedef hash_set::size_type size_type;
@@ -188,7 +188,7 @@ TEST(HashSetIntegralKey, collision)
 
 TEST(HashSetIntegralKey, reusekey)
 {
-    typedef int key_type; // prevent optimization
+    typedef int key_type;
     typedef lfds::hash_set<key_type> hash_set;
     typedef hash_set::size_type size_type;
 
@@ -254,7 +254,7 @@ TEST(HashSetIntegralKey, reusekey)
 
 TEST(HashSetIntegralKey, rehash)
 {
-    typedef int key_type; // prevent optimization
+    typedef int key_type;
     typedef lfds::hash_set<key_type> hash_set;
     typedef hash_set::size_type size_type;
 
@@ -291,7 +291,7 @@ TEST(HashSetIntegralKey, rehash)
 
 TEST(HashSetIntegralKey, random)
 {
-    typedef int key_type; // prevent optimization
+    typedef int key_type;
     typedef lfds::hash_set<key_type> hash_set;
     typedef hash_set::size_type size_type;
 
@@ -351,3 +351,41 @@ TEST(HashSet_integral_key, DataTypes)
     compile_tester<int32_t>()();
     compile_tester<int64_t>()();
 }
+
+TEST(HashSet_integral_key, snapshot_empty)
+{
+    typedef lfds::testing::adapter<int> key_type; // prevent optimization
+    typedef lfds::hash_set<key_type> hash_set;
+    typedef hash_set::size_type size_type;
+    typedef hash_set::snapshot_type snapshot_type;
+
+    snapshot_type snapshot;
+    hash_set hs;
+
+    snapshot.push_back(1);
+
+    hs.getSnapshot(snapshot);
+
+    EXPECT_EQ(snapshot.size(), 0);
+
+}
+
+TEST(HashSet_integral_key, snapshot)
+{
+    typedef int key_type;
+    typedef lfds::hash_set<key_type> hash_set;
+    typedef hash_set::size_type size_type;
+    typedef hash_set::snapshot_type snapshot_type;
+
+    snapshot_type snapshot;
+    hash_set hs;
+
+    hs.insert(1);
+
+    hs.getSnapshot(snapshot);
+
+    EXPECT_EQ(snapshot.size(), 1);
+
+    EXPECT_EQ(snapshot.front(), 1);
+}
+

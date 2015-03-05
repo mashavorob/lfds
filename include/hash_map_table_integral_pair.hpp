@@ -1,14 +1,15 @@
 /*
- * hash_set_table_integral_key.hpp
+ * hash_table_integral_pair.hpp
  *
- *  Created on: Feb 13, 2015
+ *  Created on: Feb 11, 2015
  *      Author: masha
  */
 
-#ifndef INCLUDE_HASH_SET_TABLE_INTEGRAL_KEY_HPP_
-#define INCLUDE_HASH_SET_TABLE_INTEGRAL_KEY_HPP_
+#ifndef INCLUDE_HASH_MAP_TABLE_INTEGRAL_PAIR_HPP_
+#define INCLUDE_HASH_MAP_TABLE_INTEGRAL_PAIR_HPP_
 
-#include "hash_set_integral_key.hpp"
+#include "hash_map_node_integral_pair.hpp"
+#include "cas.hpp"
 
 #include <cassert>
 #include <atomic>
@@ -17,29 +18,33 @@
 
 namespace lfds
 {
-template<class Key, class Hash, class Pred, class Allocator>
-class hash_set_table_integral_key
+template<class Key, class Value, class Hash, class Pred, class Allocator>
+class hash_map_table_integral_pair
 {
 public:
-    typedef hash_set_table_integral_key<Key, Hash, Pred, Allocator> this_type;
+    typedef hash_map_table_integral_pair<Key, Value, Hash, Pred, Allocator> this_type;
+
     typedef Key key_type;
+    typedef Value mapped_type;
     typedef Hash hash_func_type;
     typedef Pred equal_predicate_type;
     typedef Allocator allocator_type;
 
-    typedef hash_set_integral_key<key_type> node_type;
+    typedef hash_node_integral_pair<key_type, mapped_type> node_type;
     typedef hash_data_table<node_type> table_type;
-
     typedef typename table_type::size_type size_type;
-    typedef std::vector<key_type> snapshot_type;
 
-    static constexpr bool INTEGRAL = true;
+    typedef std::pair<key_type, mapped_type> value_type;
+    typedef std::vector<value_type> snapshot_type;
+
+    static constexpr bool INTEGRAL_KEY = true;
+    static constexpr bool INTEGRAL_KEYVALUE = true;
 
 private:
     typedef typename node_type::state_type state_type;
 
 public:
-    hash_set_table_integral_key()
+    hash_map_table_integral_pair()
     {
     }
     void getSnapshot_imp(const table_type& raw_table, snapshot_type & snapshot) const
@@ -51,18 +56,19 @@ public:
         {
             const node_type& node = table[i];
 
-            if (node.m_state == node_type::allocated)
+            if (node.m_data.m_state == node_type::allocated)
             {
-                snapshot.push_back(node.m_key);
+                snapshot.push_back(value_type(node.m_data.m_key, node.m_data.m_value));
             }
         }
     }
-    bool find_impl(const table_type& raw_table, const key_type key) const
+    bool find_impl(const table_type& raw_table, const key_type key,
+            mapped_type & value) const
     {
         hash_func_type hash_func;
         equal_predicate_type eq_func;
 
-        const size_type hash = hash_func(key);
+        const std::size_t hash = hash_func(key);
 
         const node_type* table = raw_table.m_table;
         const size_type capacity = raw_table.m_capacity;
@@ -73,23 +79,24 @@ public:
             {
                 i = 0;
             }
-            const node_type& node = table[i];
+            const node_type node = table[i];
 
-            switch (node.m_state)
+            switch (node.m_data.m_state)
             {
             case node_type::unused:
                 // the search finished
                 return false;
             case node_type::touched:
-                if (eq_func(key, node.m_key))
+                if (eq_func(key, node.m_data.m_key))
                 {
                     // the item was erased recently
                     return false;
                 }
                 break;
             case node_type::allocated:
-                if (eq_func(key, node.m_key))
+                if (eq_func(key, node.m_data.m_key))
                 {
+                    value = node.m_data.m_value;
                     return true;
                 }
                 break;
@@ -97,14 +104,16 @@ public:
                 assert(false);
             }
         }
+
         return false;
     }
-    bool insert_impl(table_type& raw_table, const key_type key)
+    bool insert_impl(table_type& raw_table, const key_type key,
+            const mapped_type val)
     {
         hash_func_type hash_func;
         equal_predicate_type eq_func;
 
-        const size_type hash = hash_func(key);
+        const std::size_t hash = hash_func(key);
 
         node_type* table = raw_table.m_table;
         const size_type capacity = raw_table.m_capacity;
@@ -115,39 +124,39 @@ public:
             {
                 i = 0;
             }
-            node_type& node = table[i];
+            const node_type node = table[i];
 
-            switch (node.m_state)
+            switch (node.m_data.m_state)
             {
             case node_type::unused:
             {
                 // the slot is empty so try to use it
                 const node_type new_node =
-                { key, node_type::allocated };
+                { node_type::allocated, key, val };
 
-                if (atomic_cas(table[i], node, new_node))
+                if (table[i].atomic_cas(node, new_node))
                 {
-                    ++raw_table.m_used;
                     ++raw_table.m_size;
+                    ++raw_table.m_used;
                     return true;
                 }
                 // the slot has been updated by other thread so we have to start all over again
                 continue;
             }
             case node_type::allocated:
-                if (eq_func(key, node.m_key))
+                if (eq_func(key, node.m_data.m_key))
                 {
                     // the item is allocated or concurrent insert/delete operation is in progress
                     return false;
                 }
                 break;
             case node_type::touched:
-                if (eq_func(key, node.m_key))
+                if (eq_func(key, node.m_data.m_key))
                 {
-                    static const state_type touched = node_type::touched;
-                    static const state_type allocated = node_type::allocated;
+                    const node_type new_node =
+                    { node_type::allocated, key, val };
 
-                    if (atomic_cas(table[i].m_state, touched, allocated))
+                    if (table[i].atomic_cas(node, new_node))
                     {
                         ++raw_table.m_size;
                         return true;
@@ -164,12 +173,12 @@ public:
         throw std::bad_alloc();
         return false;
     }
-    bool erase_impl(table_type& raw_table, const key_type & key)
+    bool erase_impl(table_type& raw_table, const key_type key)
     {
         hash_func_type hash_func;
         equal_predicate_type eq_func;
 
-        const size_type hash = hash_func(key);
+        const std::size_t hash = hash_func(key);
 
         node_type* table = raw_table.m_table;
         const size_type capacity = raw_table.m_capacity;
@@ -180,27 +189,29 @@ public:
             {
                 i = 0;
             }
-            node_type& node = table[i];
+            const node_type node = table[i];
 
-            switch (node.m_state)
+            switch (node.m_data.m_state)
             {
             case node_type::unused:
                 // the search finished
                 return false;
             case node_type::touched:
-                if (eq_func(key, node.m_key))
+                if (eq_func(key, node.m_data.m_key))
                 {
                     // the item was erased recently
                     return false;
                 }
                 break;
             case node_type::allocated:
-                if (eq_func(key, node.m_key))
+                if (eq_func(key, node.m_data.m_key))
                 {
-                    static const state_type touched = node_type::touched;
-                    static const state_type allocated = node_type::allocated;
 
-                    if (atomic_cas(table[i].m_state, allocated, touched))
+                    volatile state_type & state = table[i].m_data.m_state;
+                    static const state_type allocated = node_type::allocated;
+                    static const state_type touched = node_type::touched;
+
+                    if (atomic_cas(state, allocated, touched))
                     {
                         --raw_table.m_size;
                         return true;
@@ -217,25 +228,21 @@ public:
     }
     void destroyNode_impl(node_type & node)
     {
-        assert(
-                node.m_state == node_type::allocated
-                        || node.m_state == node_type::touched
-                        || node.m_state == node_type::unused);
     }
     void rehash_impl(const table_type& src, table_type& dst)
     {
         for (size_type i = 0; i < src.m_capacity; ++i)
         {
-            node_type& node = src.m_table[i];
+            // remove volatile because of e
+            const node_type& node = src.m_table[i];
 
-            if (node.m_state == node_type::allocated)
+            if (node_type::allocated == node.m_data.m_state)
             {
-                key_type & key = node.m_key;
-
                 insert_unique_key(dst, node);
             }
         }
     }
+
     // simplified form of insert()
     // the function assumes:
     //    * exclusive access to the container
@@ -244,9 +251,8 @@ public:
     void insert_unique_key(table_type& dst, const node_type& new_node)
     {
         hash_func_type hash_func;
-        const size_type hash = hash_func(new_node.m_key);
         const size_type capacity = dst.m_capacity;
-        node_type* table = dst.m_table;
+        const size_type hash = hash_func(new_node.m_data.m_key);
 
         for (size_type i = hash % capacity;; ++i)
         {
@@ -254,8 +260,8 @@ public:
             {
                 i = 0;
             }
-            node_type& node = table[i];
-            if (node_type::unused == node.m_state)
+            node_type& node = dst.m_table[i];
+            if (node_type::unused == node.m_data.m_state)
             {
                 node = new_node;
 
@@ -269,4 +275,4 @@ public:
 
 }
 
-#endif /* INCLUDE_HASH_SET_TABLE_INTEGRAL_KEY_HPP_ */
+#endif /* INCLUDE_HASH_MAP_TABLE_INTEGRAL_PAIR_HPP_ */

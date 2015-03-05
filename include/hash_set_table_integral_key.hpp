@@ -17,17 +17,19 @@
 namespace lfds
 {
 template<class Key, class Hash, class Pred, class Allocator>
-class hash_set_table_integral_key: private hash_table_base
+class hash_set_table_integral_key
 {
 public:
-    typedef hash_table_base base_type;
     typedef hash_set_table_integral_key<Key, Hash, Pred, Allocator> this_type;
     typedef Key key_type;
-    typedef Hash hash_type;
+    typedef Hash hash_func_type;
     typedef Pred equal_predicate_type;
+    typedef Allocator allocator_type;
+
     typedef hash_set_integral_key<key_type> node_type;
-    typedef typename base_type::size_type size_type;
-    typedef typename Allocator::template rebind<node_type>::other node_allocator_type;
+    typedef hash_data_table<node_type> table_type;
+
+    typedef typename table_type::size_type size_type;
 
     static constexpr bool INTEGRAL = true;
 
@@ -35,43 +37,26 @@ private:
     typedef typename node_type::state_type state_type;
 
 public:
-    hash_set_table_integral_key(const size_type reserve,
-            node_allocator_type& node_allocator) :
-            base_type(reserve), m_node_allocator(node_allocator)
+    hash_set_table_integral_key()
     {
-        m_table = m_node_allocator.allocate(m_capacity);
-
-        for (size_type i = 0; i < m_capacity; ++i)
-        {
-            m_node_allocator.construct(&m_table[i]);
-        }
     }
-    ~hash_set_table_integral_key()
+    bool find_impl(const table_type& raw_table, const key_type key) const
     {
-        // remove volatile
-        node_type* table = const_cast<node_type*>(m_table);
-        m_node_allocator.deallocate(table, m_capacity);
-    }
-    bool find(const key_type key) const
-    {
-        hash_type hash_func;
+        hash_func_type hash_func;
         equal_predicate_type eq_func;
 
-        std::size_t hash = hash_func(key);
+        const size_type hash = hash_func(key);
 
-        size_type start = hash % m_capacity;
-        size_type i = start;
+        const node_type* table = raw_table.m_table;
+        const size_type capacity = raw_table.m_capacity;
 
-        // prevent concurrent deleting
-        typedef weak_lock lock_type;
-        typedef lock_type::guard_type guard_type;
-
-        guard_type guard = lock_type::create(m_lock);
-        guard.lock();
-
-        do
+        for (size_type i = hash % capacity;; ++i)
         {
-            const node_type node = m_table[i];
+            if ( i == capacity )
+            {
+                i = 0;
+            }
+            const node_type& node = table[i];
 
             switch (node.m_state)
             {
@@ -94,34 +79,26 @@ public:
             default:
                 assert(false);
             }
-            advance_index(i);
-        } while (i != start);
-
+        }
         return false;
     }
-    bool insert(const key_type key)
+    bool insert_impl(table_type& raw_table, const key_type key)
     {
-        check_watermark(
-                std::bind(&this_type::rehash, this, std::placeholders::_1));
-
-        hash_type hash_func;
+        hash_func_type hash_func;
         equal_predicate_type eq_func;
 
-        std::size_t hash = hash_func(key);
+        const size_type hash = hash_func(key);
 
-        size_type start = hash % m_capacity;
-        size_type i = start;
+        node_type* table = raw_table.m_table;
+        const size_type capacity = raw_table.m_capacity;
 
-        // prevent concurrent deleting
-        typedef weak_lock lock_type;
-        typedef lock_type::guard_type guard_type;
-
-        guard_type guard = lock_type::create(m_lock);
-        guard.lock();
-
-        do
+        for (size_type i = hash % capacity;; ++i)
         {
-            const node_type node = m_table[i];
+            if ( i == capacity )
+            {
+                i = 0;
+            }
+            node_type& node = table[i];
 
             switch (node.m_state)
             {
@@ -131,10 +108,10 @@ public:
                 const node_type new_node =
                 { key, node_type::allocated };
 
-                if (atomic_cas(m_table[i], node, new_node))
+                if (atomic_cas(table[i], node, new_node))
                 {
-                    m_size.fetch_add(1, std::memory_order_relaxed);
-                    m_used.fetch_add(1, std::memory_order_relaxed);
+                    ++raw_table.m_used;
+                    ++raw_table.m_size;
                     return true;
                 }
                 // the slot has been updated by other thread so we have to start all over again
@@ -153,9 +130,9 @@ public:
                     static const state_type touched = node_type::touched;
                     static const state_type allocated = node_type::allocated;
 
-                    if (atomic_cas(m_table[i].m_state, touched, allocated))
+                    if (atomic_cas(table[i].m_state, touched, allocated))
                     {
-                        m_size.fetch_add(1, std::memory_order_relaxed);
+                        ++raw_table.m_size;
                         return true;
                     }
                     // the slot has been updated by other thread
@@ -166,31 +143,27 @@ public:
             default:
                 assert(false);
             }
-            advance_index(i);
-        } while (i != start);
+        }
         throw std::bad_alloc();
         return false;
     }
-    bool erase(const key_type key)
+    bool erase_impl(table_type& raw_table, const key_type & key)
     {
-        hash_type hash_func;
+        hash_func_type hash_func;
         equal_predicate_type eq_func;
 
-        std::size_t hash = hash_func(key);
+        const size_type hash = hash_func(key);
 
-        size_type start = hash % m_capacity;
-        size_type i = start;
+        node_type* table = raw_table.m_table;
+        const size_type capacity = raw_table.m_capacity;
 
-        // prevent concurrent accessing
-        typedef weak_lock lock_type;
-        typedef lock_type::guard_type guard_type;
-
-        guard_type guard = lock_type::create(m_lock);
-        guard.lock();
-
-        do
+        for (size_type i = hash % capacity;; ++i)
         {
-            const node_type node = m_table[i];
+            if ( i == capacity )
+            {
+                i = 0;
+            }
+            node_type& node = table[i];
 
             switch (node.m_state)
             {
@@ -210,9 +183,9 @@ public:
                     static const state_type touched = node_type::touched;
                     static const state_type allocated = node_type::allocated;
 
-                    if (atomic_cas(m_table[i].m_state, allocated, touched))
+                    if (atomic_cas(table[i].m_state, allocated, touched))
                     {
-                        m_size.fetch_sub(1, std::memory_order_relaxed);
+                        --raw_table.m_size;
                         return true;
                     }
                     // the item found but it is being erased in another thread;
@@ -222,79 +195,59 @@ public:
             default:
                 assert(false);
             }
-            advance_index(i);
-        } while (i != start);
-
+        }
         return false;
     }
-    size_type size() const
+    void destroyNode_impl(node_type & node)
     {
-        return m_size;
+        assert(
+                node.m_state == node_type::allocated
+                        || node.m_state == node_type::touched
+                        || node.m_state == node_type::unused);
     }
-    size_type capacity() const
+    void rehash_impl(const table_type& src, table_type& dst)
     {
-        return m_capacity;
-    }
-private:
-    // the function assumes exclusive access
-    void rehash(const size_type new_size)
-    {
-        this_type buffer(new_size, m_node_allocator);
-
-        // assume exclusive access so remove volatile
-        const node_type* table = const_cast<node_type*>(m_table);
-        for (size_type i = 0; i < m_capacity; ++i)
+        for (size_type i = 0; i < src.m_capacity; ++i)
         {
-            const node_type& node = table[i];
-            if (node_type::allocated == node.m_state)
+            node_type& node = src.m_table[i];
+
+            if (node.m_state == node_type::allocated)
             {
-                buffer.insert_unique_key(node);
+                key_type & key = node.m_key;
+
+                insert_unique_key(dst, node);
             }
         }
-        assert(buffer.size() == size());
-        assert(buffer.size() < buffer.m_high_watermark);
-        swap(buffer);
     }
-
     // simplified form of insert()
     // the function assumes:
     //    * exclusive access to the container
     //    * new key is unique
     //    * table has enough capacity to insert specified element
-    void insert_unique_key(const node_type& new_node)
+    void insert_unique_key(table_type& dst, const node_type& new_node)
     {
-        hash_type hash_func;
-        size_type hash = hash_func(new_node.m_key);
-        size_type start = hash % m_capacity;
-        size_type i = start;
+        hash_func_type hash_func;
+        const size_type hash = hash_func(new_node.m_key);
+        const size_type capacity = dst.m_capacity;
+        node_type* table = dst.m_table;
 
-        // assume exclusive access so remove volatile
-        node_type* table = const_cast<node_type*>(m_table);
-
-        do
+        for (size_type i = hash % capacity;; ++i)
         {
+            if ( i == capacity )
+            {
+                i = 0;
+            }
             node_type& node = table[i];
             if (node_type::unused == node.m_state)
             {
                 node = new_node;
 
-                m_size.fetch_add(1, std::memory_order_relaxed);
-                m_used.fetch_add(1, std::memory_order_relaxed);
+                ++dst.m_size;
+                ++dst.m_used;
                 break;
             }
-            advance_index(i);
-        } while (i != start);
+        }
     }
-    void swap(this_type& other)
-    {
-        base_type::swap(other);
-        std::swap(m_table, other.m_table);
-    }
-
-private:
-    volatile node_type* m_table;
-    // fields below do not participate in swap() operation
-    node_allocator_type& m_node_allocator;
 };
 
 }

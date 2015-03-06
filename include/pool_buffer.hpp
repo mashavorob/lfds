@@ -12,6 +12,7 @@
 
 #include <atomic>
 #include <cassert>
+#include <cstddef>
 #include <algorithm>
 
 namespace lfds
@@ -27,10 +28,7 @@ struct pool_node
 
     static this_type* recover(T* p)
     {
-        static constexpr int offset =
-                reinterpret_cast<char*>(&reinterpret_cast<this_type*>(0)->m_data)
-                        - reinterpret_cast<char*>(0);
-
+        static constexpr int offset = offsetof(this_type, m_data);
         return reinterpret_cast<this_type*>(reinterpret_cast<char*>(p) - offset);
     }
 };

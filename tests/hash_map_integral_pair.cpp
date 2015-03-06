@@ -418,5 +418,46 @@ TEST(HashMap_integral_pair, random)
     EXPECT_EQ(count_inserted, count_found);
 }
 
+TEST(HashMap_integral_pair, snapshot_empty)
+{
+    typedef int key_type;
+    typedef int value_type;
+    typedef lfds::hash_map<key_type, value_type> hash_map;
+    typedef hash_map::size_type size_type;
+    typedef hash_map::snapshot_type snapshot_type;
+
+    snapshot_type snapshot;
+    snapshot.push_back(std::make_pair(1, 1));
+
+    hash_map hm;
+
+    hm.getSnapshot(snapshot);
+
+    EXPECT_EQ(snapshot.size(), 0);
+
+}
+
+TEST(HashMap_integral_pair, snapshot)
+{
+    typedef int key_type;
+    typedef int value_type;
+    typedef lfds::hash_map<key_type, value_type> hash_map;
+    typedef hash_map::size_type size_type;
+    typedef hash_map::snapshot_type snapshot_type;
+
+    snapshot_type snapshot;
+
+    hash_map hm;
+
+    hm.insert(1, 1);
+
+    hm.getSnapshot(snapshot);
+
+    EXPECT_EQ(snapshot.size(), 1);
+
+    EXPECT_EQ(snapshot.front().first, 1);
+    EXPECT_EQ(snapshot.front().second, 1);
+}
+
 
 

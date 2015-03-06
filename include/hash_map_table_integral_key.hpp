@@ -82,7 +82,7 @@ public:
                 state_type state = node.state();
                 if (state == key_item_type::allocated)
                 {
-                    snapshot.push_back(value_type(*node.key(), *node.value()));
+                    snapshot.push_back(value_type(item.m_key, *node.value()));
                 }
             }
         }

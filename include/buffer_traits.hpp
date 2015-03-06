@@ -14,10 +14,7 @@
 namespace lfds {
 
 template<class T, class Allocator, bool FixedSize>
-struct buffer_traits
-{
-
-};
+struct buffer_traits;
 
 template<class T, class Allocator>
 struct buffer_traits<T, Allocator, true>

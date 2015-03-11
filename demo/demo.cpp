@@ -43,6 +43,7 @@ const char* usage =
         "--profile-queue-dyn-sp-sc     run profile for dynamic size single producer single consumer queue\n"
         "--profile-cas                 run profile for compare and swap operations\n"
         "--profile-virtual-func        run profile for virtual function\n"
+        "--profile-trie-set            run profile for lock free trie set\n"
         "--help        				   shows this message\n";
 
 int main(int argc, char** argv)
@@ -61,6 +62,7 @@ int main(int argc, char** argv)
     bool doDemoMap = false;
     bool doDemoSet = false;
     bool doDemoTrieSet = false;
+    bool doProfileTrieSet = false;
     std::set<int> queueDemos;
     std::set<int> queueProfiles;
 
@@ -163,6 +165,10 @@ int main(int argc, char** argv)
         {
             doVirtualFunc = true;
         }
+        else if (strcmp(argv[i], "--profile-trie-set") == 0)
+        {
+            doProfileTrieSet = true;
+        }
         else if (strcmp(argv[i], "--help") == 0)
         {
             showCommandLineOptions = true;
@@ -225,6 +231,10 @@ int main(int argc, char** argv)
     if ( doDemoTrieSet )
     {
         DemoTrieSet();
+    }
+    if ( doProfileTrieSet )
+    {
+        ProfileTrieSet();
     }
 
     return 0;

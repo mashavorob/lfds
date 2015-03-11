@@ -11,5 +11,6 @@
 
 void DemoTrieSet();
 
+void ProfileTrieSet();
 
 #endif /* DEMO_DEMO_TRIE_SET_HPP_ */

@@ -22,7 +22,6 @@ add_executable( tests
     hash_map_integral_pair.cpp
     hash_set_integral_key.cpp
     trie_set.cpp
-    bit_trie_set.cpp
     )
 
 # Link test executable against gtest & gtest_main

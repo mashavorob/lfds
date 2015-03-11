@@ -20,10 +20,10 @@ struct __attribute__((aligned(sizeof(void*)*2))) ref_ptr
     typedef ref_ptr<T> this_type;
     typedef std::size_t size_type;
     typedef T value_type;
-    typedef std::atomic<value_type*> atomic_ptr;
+    typedef std::atomic<value_type*> atomic_ptr_type;
     typedef std::atomic<size_type> atomic_counter;
 
-    atomic_ptr m_ptr;
+    atomic_ptr_type m_ptr;
     mutable atomic_counter m_refCount;
 
     ref_ptr() :
@@ -31,7 +31,7 @@ struct __attribute__((aligned(sizeof(void*)*2))) ref_ptr
     {
 
     }
-    explicit ref_ptr(value_type* node, size_type refCount) :
+    ref_ptr(value_type* node, size_type refCount) :
             m_ptr(node), m_refCount(refCount)
     {
 

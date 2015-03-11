@@ -39,7 +39,7 @@ public:
 
     typedef ref_ptr<table_type> table_ref_ptr_type;
     typedef typename table_ref_ptr_type::size_type counter_type;
-    typedef typename table_ref_ptr_type::atomic_ptr atomic_table_ptr_type;
+    typedef typename table_ref_ptr_type::atomic_ptr_type atomic_table_ptr_type;
     typedef typename allocator_type::template rebind<node_type>::other node_allocator_type;
 
     // the class reserves extra space for insert operation

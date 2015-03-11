@@ -10,7 +10,6 @@
 
 #include <queue.hpp>
 #include <trie_set.hpp>
-#include <bit_trie_set.hpp>
 #include <hash_set.hpp>
 
 #include <atomic>
@@ -338,6 +337,26 @@ public:
     }
 };
 
+double getRatio(double a, double b)
+{
+    double r = a/b;
+    if ( r >= 2. )
+    {
+        r = static_cast<int>(r);
+    }
+    else if ( r >= 1.1 )
+    {
+        r = static_cast<int>(r*10);
+        r = r/10;
+    }
+    else
+    {
+        r = static_cast<int>(r*100);
+        r = r/100;
+    }
+    return r;
+}
+
 template<class BM>
 double DoBenchmark(BM & bm, const std::size_t num_threads, const char* title,
         const double ref_perf = 0.)
@@ -348,14 +367,22 @@ double DoBenchmark(BM & bm, const std::size_t num_threads, const char* title,
     std::cout << static_cast<int>(perf * 1e9) << " ns per find";
     if (ref_perf > std::numeric_limits<double>::epsilon())
     {
-        std::cout << " (" << static_cast<int>(perf / ref_perf)
-                << " times slower)";
+        if ( ref_perf < perf )
+        {
+            std::cout << " (" << getRatio(perf, ref_perf)
+                    << " times slower)";
+        }
+        else
+        {
+            std::cout << " (" << getRatio(ref_perf, perf)
+                    << " times faster)";
+        }
     }
     std::cout << std::endl;
     return perf;
 }
 
-void DemoTrieSet()
+static void Init()
 {
     if (words.empty())
     {
@@ -371,15 +398,18 @@ void DemoTrieSet()
             wordKeys[i] = words2[index].c_str();
         }
     }
+}
+
+void DemoTrieSet()
+{
+    Init();
 
     typedef lfds::trie_set<> lf_trie_set;
-    typedef lfds::bit_trie_set<> lf_bit_trie_set;
     typedef lfds::hash_set<std::string> lf_hash_set;
     typedef std_set_wrapper<std::string> std_set_type;
     typedef std_unordered_set_wrapper<std::string> std_unordered_set_type;
 
-    typedef Benchmark<lf_trie_set> lf_trie_benchmark_type;
-    typedef Benchmark<lf_bit_trie_set> lf_bit_trie_benchmark_type;
+    typedef Benchmark<lf_trie_set, const char*> lf_trie_benchmark_type;
     typedef Benchmark<lf_hash_set> lf_hash_set_benchmark_type;
     typedef Benchmark<lf_hash_set, const char*> lf_hash_set_c_benchmark_type;
     typedef Benchmark<std_set_type> std_set_benchmark_type;
@@ -390,7 +420,6 @@ void DemoTrieSet()
     const std::size_t num_threads = TRIE_TEST_NUM_THREADS;
 
     lf_trie_benchmark_type bm_trie_set;
-    lf_bit_trie_benchmark_type bm_bit_trie_set;
     lf_hash_set_benchmark_type bm0;
     lf_hash_set_c_benchmark_type bm1;
     std_set_benchmark_type bm2;
@@ -408,7 +437,6 @@ void DemoTrieSet()
     const char* uset_title_c   = " benchmark std unordered_set (char* as key): ";
 
     const double ref_perf = DoBenchmark(bm_trie_set, num_threads, trie_title);
-    DoBenchmark(bm_bit_trie_set, num_threads, bit_trie_title, ref_perf);
     DoBenchmark(bm0, num_threads, hset_title, ref_perf);
     DoBenchmark(bm1, num_threads, hset_title_c, ref_perf);
     DoBenchmark(bm2, num_threads, set_title, ref_perf);
@@ -417,3 +445,18 @@ void DemoTrieSet()
     DoBenchmark(bm5, num_threads, uset_title_c, ref_perf);
 }
 
+void ProfileTrieSet()
+{
+    Init();
+
+    typedef lfds::trie_set<> lf_trie_set;
+
+    typedef Benchmark<lf_trie_set> lf_trie_benchmark_type;
+    const std::size_t num_threads = TRIE_TEST_NUM_THREADS;
+
+    lf_trie_benchmark_type bm_trie_set;
+
+    const char* trie_title     = "profiling lock free trie: ";
+
+    DoBenchmark(bm_trie_set, num_threads, trie_title);
+}

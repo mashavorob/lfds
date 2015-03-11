@@ -24,20 +24,19 @@ struct trie_set_node
 
     typedef std::atomic<bool> atomic_flag_type;
 
-    typedef typename std::size_t size_type;
-    typedef typename std::atomic<trie_set_node*> atomic_ptr_type;
-    typedef typename std::atomic<int> atomic_counter_type;
+    typedef std::size_t size_type;
+    typedef std::atomic<size_type> atomic_counter_type;
+    typedef ref_ptr<trie_set_node> ref_ptr_type;
 
     trie_set_node* m_parent;
-    atomic_ptr_type m_children[SIZE];
+    ref_ptr_type m_children[SIZE];
     atomic_counter_type m_refCount;
-    unsigned int m_char;
+
     atomic_flag_type m_terminal;
 
     trie_set_node() :
-            m_parent(nullptr), m_refCount(0), m_char(0), m_terminal(false)
+            m_parent(nullptr), m_refCount(0), m_terminal(false)
     {
-        std::fill(m_children, m_children + SIZE, nullptr);
     }
 };
 }

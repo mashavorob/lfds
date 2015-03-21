@@ -10,6 +10,7 @@
 
 #include <queue.hpp>
 #include <hash_map.hpp>
+#include <hash_trie.hpp>
 
 #include <atomic>
 #include <cstdlib>
@@ -23,9 +24,9 @@
 #include <iostream>
 #include <set>
 
-static const unsigned MAP_TEST_SIZE = 4000;
+static const unsigned MAP_TEST_SIZE = 40000;
 static const unsigned MAP_TEST_NUM_THREADS = 2;
-static const bool ALLOW_CONCURENT_MODIFICATIONS = true;
+static const bool ALLOW_CONCURRENT_MODIFICATIONS = true;
 
 template<class Data>
 struct get_random_data
@@ -301,7 +302,7 @@ public:
 
         std::vector<std::thread> threads;
 
-        if ( ALLOW_CONCURENT_MODIFICATIONS )
+        if ( ALLOW_CONCURRENT_MODIFICATIONS )
         {
             threads.push_back(std::thread(std::ref(deleter), std::ref(m)));
         }
@@ -357,12 +358,14 @@ void DemoMap()
     typedef lfds::hash_map<int, int> lf_map_type_integral_pair;
     typedef lfds::hash_map<int, mapped_type> lf_map_type_integral_key;
     typedef lfds::hash_map<key_type, mapped_type> lf_map_type;
+    typedef lfds::hash_trie<int, int> lf_trie_type;
     typedef std_map_wrapper<key_type, mapped_type> std_map_type;
     typedef std_unordered_map_wrapper<key_type, mapped_type> std_unordered_map_type;
 
     typedef Benchmark<data_type, lf_map_type_integral_pair> lf_map_benchmark_type_integral_pair;
     typedef Benchmark<data_type, lf_map_type_integral_key> lf_map_benchmark_type_integral_key;
     typedef Benchmark<data_type, lf_map_type> lf_map_benchmark_type;
+    typedef Benchmark<data_type, lf_trie_type> lf_trie_benchmark_type;
     typedef Benchmark<data_type, std_map_type> std_map_benchmark_type;
     typedef Benchmark<data_type, std_unordered_map_type> std_unorderd_benchmark_type;
 
@@ -371,8 +374,15 @@ void DemoMap()
     lf_map_benchmark_type_integral_pair bm1_integral_pair;
     lf_map_benchmark_type_integral_key bm1_integral_key;
     lf_map_benchmark_type bm1;
+    lf_trie_benchmark_type bmt;
     std_map_benchmark_type bm2;
     std_unorderd_benchmark_type bm3;
+
+
+    std::cout << "benchmark lock free hash trie: ";
+    std::cout.flush();
+    double rt_generic = bmt(num_threads);
+    std::cout << static_cast<int>(rt_generic * 1e9) << " ns per find" << std::endl;
 
     std::cout << "benchmark lock free hash map (integral key-value pair): ";
     std::cout.flush();

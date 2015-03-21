@@ -5,8 +5,8 @@
  *      Author: masha
  */
 
-#ifndef INCLUDE_ABAPTR_HPP_
-#define INCLUDE_ABAPTR_HPP_
+#ifndef INCLUDE_ABA_PTR_HPP_
+#define INCLUDE_ABA_PTR_HPP_
 
 #include <cstddef>
 #include "cas.hpp"
@@ -73,4 +73,4 @@ public:
 
 }
 
-#endif /* INCLUDE_ABAPTR_HPP_ */
+#endif /* INCLUDE_ABA_PTR_HPP_ */

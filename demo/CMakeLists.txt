@@ -16,7 +16,6 @@ add_executable( demo
     demo_map.cpp
     demo_set.cpp
     random_strings.cpp
-    demo_trie_set.cpp
     )
 
 target_link_libraries (demo ${CMAKE_THREAD_LIBS_INIT})

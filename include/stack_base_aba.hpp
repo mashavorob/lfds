@@ -8,7 +8,7 @@
 #ifndef INCLUDE_STACK_BASE_ABA_HPP_
 #define INCLUDE_STACK_BASE_ABA_HPP_
 
-#include "abaptr.hpp"
+#include <aba_ptr.hpp>
 #include "stack_node.hpp"
 
 namespace lfds

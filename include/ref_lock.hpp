@@ -8,35 +8,79 @@
 #ifndef INCLUDE_REF_LOCK_HPP_
 #define INCLUDE_REF_LOCK_HPP_
 
-namespace lfds {
+#include <cassert>
+
+namespace lfds
+{
 
 template<class T>
 class ref_lock
 {
 public:
-    ref_lock(const T& obj, const bool initialAddRef = true) : m_obj(obj)
+    typedef ref_lock<T> this_type;
+
+    ref_lock(T& obj) :
+            m_obj(&obj)
     {
-        if ( initialAddRef )
-        {
-            m_obj.add_ref();
-        }
+        m_obj->add_ref();
+    }
+    ref_lock(T& obj, bool initialLock) :
+            m_obj(&obj)
+    {
+        assert(!initialLock);
     }
     ~ref_lock()
     {
-        m_obj.release();
+        m_obj->release();
+    }
+
+    void swap(this_type & other)
+    {
+        T* obj = m_obj;
+        m_obj = other.get();
+        other.put(obj);
+    }
+
+    void swap(T & other)
+    {
+        this_type dummy(other);
+        swap(dummy);
+    }
+
+    void swap()
+    {
+        static T sentinelObj;
+        this_type dummy(sentinelObj);
+        dummy.swap(*this);
+    }
+
+    T* get()
+    {
+        return m_obj;
+    }
+
+    T& operator*()
+    {
+        return *m_obj;
+    }
+    T* operator->()
+    {
+        return m_obj;
     }
 private:
-    typedef ref_lock<T> this_type;
+    void put(T* obj)
+    {
+        m_obj = obj;
+    }
+private:
 
-    ref_lock(const this_type&);
-    this_type& operator=(const this_type&);
+    ref_lock(const this_type&) = delete;
+    this_type& operator=(const this_type&) = delete;
 
 private:
-    const T & m_obj;
+    T *m_obj;
 };
 
 }
-
-
 
 #endif /* INCLUDE_REF_LOCK_HPP_ */

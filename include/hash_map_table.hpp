@@ -62,7 +62,7 @@ public:
 // };
 private:
     typedef typename node_type::hash_item_type hash_item_type;
-    typedef ref_lock<node_type> scoped_ref_lock;
+    typedef ref_lock<const node_type> scoped_ref_lock;
 
 public:
     hash_map_table()

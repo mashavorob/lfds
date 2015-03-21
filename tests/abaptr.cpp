@@ -5,9 +5,9 @@
  *      Author: masha
  */
 
+#include <aba_ptr.hpp>
 #include "gtest/gtest.h"
 
-#include "abaptr.hpp"
 
 TEST(abaptr, Negative)
 {

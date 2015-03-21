@@ -8,8 +8,7 @@
 #ifndef INCLUDE_POOL_BUFFER_HPP_
 #define INCLUDE_POOL_BUFFER_HPP_
 
-#include "abaptr.hpp"
-
+#include <aba_ptr.hpp>
 #include <atomic>
 #include <cassert>
 #include <cstddef>
@@ -24,13 +23,22 @@ struct pool_node
 {
     typedef pool_node<T> this_type;
     this_type* m_next;
-    T m_data;
+    T* data()
+    {
+        return reinterpret_cast<T*>(m_data);
+    }
+    const T* data() const
+    {
+        return reinterpret_cast<const T*>(m_data);
+    }
 
     static this_type* recover(T* p)
     {
         static constexpr int offset = offsetof(this_type, m_data);
         return reinterpret_cast<this_type*>(reinterpret_cast<char*>(p) - offset);
     }
+private:
+    char m_data[sizeof(T)] __attribute__((aligned(__alignof(T))));
 };
 
 template<class T, class Allocator>
@@ -124,7 +132,7 @@ public:
     typedef typename Allocator::template rebind<char>::other byte_allocator_type;
     typedef typename Allocator::template rebind<chunk_type>::other chunk_allocator_type;
     typedef typename chunk_type::node_type node_type;
-    typedef typename chunk_type::allocator_type node_allocator_type;
+    typedef typename chunk_type::allocator_type value_allocator_type;
     typedef std::size_t size_type;
 
     static constexpr unsigned int MIN_SIZE = 32;
@@ -135,7 +143,7 @@ private:
 
 public:
     pool_buffer(size_type initialCapacity) :
-            m_reserved(0), m_freeNodes(nullptr), m_chunks(nullptr), m_byte_allocator(), m_node_allocator(), m_chunk_allocator()
+            m_reserved(0), m_freeNodes(nullptr), m_chunks(nullptr), m_byte_allocator(), m_value_allocator(), m_chunk_allocator()
     {
         m_freeNodes.m_ptr = reserve(initialCapacity).first;
     }
@@ -177,11 +185,14 @@ public:
                 success = m_freeNodes.atomic_cas(old_val, new_val);
             }
         } while (!success);
-        return &node->m_data;
+        T* p = node->data();
+        m_value_allocator.construct(p);
+        return p;
     }
     void deallocate(T* p)
     {
         node_type* node = node_type::recover(p);
+        m_value_allocator.destroy(p);
         atomic_push(m_freeNodes, node);
     }
     size_type size() const
@@ -215,7 +226,6 @@ private:
         char* raw_ptr = m_byte_allocator.allocate(byte_size);
         chunk_type* chunk = reinterpret_cast<chunk_type*>(raw_ptr);
         m_chunk_allocator.construct(chunk, chunk_size);
-        chunk->construct(m_node_allocator);
         return chunk;
     }
 
@@ -224,9 +234,7 @@ private:
         size_type byte_size = chunk_type::getByteSize(chunk->m_size);
         char* raw_ptr = reinterpret_cast<char*>(chunk);
 
-        chunk->destroy(m_node_allocator);
         m_chunk_allocator.destroy(chunk);
-
         m_byte_allocator.deallocate(raw_ptr, byte_size);
     }
 private:
@@ -234,7 +242,7 @@ private:
     volatile abaptr<node_type> m_freeNodes;
     std::atomic<chunk_type*> m_chunks;
     byte_allocator_type m_byte_allocator;
-    node_allocator_type m_node_allocator;
+    value_allocator_type m_value_allocator;
     chunk_allocator_type m_chunk_allocator;
 };
 }

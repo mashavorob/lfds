@@ -67,8 +67,8 @@ public:
         mutable std::atomic<counter_type> m_count;
     };
 
-    typedef ref_lock<table_ref_ptr_type> scoped_lock_type;
-    typedef ref_lock<insert_counter> scoped_reserver_type;
+    typedef ref_lock<const table_ref_ptr_type> scoped_lock_type;
+    typedef ref_lock<const insert_counter> scoped_reserver_type;
 
     static size_type adjustCapacity(size_type capacity)
     {

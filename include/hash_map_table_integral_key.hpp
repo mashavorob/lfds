@@ -59,7 +59,7 @@ private:
 
     typedef typename node_type::key_item_type key_item_type;
     typedef typename node_type::state_type state_type;
-    typedef ref_lock<node_type> scoped_node_ref_lock;
+    typedef ref_lock<const node_type> scoped_node_ref_lock;
 
 public:
     hash_map_table_integral_key()

@@ -18,6 +18,7 @@ endif()
 enable_testing()
 add_subdirectory(tests)
 add_subdirectory(demo)
+add_subdirectory(perftest)
 
 install(DIRECTORY "${PROJECT_SOURCE_DIR}/include" DESTINATION "lfds")
 

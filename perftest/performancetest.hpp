@@ -20,16 +20,13 @@ class IPerformanceTest
 public:
     virtual ~IPerformanceTest();
 
-    double doTest() const = 0;
+    virtual double doTest() const = 0;
 };
 
 class PerformanceTest
 {
 public:
-    PerformanceTest(IPerformanceTest* impl,
-         const char* units,
-         const char* displayName,
-         const char* group);
+    PerformanceTest(IPerformanceTest* impl);
 
     PerformanceTest(PerformanceTest && other);
 
@@ -41,24 +38,8 @@ public:
     {
         return m_impl;
     }
-    const std::string & getUnits() const
-    {
-        return m_units;
-    }
-    const std::string & getDisplayName() const
-    {
-        return m_displayName;
-    }
-    const std::string & getGroup() const
-    {
-        return m_group;
-    }
-
 private:
     const IPerformanceTest* m_impl;
-    std::string m_units;            // measure units
-    std::string m_displayName;      // test's display name
-    std::string m_group;            // test's group name
 };
 
 }

@@ -17,23 +17,14 @@ IPerformanceTest::~IPerformanceTest()
 
 }
 
-PerformanceTest::PerformanceTest(IPerformanceTest* impl,
-           const char* units,
-           const char* displayName,
-           const char* group) :
-        m_impl(impl),
-        m_units(units),
-        m_displayName(displayName),
-        m_group(group)
+PerformanceTest::PerformanceTest(IPerformanceTest* impl) :
+        m_impl(impl)
 {
 
 }
 
 PerformanceTest::PerformanceTest(PerformanceTest && other) :
-        m_impl(other.m_impl),
-        m_units(other.m_units),
-        m_displayName(other.m_displayName),
-        m_group(other.m_group)
+        m_impl(other.m_impl)
 {
     other.m_impl = nullptr;
 }

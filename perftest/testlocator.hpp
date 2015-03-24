@@ -9,9 +9,7 @@
 #define PERFTEST_TESTLOCATOR_HPP_
 
 #include "performancetest.hpp"
-
-#include <set>
-#include <string>
+#include "testtypes.hpp"
 
 namespace lfds
 {
@@ -22,15 +20,15 @@ class IPerfTestFactory;
 
 struct PerfTestInfo
 {
-    PerfTestInfo* m_link;
-
     const char* m_name;
     const char* m_displayName;
     const char* m_group;
     const char** m_labels;
     const char* m_units;
-
     IPerfTestFactory* m_factory;
+
+    id_type m_id;
+    PerfTestInfo* m_link;
 };
 
 class PerfTestLocator
@@ -39,23 +37,42 @@ private:
     PerfTestLocator();
 public:
 
-    typedef std::set<std::string> collection_type;
+    typedef std::size_t size_type;
 
-    const PerfTestLocator& getInstance();
+public:
+    static const PerfTestLocator& getInstance();
 
     static void registerTest(PerfTestInfo* info);
 
-    collection_type getGroups() const;
+    static size_type getSize()
+    {
+        return m_link ? m_link->m_id + 1 : 0;
+    }
 
-    collection_type getTests(const std::string & group) const;
+    const char* getTestName(const id_type id) const
+    {
+        return at(id)->m_name;
+    }
+    const char* getTestDisplayName(const id_type id) const
+    {
+        return at(id)->m_displayName;
+    }
+    const char* getTestGroup(const id_type id) const
+    {
+        return at(id)->m_group;
+    }
+    const char** getTestLabels(const id_type id) const
+    {
+        return at(id)->m_labels;
+    }
+    const char* getTestUnits(const id_type id) const
+    {
+        return at(id)->m_units;
+    }
+    PerformanceTest getTest(const id_type id) const;
 
-    collection_type getLabels(const std::string & group, const std::string & test) const;
-
-    collection_type select(const std::string & group, const collection_type & labels) const;
-
-    PerformanceTest getTest(const std::string & group, const std::string & test) const;
 private:
-    static bool matchGroup(const std::string & group, const PerfTestInfo* info);
+    const PerfTestInfo* at(const id_type id) const;
 private:
     static PerfTestInfo* m_link;
 };

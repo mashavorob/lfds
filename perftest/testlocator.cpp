@@ -9,7 +9,7 @@
 #include "performancetest.hpp"
 #include "testfactory.hpp"
 
-#include <exception>
+#include <stdexcept>
 
 
 namespace lfds
@@ -18,108 +18,47 @@ namespace perftest
 {
 
 PerfTestInfo* PerfTestLocator::m_link = nullptr;
-static const char* const all = "all";
 
 PerfTestLocator::PerfTestLocator()
 {
 
 }
 
+const PerfTestLocator& PerfTestLocator::getInstance()
+{
+    static const PerfTestLocator instance;
+
+    return instance;
+}
+
 void PerfTestLocator::registerTest(PerfTestInfo* info)
 {
+    info->m_id = getSize();
     info->m_link = m_link;
     m_link = info;
 }
 
-PerfTestLocator::collection_type PerfTestLocator::getGroups() const
+PerformanceTest PerfTestLocator::getTest(const id_type id) const
 {
-    collection_type coll;
-
-    PerfTestInfo* link = m_link;
-    while ( link )
-    {
-        coll.insert(link->m_group);
-        link = link->m_link;
-    }
-    return coll;
+    return PerformanceTest(at(id)->m_factory->create());
 }
 
-PerfTestLocator::collection_type PerfTestLocator::getTests(const std::string & group) const
+const PerfTestInfo* PerfTestLocator::at(const id_type id) const
 {
-    collection_type coll;
-
-    PerfTestInfo* link = m_link;
-    while ( link )
+    if ( id >= getSize() )
     {
-        if ( matchGroup(group, link) )
-        {
-            coll.insert(link->m_name);
-        }
-        link = link->m_link;
+        throw std::out_of_range("PerfTestLocator::at()");
     }
-    return coll;
-}
-
-PerfTestLocator::collection_type PerfTestLocator::getLabels(const std::string & group, const std::string & test) const
-{
-    collection_type coll;
-
     PerfTestInfo* link = m_link;
     while ( link )
     {
-        if ( group == link->m_group && test == link->m_name )
+        if ( link->m_id == id )
         {
-            for ( int i = 0; link->m_labels[i]; ++i )
-            {
-                coll.insert(link->m_labels[i]);
-            }
             break;
         }
         link = link->m_link;
     }
-    return coll;
-}
-
-PerfTestLocator::collection_type PerfTestLocator::select(const std::string & group, const PerfTestLocator::collection_type & labels) const
-{
-    collection_type coll;
-
-    PerfTestInfo* link = m_link;
-    while ( link )
-    {
-        if ( matchGroup(group, link) )
-        {
-            for ( int i = 0; link->m_labels[i]; ++i )
-            {
-                if ( labels.empty() || labels.find(link->m_labels[i]) != labels.end() )
-                {
-                    coll.insert(link->m_labels[i]);
-                }
-            }
-        }
-    }
-    return coll;
-}
-
-PerformanceTest PerfTestLocator::getTest(const std::string & group, const std::string & test) const
-{
-    PerfTestInfo* link = m_link;
-    while ( link )
-    {
-        if ( group == link->m_group && test == link->m_name )
-        {
-            IPerformanceTest* impl = link->m_factory->create();
-            return PerformanceTest(impl, link->m_units, link->m_displayName, link->m_group);
-        }
-        link = link->m_link;
-    }
-    throw std::out_of_range();
-    return PerformanceTest(nullptr, nullptr, nullptr, nullptr);
-}
-
-bool PerfTestLocator::matchGroup(const std::string & group, const PerfTestInfo* info)
-{
-    return ( group == all || group == info->m_group );
+    return link;
 }
 
 }

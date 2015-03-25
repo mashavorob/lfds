@@ -39,6 +39,22 @@ public:
 
     typedef std::size_t size_type;
 
+    struct get_test_name
+    {
+        const char* operator()(const id_type id)
+        {
+            return PerfTestLocator::getInstance().getTestName(id);
+        }
+    };
+
+    struct get_test_group
+    {
+        const char* operator()(const id_type id)
+        {
+            return PerfTestLocator::getInstance().getTestGroup(id);
+        }
+    };
+
 public:
     static const PerfTestLocator& getInstance();
 
@@ -71,7 +87,6 @@ public:
     }
     PerformanceTest getTest(const id_type id) const;
 
-private:
     const PerfTestInfo* at(const id_type id) const;
 private:
     static PerfTestInfo* m_link;

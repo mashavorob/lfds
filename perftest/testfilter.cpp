@@ -17,22 +17,6 @@ namespace perftest
 
 namespace {
 
-struct get_name
-{
-    const char* operator()(const id_type id)
-    {
-        return PerfTestLocator::getInstance().getTestName(id);
-    }
-};
-
-struct get_group
-{
-    const char* operator()(const id_type id)
-    {
-        return PerfTestLocator::getInstance().getTestGroup(id);
-    }
-};
-
 template<class Accessor>
 struct remove_items
 {
@@ -84,14 +68,14 @@ ids_type Filter::getAllTests()
 
 void Filter::byName(ids_type & ids, const strs_type & names)
 {
-    remove_items<get_name> remove;
+    remove_items<PerfTestLocator::get_test_name> remove;
 
     remove(ids, names);
 }
 
 void Filter::byGroup(ids_type & ids, const strs_type & groups)
 {
-    remove_items<get_group> remove;
+    remove_items<PerfTestLocator::get_test_group> remove;
 
     remove(ids, groups);
 }

@@ -20,9 +20,9 @@ class IPerfTestFactory;
 
 struct PerfTestInfo
 {
+    const char* m_group;
     const char* m_name;
     const char* m_displayName;
-    const char* m_group;
     const char** m_labels;
     const char* m_units;
     IPerfTestFactory* m_factory;

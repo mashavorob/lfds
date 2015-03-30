@@ -9,8 +9,6 @@
 #define INCLUDE_DYNAMIC_BUFFER_HPP_
 
 #include "buffer_base.hpp"
-#include "pool_buffer.hpp"
-#include "stack_base_aba.hpp"
 
 namespace lfds
 {
@@ -19,33 +17,52 @@ template<class T, class Allocator>
 class dynamic_buffer
 {
 public:
-    typedef fixed_buffer<T, Allocator> this_class;
-    typedef stack_base_aba<T> collection_type;
-    typedef typename collection_type::node_type node_type;
+    typedef T value_type;
     typedef Allocator allocator_type;
-    typedef typename allocator_type::size_type size_type;
+    typedef dynamic_buffer<value_type, allocator_type> this_class;
+    typedef buffer_base<this_class> base_class;
+    typedef typename base_class::node_type node_type;
+    typedef typename base_class::size_type size_type;
+
+private:
+    typedef typename Allocator::template rebind<node_type>::other node_allocator_type;
+
 public:
     static const bool fixed_size = false;
 
 public:
-    dynamic_buffer(size_type initialCapacity) : m_pool(initialCapacity)
+    dynamic_buffer(size_type initialCapacity)
     {
+        for ( size_type i = 0; i < initialCapacity; ++i )
+        {
+            node_type* node = m_base.allocate_nodes(1);
+            m_base.pushFreeNode(node);
+        }
     }
     ~dynamic_buffer()
     {
+        node_type* node = m_base.popFreeNode();
+        while ( node )
+        {
+            m_base.deallocate_nodes(node, 1);
+            node = m_base.popFreeNode();
+        }
     }
 
     template<class ... Args>
     node_type* new_node(Args&&... data)
     {
-        node_type* p = m_pool.allocate();
-        m_base.construct_data(p, std::forward<Args>(data)...);
-        return p;
+        node_type* node = m_base.popFreeNode();
+        if ( !node )
+        {
+            node = m_base.allocate_nodes(1);
+        }
+        m_base.construct_data(node, std::forward<Args>(data)...);
+        return node;
     }
     void free_node(node_type* p)
     {
-        m_base.destroy_data(p);
-        m_pool.deallocate(p);
+        m_base.free_node(p);
     }
     size_type capacity() const
     {
@@ -53,11 +70,7 @@ public:
     }
 
 private:
-    typedef buffer_base<this_class> base_class;
-    typedef pool_buffer<node_type, Allocator> pool_buffer_type;
-
     base_class m_base;
-    pool_buffer_type m_pool;
 };
 
 }

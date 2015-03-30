@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include <utility>
 #include <cassert>
 #include <cstring>
@@ -238,7 +239,7 @@ CommandLineParser::Command CommandLineParser::onRunTests(const int argc,
     Validator<getAllLabels> validateLabels;
     strs_type names;
     strs_type groups;
-    strs_type labels;
+    std::vector<strs_type> labels;
     std::string ereoneous;
     for (int i = 0; i < argc; ++i)
     {
@@ -251,12 +252,14 @@ CommandLineParser::Command CommandLineParser::onRunTests(const int argc,
         else if (pair.first == "--groups")
         {
             parseList(pair.second, groups);
-            validateGroups(argv[i], "unrecognized group ", names);
+            validateGroups(argv[i], "unrecognized group ", groups);
         }
         else if (pair.first == "--labels")
         {
-            parseList(pair.second, labels);
-            validateNames(argv[i], "unrecognized label ", names);
+            strs_type buff;
+            parseList(pair.second, buff);
+            validateLabels(argv[i], "unrecognized label ", buff);
+            labels.push_back(buff);
         }
         else
         {
@@ -269,7 +272,15 @@ CommandLineParser::Command CommandLineParser::onRunTests(const int argc,
     tests = Filter::getAllTests();
     Filter::byName(tests, names);
     Filter::byGroup(tests, groups);
-    Filter::byLabels(tests, labels);
+    std::vector<strs_type>::const_iterator i = labels.begin();
+    std::vector<strs_type>::const_iterator end = labels.end();
+
+    for ( ; i != end; ++i )
+    {
+        const strs_type & buff = *i;
+        Filter::byLabels(tests, buff);
+    }
+
     return cmdRunTests;
 }
 

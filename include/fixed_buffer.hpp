@@ -9,7 +9,6 @@
 #define INCLUDE_FIXED_BUFFER_HPP_
 
 #include "buffer_base.hpp"
-#include "stack_base_aba.hpp"
 
 namespace lfds
 {
@@ -18,11 +17,12 @@ template<class T, class Allocator>
 class fixed_buffer
 {
 public:
-    typedef fixed_buffer<T, Allocator> this_class;
-    typedef stack_base_aba<T> collection_type;
-    typedef typename collection_type::node_type node_type;
+    typedef T value_type;
     typedef Allocator allocator_type;
-    typedef typename allocator_type::size_type size_type;
+    typedef fixed_buffer<value_type, allocator_type> this_class;
+    typedef buffer_base<this_class> base_class;
+    typedef typename base_class::node_type node_type;
+    typedef typename base_class::size_type size_type;
 public:
     static const bool fixed_size = true;
 
@@ -33,7 +33,7 @@ public:
         m_reserved = m_base.allocate_nodes(m_capacity);
         for (auto i = 0; i < m_capacity; ++i)
         {
-            m_freeNodes.push(m_reserved + i);
+            m_base.pushFreeNode(m_reserved + i);
         }
     }
 
@@ -45,17 +45,11 @@ public:
     template<class ... Args>
     node_type* new_node(Args&&... data)
     {
-        node_type* p = m_freeNodes.atomic_pop();
-        if (p)
-        {
-            m_base.construct_data(p, std::forward<Args>(data)...);
-        }
-        return p;
+        return m_base.new_node(std::forward<Args>(data)...);
     }
     void free_node(node_type* p)
     {
-        m_base.destroy_data(p);
-        m_freeNodes.atomic_push(p);
+        m_base.free_node(p);
     }
 
     size_type capacity() const
@@ -64,12 +58,10 @@ public:
     }
 
 private:
-    typedef buffer_base<this_class> base_class;
 
     base_class m_base;
     size_type m_capacity;
     node_type* m_reserved;
-    collection_type m_freeNodes;
 };
 
 }

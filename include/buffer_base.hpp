@@ -8,6 +8,8 @@
 #ifndef INCLUDE_BUFFER_BASE_HPP_
 #define INCLUDE_BUFFER_BASE_HPP_
 
+#include "stack_base_aba.hpp"
+
 namespace lfds
 {
 
@@ -17,9 +19,11 @@ class buffer_base
 public:
     typedef buffer_base<Buffer> this_class;
     typedef Buffer buffer_type;
-    typedef typename buffer_type::node_type node_type;
+    typedef typename buffer_type::value_type value_type;
+    typedef stack_base_aba<value_type> collection_type;
+    typedef typename collection_type::node_type node_type;
     typedef typename buffer_type::allocator_type data_allocator_type;
-    typedef typename buffer_type::size_type size_type;
+    typedef typename data_allocator_type::size_type size_type;
     typedef typename data_allocator_type::template rebind<node_type>::other node_allocator_type;
 
     // non copyable
@@ -51,10 +55,35 @@ public:
     {
         m_dataAllocator.destroy(p->data());
     }
+    void pushFreeNode(node_type* p)
+    {
+        m_freeNodes.atomic_push(p);
+    }
+    node_type* popFreeNode()
+    {
+        return m_freeNodes.atomic_pop();
+    }
+    template<class ... Args>
+    node_type* new_node(Args&&... data)
+    {
+        node_type* p = popFreeNode();
+        if (p)
+        {
+            construct_data(p, std::forward<Args>(data)...);
+        }
+        return p;
+    }
+    void free_node(node_type* p)
+    {
+        destroy_data(p);
+        pushFreeNode(p);
+    }
+
 
 private:
     data_allocator_type m_dataAllocator;
     node_allocator_type m_nodeAllocator;
+    collection_type m_freeNodes;
 };
 
 }

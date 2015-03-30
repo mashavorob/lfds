@@ -23,7 +23,7 @@ template<class HashTable>
 class hash_table_base
 {
 public:
-    static const unsigned int HIGH_WATERMARK_MULT = 7;
+    static const unsigned int HIGH_WATERMARK_MULT = 5;
     static const unsigned int HIGH_WATERMARK_DIV = 10;
     static const unsigned int MIN_CAPACITY = 20;
 
@@ -79,6 +79,11 @@ public:
         return adjustCapacity(capacity) * HIGH_WATERMARK_MULT
                 / HIGH_WATERMARK_DIV;
     }
+    static size_type calcCapacity(size_type watermark)
+    {
+        return adjustCapacity(watermark * HIGH_WATERMARK_DIV
+                / HIGH_WATERMARK_MULT) + 32; // 32 is good number to compensate concurrent insertions
+    }
 
     //
     // template<class CompatibleKey, Key>
@@ -97,7 +102,7 @@ public:
                     hashTable)
     {
         table_type* ptr = &m_tables[m_currTable];
-        init_table(ptr, adjustCapacity(reserve));
+        init_table(ptr, calcCapacity(reserve));
         m_constTable.m_ptr.store(ptr, std::memory_order_relaxed);
         m_mutableTable.m_ptr.store(ptr, std::memory_order_relaxed);
     }

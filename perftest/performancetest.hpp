@@ -20,7 +20,7 @@ class IPerformanceTest
 public:
     virtual ~IPerformanceTest();
 
-    virtual double doTest() const = 0;
+    virtual double doTest() = 0;
 };
 
 class PerformanceTest
@@ -34,12 +34,12 @@ public:
 
     ~PerformanceTest();
 
-    const IPerformanceTest* operator->() const
+    IPerformanceTest* operator->()
     {
         return m_impl;
     }
 private:
-    const IPerformanceTest* m_impl;
+    IPerformanceTest* m_impl;
 };
 
 }

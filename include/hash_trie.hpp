@@ -386,9 +386,9 @@ private:
 
 }
 
-template<class Key, class Value, class Hash = std::hash<Key>,
+template<class Key, class Value, int BFactor = 16, class Hash = std::hash<Key>,
         class Pred = std::equal_to<Key>,
-        class Allocator = std::allocator<Value>, int BFactor = 16>
+        class Allocator = std::allocator<Value>>
 class hash_trie
 {
 public:
@@ -401,8 +401,8 @@ public:
 
     static constexpr int BFACTOR = BFactor; // branching factor
 
-    typedef hash_trie<key_type, mapped_type, hash_base_type, predicate_type,
-            allocator_type, BFACTOR> this_type;
+    typedef hash_trie<key_type, mapped_type, BFACTOR, hash_base_type, predicate_type,
+            allocator_type> this_type;
 
     typedef htrie::hash_adapter<key_type, hash_base_type> hash_func_type;
     typedef typename hash_func_type::hash_type hash_type;

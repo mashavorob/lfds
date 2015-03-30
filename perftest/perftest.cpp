@@ -17,7 +17,6 @@
 
 using namespace lfds::perftest;
 
-
 template<class Pred>
 void forEachItem(const ids_type & ids, Pred pred)
 {
@@ -26,7 +25,7 @@ void forEachItem(const ids_type & ids, Pred pred)
 
     const PerfTestLocator& locator = PerfTestLocator::getInstance();
 
-    for ( ids_type::const_iterator i = beg; i != end; ++i )
+    for (ids_type::const_iterator i = beg; i != end; ++i)
     {
         pred(i);
     }
@@ -38,7 +37,7 @@ void forEachName(const group_type & group, Pred pred)
     group_type::const_iterator beg = group.begin();
     group_type::const_iterator end = group.end();
 
-    for ( group_type::const_iterator i = beg; i != end; ++i )
+    for (group_type::const_iterator i = beg; i != end; ++i)
     {
         pred(i);
         const ids_type & ids = i->second;
@@ -52,7 +51,7 @@ void forEachGroup(const groups_type & groups, Pred pred)
     groups_type::const_iterator beg = groups.begin();
     groups_type::const_iterator end = groups.end();
 
-    for ( groups_type::const_iterator i = beg; i != end; ++i )
+    for (groups_type::const_iterator i = beg; i != end; ++i)
     {
         pred(i);
         const group_type & group = i->second;
@@ -75,8 +74,7 @@ struct Generic
     }
 };
 
-
-struct Display : public Generic
+struct Display: public Generic
 {
     void operator()(ids_type::const_iterator iter)
     {
@@ -86,13 +84,13 @@ struct Display : public Generic
         const char* displayName = locator.getTestDisplayName(id);
         const char** labels = locator.getTestLabels(id);
 
-        std::cout << "        parameter:" << displayName;
+        std::cout << "        parameter:" << displayName << std::endl;
         std::cout << "        labels: ";
 
-        if ( labels[0] )
+        if (labels[0])
         {
             std::cout << labels[0];
-            for ( int i = 1; labels[i]; ++i )
+            for (int i = 1; labels[i]; ++i)
             {
                 std::cout << ", " << labels[i];
             }
@@ -112,7 +110,7 @@ struct Display : public Generic
     }
 };
 
-struct RunTest : public Generic
+struct RunTest: public Generic
 {
     void operator()(ids_type::const_iterator iter)
     {
@@ -121,14 +119,15 @@ struct RunTest : public Generic
         const id_type id = *iter;
         const char* displayName = locator.getTestDisplayName(id);
         const char* units = locator.getTestUnits(id);
-        const PerformanceTest test = locator.getTest(id);
+        PerformanceTest test = locator.getTest(id);
 
         std::cout << "        " << displayName << ": running\r";
         std::cout.flush();
 
         const double res = normalize(test->doTest());
 
-        std::cout << "        " << displayName << ": " << res << " " << units << std::endl;
+        std::cout << "        " << displayName << ": " << res << " " << units
+                << "        " << std::endl;
     }
     void operator()(group_type::const_iterator iter)
     {
@@ -144,21 +143,21 @@ struct RunTest : public Generic
 
     static double normalize(double val)
     {
-        if ( fabs(val) > 10 )
+        if (fabs(val) > 10)
         {
             val = round(val);
         }
-        else if ( fabs(val) > 5 )
+        else if (fabs(val) > 5)
         {
-            val = round(val*10)/10.;
+            val = round(val * 10) / 10.;
         }
-        else if ( fabs(val) > 1 )
+        else if (fabs(val) > 1)
         {
-            val = round(val*100)/100.;
+            val = round(val * 100) / 100.;
         }
         else
         {
-            val = round(val*1000)/1000.;
+            val = round(val * 1000) / 1000.;
         }
         return val;
     }
@@ -189,7 +188,7 @@ int main(int argc, const char** argv)
 
     ids_type ids;
     CommandLineParser::Command cmd = CommandLineParser::parse(argc, argv, ids);
-    switch ( cmd )
+    switch (cmd)
     {
     case CommandLineParser::cmdShowHelp:
         CommandLineParser::showHelp(argv[0]);

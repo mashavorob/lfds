@@ -29,9 +29,19 @@ template<class Test>
 class PerfTestFactoryImpl: public IPerfTestFactory
 {
 public:
-    PerfTestFactoryImpl(PerfTestInfo& info)
+    PerfTestFactoryImpl(const char* group,
+                        const char* name,
+                        const char* displayName,
+                        const char** labels,
+                        const char* units)
     {
-        PerfTestLocator::registerTest(&info);
+        m_info.m_group = group;
+        m_info.m_name = name;
+        m_info.m_displayName = displayName;
+        m_info.m_labels = labels;
+        m_info.m_units = units;
+        m_info.m_factory = this;
+        PerfTestLocator::registerTest(&m_info);
     }
 
     // override
@@ -39,6 +49,8 @@ public:
     {
         return new Test();
     }
+private:
+    PerfTestInfo m_info;
 };
 
 }

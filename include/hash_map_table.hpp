@@ -92,10 +92,7 @@ public:
     bool find_impl(const table_type& raw_table, const key_type & key,
             mapped_type & value) const
     {
-        hash_func_type hash_func;
-        equal_predicate_type eq_func;
-
-        const size_type hash = hash_func(key);
+        const size_type hash = m_hash_func(key);
 
         const node_type* table = raw_table.m_table;
         const size_type capacity = raw_table.m_capacity;
@@ -125,21 +122,21 @@ public:
                 }
                 break;
             case hash_item_type::pending2:
-                if (eq_func(key, *node.key()))
+                if (m_eq_func(key, *node.key()))
                 {
                     // the item is being processed now, there is no reason to wait
                     return false;
                 }
                 break;
             case hash_item_type::touched:
-                if (eq_func(key, *node.key()))
+                if (m_eq_func(key, *node.key()))
                 {
                     // the item was erased recently
                     return false;
                 }
                 break;
             case hash_item_type::allocated:
-                if (eq_func(key, *node.key()))
+                if (m_eq_func(key, *node.key()))
                 {
                     scoped_ref_lock guard(node);
                     std::size_t state = node.get_state();
@@ -166,10 +163,7 @@ public:
     template<class ... Args>
     bool insert_impl(table_type& raw_table, const key_type & key, Args&&... val)
     {
-        hash_func_type hash_func;
-        equal_predicate_type eq_func;
-
-        const size_type hash = hash_func(key);
+        const size_type hash = m_hash_func(key);
 
         node_type* table = raw_table.m_table;
         const size_type capacity = raw_table.m_capacity;
@@ -217,14 +211,14 @@ public:
                 break;
             case hash_item_type::pending2:
             case hash_item_type::allocated:
-                if (eq_func(key, *node.key()))
+                if (m_eq_func(key, *node.key()))
                 {
                     // the item is allocated or concurrent insert/delete operation is in progress
                     return false;
                 }
                 break;
             case hash_item_type::touched:
-                if (eq_func(key, *node.key()))
+                if (m_eq_func(key, *node.key()))
                 {
                     hash_item_type new_item =
                     { hash, hash_item_type::pending2 };
@@ -251,10 +245,7 @@ public:
 
     bool erase_impl(table_type& raw_table, const key_type & key)
     {
-        hash_func_type hash_func;
-        equal_predicate_type eq_func;
-
-        const size_type hash = hash_func(key);
+        const size_type hash = m_hash_func(key);
 
         node_type* table = raw_table.m_table;
         const size_type capacity = raw_table.m_capacity;
@@ -284,21 +275,21 @@ public:
                 }
                 break;
             case hash_item_type::pending2:
-                if (eq_func(key, *node.key()))
+                if (m_eq_func(key, *node.key()))
                 {
                     // the item is being processed now, there is no reason to wait
                     return false;
                 }
                 break;
             case hash_item_type::touched:
-                if (eq_func(key, *node.key()))
+                if (m_eq_func(key, *node.key()))
                 {
                     // the item was erased recently
                     return false;
                 }
                 break;
             case hash_item_type::allocated:
-                if (eq_func(key, *node.key()))
+                if (m_eq_func(key, *node.key()))
                 {
                     // reset readiness
                     hash_item_type new_item =
@@ -397,6 +388,8 @@ public:
 private:
     key_allocator_type m_key_allocator;
     value_allocator_type m_value_allocator;
+    hash_func_type m_hash_func;
+    equal_predicate_type m_eq_func;
 };
 
 }

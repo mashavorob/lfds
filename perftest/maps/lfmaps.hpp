@@ -20,16 +20,21 @@ namespace maps
 namespace adapter
 {
 
-template<class Key, class Value, class Hash = std::hash<Key>>
+template<class Key, class Value, class Hash = std::hash<Key>, class Allocator = std::allocator<Value>>
 class hash_map
 {
 public:
-    typedef lfds::hash_map<Key, Value, Hash> collection_type;
+    typedef lfds::hash_map<Key, Value, Hash, std::equal_to<Key>, Allocator> collection_type;
     typedef typename collection_type::key_type key_type;
     typedef typename collection_type::mapped_type mapped_type;
     typedef typename collection_type::size_type size_type;
 
     static constexpr bool RESERVE_IMPLEMENTED = true;
+    static constexpr bool ALLOCATOR_IMPLEMENTED = true;
+
+    typedef Allocator allocator_type;
+    typedef counted_allocator<allocator_type> counted_allocator_type;
+    typedef hash_map<Key, Value, Hash, counted_allocator_type> counted_map_type;
 
 public:
     hash_map(size_type reserve = 0) :
@@ -58,16 +63,21 @@ private:
 };
 
 
-template<class Key, class Value, int BFactor>
+template<class Key, class Value, int BFactor, class Allocator = std::allocator<Value>>
 class hash_trie
 {
 public:
-    typedef lfds::hash_trie<Key, Value, BFactor> collection_type;
+    typedef lfds::hash_trie<Key, Value, BFactor, std::hash<Key>, std::equal_to<Key>, Allocator> collection_type;
     typedef typename collection_type::key_type key_type;
     typedef typename collection_type::mapped_type mapped_type;
     typedef typename collection_type::size_type size_type;
 
     static constexpr bool RESERVE_IMPLEMENTED = false;
+    static constexpr bool ALLOCATOR_IMPLEMENTED = true;
+
+    typedef Allocator allocator_type;
+    typedef counted_allocator<allocator_type> counted_allocator_type;
+    typedef hash_trie<Key, Value, BFactor, counted_allocator_type> counted_map_type;
 
 public:
     hash_trie(size_type reserve = 0) :

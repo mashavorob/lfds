@@ -22,9 +22,10 @@ public:
     typedef typename buffer_type::value_type value_type;
     typedef stack_base_aba<value_type> collection_type;
     typedef typename collection_type::node_type node_type;
-    typedef typename buffer_type::allocator_type data_allocator_type;
+    typedef typename buffer_type::allocator_type allocator_type;
+    typedef typename allocator_type::template rebind<value_type>::other data_allocator_type;
     typedef typename data_allocator_type::size_type size_type;
-    typedef typename data_allocator_type::template rebind<node_type>::other node_allocator_type;
+    typedef typename allocator_type::template rebind<node_type>::other node_allocator_type;
 
     // non copyable
 private:

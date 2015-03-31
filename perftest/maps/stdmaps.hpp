@@ -9,6 +9,7 @@
 #define PERFTEST_STDMAP_HPP_
 
 #include <testsync.hpp>
+#include <testallocator.hpp>
 
 #include <map>
 #include <unordered_map>
@@ -29,19 +30,19 @@ typedef lfds::perftest::sync::guard guard_type;
 
 namespace
 {
-template<class Key, class Value, bool Unordered>
+template<class Key, class Value, class Allocator, bool Unordered>
 struct get_map_type;
 
-template<class Key, class Value>
-struct get_map_type<Key, Value, false>
+template<class Key, class Value, class Allocator>
+struct get_map_type<Key, Value, Allocator, false>
 {
-    typedef std::map<Key, Value> type;
+    typedef std::map<Key, Value, std::less<Key>, Allocator> type;
 };
 
-template<class Key, class Value>
-struct get_map_type<Key, Value, true>
+template<class Key, class Value, class Allocator>
+struct get_map_type<Key, Value, Allocator, true>
 {
-    typedef std::unordered_map<Key, Value> type;
+    typedef std::unordered_map<Key, Value, std::hash<Key>, std::equal_to<Key>, Allocator> type;
 };
 
 template<class Map, bool Unordered>
@@ -72,16 +73,21 @@ struct reserver<Map, true>
 
 }
 
-template<class Key, class Value, bool Unordered>
+template<class Key, class Value, bool Unordered, class Allocator = std::allocator<std::pair<const Key, Value>> >
 class stdmap
 {
 public:
-    typedef typename get_map_type<Key, Value, Unordered>::type collection_type;
+    typedef typename get_map_type<Key, Value, Allocator, Unordered>::type collection_type;
     typedef typename collection_type::key_type key_type;
     typedef typename collection_type::mapped_type mapped_type;
     typedef typename collection_type::size_type size_type;
 
     static constexpr bool RESERVE_IMPLEMENTED = Unordered;
+    static constexpr bool ALLOCATOR_IMPLEMENTED = true;
+
+    typedef Allocator allocator_type;
+    typedef counted_allocator<allocator_type> counted_allocator_type;
+    typedef stdmap<Key, Value, Unordered, counted_allocator_type> counted_map_type;
 
 public:
 

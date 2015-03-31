@@ -7,6 +7,7 @@ add_executable( perftest
 	performancetest.cpp
 	perftest.cpp
 	testfactory.cpp
+	testallocator.cpp
 	testfilter.cpp
 	testlocator.cpp
 	testmaxtime.cpp

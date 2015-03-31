@@ -37,10 +37,10 @@ struct slow_hash
 static const unsigned int NANOSECONDS_PER_SEC = static_cast<unsigned int>(1e9);
 static const unsigned int MICROSECONDS_PER_SEC = static_cast<unsigned int>(1e6);
 
-class noir_registrar
+class void_registrar
 {
 public:
-    noir_registrar(const char*, const char*)
+    void_registrar(const char*, const char*)
     {
 
     }
@@ -51,25 +51,53 @@ class ir_registrar
 {
 public:
     typedef Map map_type;
-    typedef MaxInsertTester<map_type, true> max_insert_ir_tester_type;
-    typedef MaximumOpTimeTest<max_insert_ir_tester_type, MICROSECONDS_PER_SEC> max_insert_ir_test_type;
-    typedef PerfTestFactoryImpl<max_insert_ir_test_type> max_insert_ir_factory_type;
+    typedef MaxInsertTester<map_type, true> tester_type;
+    typedef MaximumOpTimeTest<tester_type, MICROSECONDS_PER_SEC> test_type;
+    typedef PerfTestFactoryImpl<test_type> factory_type;
 
     ir_registrar(const char* group, const char* name) :
-            m_max_insert(group, name,
+        m_factory(group, name,
                     "maximum insert time (with initial reserve)",
-                    getMaxInsertLabels(), "μs/op")
+                    getLabels(), "μs/op")
     {
 
     }
 
 private:
-    max_insert_ir_factory_type m_max_insert;
+    factory_type m_factory;
 
-    static const char** getMaxInsertLabels()
+    static const char** getLabels()
     {
         static const char* labels[] =
         { "time", "max", "insert", "st", "initial-reserve", "nexus", nullptr };
+        return labels;
+    }
+};
+
+template<class Map>
+class mem_registrar
+{
+public:
+    typedef typename Map::counted_map_type map_type;
+    typedef AvgInsertTester<map_type> tester_type;
+    typedef MemConsumptionTestImpl<tester_type, 1> mem_test_type;
+    typedef PerfTestFactoryImpl<mem_test_type> factory_type;
+
+    mem_registrar(const char* group, const char* name) :
+        m_factory(group, name,
+                    "memory consumption",
+                    getLabels(), "Mb")
+    {
+
+    }
+
+private:
+    factory_type m_factory;
+
+    static const char** getLabels()
+    {
+        static const char* labels[] =
+        { "mem", "nexus", nullptr };
         return labels;
     }
 };
@@ -80,13 +108,28 @@ struct get_ir_registrar;
 template<class Map>
 struct get_ir_registrar<Map, false>
 {
-    typedef noir_registrar type;
+    typedef void_registrar type;
 };
 
 template<class Map>
 struct get_ir_registrar<Map, true>
 {
     typedef ir_registrar<Map> type;
+};
+
+template<class Map, bool = Map::ALLOCATOR_IMPLEMENTED>
+struct get_mem_registrar;
+
+template<class Map>
+struct get_mem_registrar<Map, false>
+{
+    typedef void_registrar type;
+};
+
+template<class Map>
+struct get_mem_registrar<Map, true>
+{
+    typedef mem_registrar<Map> type;
 };
 
 
@@ -118,7 +161,6 @@ public:
     typedef MtTestImpl<map_type, noiser_type, max_worker_type, max_agg_type,
             MICROSECONDS_PER_SEC, TYPICAL_SIZE> mt_max_test;
 
-    typedef MemConsumptionTestImpl<max_insert_test_type, 1> mem_tester_type;
 
     typedef PerfTestFactoryImpl<avg_insert_test_type> avg_insert_factory_type;
     typedef PerfTestFactoryImpl<max_insert_test_type> max_insert_factory_type;
@@ -129,6 +171,7 @@ public:
     typedef PerfTestFactoryImpl<mt_max_test> mem_tester_factory_type;
 
     typedef typename get_ir_registrar<Map>::type ir_registrar_type;
+    typedef typename get_mem_registrar<Map>::type mem_registrar_type;
 
 public:
     registrar(const char* group, const char* name) :
@@ -144,8 +187,8 @@ public:
                     getMtAvgFindLabels(), "ns/op"),
             m_mt_max_find(group, name, "mt maximum find time",
                     getMtMaxFindLabels(), "μs/op"),
-            m_mem_test(group, name, "memory consumption", getMemLabels(), "Mb"),
-            m_ir_registrar(group, name)
+            m_ir_registrar(group, name),
+            m_mem_registrar(group, name)
     {
 
     }
@@ -156,8 +199,8 @@ private:
     avg_find_factory_type m_avg_find;
     mt_avg_find_factory_type m_mt_avg_find;
     mt_max_find_factory_type m_mt_max_find;
-    mem_tester_factory_type m_mem_test;
     ir_registrar_type m_ir_registrar;
+    mem_registrar_type m_mem_registrar;
 
     static const char** getAvgInsertLabels()
     {
@@ -193,12 +236,6 @@ private:
     {
         static const char* labels[] =
         { "time", "max", "find", "mt", "nexus", nullptr };
-        return labels;
-    }
-    static const char** getMemLabels()
-    {
-        static const char* labels[] =
-        { "mem", "nexus", nullptr };
         return labels;
     }
 };

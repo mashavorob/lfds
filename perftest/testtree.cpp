@@ -28,7 +28,7 @@ public:
 
     void operator()(const id_type id)
     {
-        const char* groupName = m_locator.getTestName(id);
+        const char* groupName = m_locator.getTestGroup(id);
         const char* name = m_locator.getTestName(id);
         group_type & group = m_groups[groupName];
         ids_type & ids = group[name];

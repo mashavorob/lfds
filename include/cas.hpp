@@ -9,6 +9,7 @@
 #define INCLUDE_CAS_HPP_
 
 #include "inttypes.hpp"
+#include "xtomic.hpp"
 
 namespace lfds
 {
@@ -27,6 +28,7 @@ struct CAS
         const data_type * pOldVal = reinterpret_cast<const data_type*>(&oldVal);
         const data_type * pNewVal = reinterpret_cast<const data_type*>(&newVal);
 
+        atomic_guard guard;
         return __sync_bool_compare_and_swap(pVar, *pOldVal, *pNewVal);
     }
 };

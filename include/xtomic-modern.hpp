@@ -23,6 +23,14 @@ inline void thread_fence(barriers::eacquire)
     __atomic_thread_fence(__ATOMIC_ACQUIRE);
 }
 
+inline void atomic_prologue()
+{
+}
+
+inline void atomic_epilogue()
+{
+}
+
 template<class T>
 class xtomic
 {

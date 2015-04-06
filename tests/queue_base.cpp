@@ -12,9 +12,10 @@
 TEST(queue_base, pop)
 {
     typedef lfds::queue_base<int, false, false> queue_type;
+    typedef queue_type::node_type node_type;
 
     queue_type queue;
-    EXPECT_EQ(queue.pop(), nullptr);
+    EXPECT_EQ(queue.pop(), static_cast<node_type*>(0));
 }
 
 TEST(queue_base, push)
@@ -26,7 +27,7 @@ TEST(queue_base, push)
     node_type a;
     queue.push(&a);
     EXPECT_EQ(queue.pop(), &a);
-    EXPECT_EQ(queue.pop(), nullptr);
+    EXPECT_EQ(queue.pop(), static_cast<node_type*>(0));
 }
 
 TEST(queue_base, push3)
@@ -42,15 +43,16 @@ TEST(queue_base, push3)
     EXPECT_EQ(queue.pop(), &a[0]);
     EXPECT_EQ(queue.pop(), &a[1]);
     EXPECT_EQ(queue.pop(), &a[2]);
-    EXPECT_EQ(queue.pop(), nullptr);
+    EXPECT_EQ(queue.pop(), static_cast<node_type*>(0));
 }
 
 TEST(queue_base, atomic_pop)
 {
     typedef lfds::queue_base<int, false, false> queue_type;
+    typedef queue_type::node_type node_type;
 
     queue_type queue;
-    EXPECT_EQ(queue.atomic_pop(), nullptr);
+    EXPECT_EQ(queue.atomic_pop(), static_cast<node_type*>(0));
 }
 
 TEST(queue_base, atomic_push)
@@ -59,11 +61,11 @@ TEST(queue_base, atomic_push)
     typedef queue_type::node_type node_type;
 
     queue_type queue;
-    EXPECT_EQ(queue.atomic_pop(), nullptr);
+    EXPECT_EQ(queue.atomic_pop(), static_cast<node_type*>(0));
     node_type a;
     queue.atomic_push(&a);
     EXPECT_EQ(queue.atomic_pop(), &a);
-    EXPECT_EQ(queue.atomic_pop(), nullptr);
+    EXPECT_EQ(queue.atomic_pop(), static_cast<node_type*>(0));
 }
 
 TEST(queue_base, atomic_push3)
@@ -72,7 +74,7 @@ TEST(queue_base, atomic_push3)
     typedef queue_type::node_type node_type;
 
     queue_type queue;
-    EXPECT_EQ(queue.atomic_pop(), nullptr);
+    EXPECT_EQ(queue.atomic_pop(), static_cast<node_type*>(0));
 
     node_type a[3];
     queue.atomic_push(&a[0]);
@@ -81,5 +83,5 @@ TEST(queue_base, atomic_push3)
     EXPECT_EQ(queue.atomic_pop(), &a[0]);
     EXPECT_EQ(queue.atomic_pop(), &a[1]);
     EXPECT_EQ(queue.atomic_pop(), &a[2]);
-    EXPECT_EQ(queue.atomic_pop(), nullptr);
+    EXPECT_EQ(queue.atomic_pop(), static_cast<node_type*>(0));
 }

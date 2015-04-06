@@ -12,10 +12,10 @@
 #include "hash_table_base.hpp"
 #include "ref_lock.hpp"
 #include "ref_ptr.hpp"
+#include "cppbasics.hpp"
 
 #include <utility>
 #include <algorithm>
-#include <atomic>
 #include <cassert>
 #include <iostream>
 #include <functional>
@@ -146,9 +146,13 @@ public:
 
         return false;
     }
-
+#if LFDS_USE_CPP11
     template<class ... Args>
     bool insert_impl(table_type& raw_table, const key_type key, Args&&... val)
+#else // LFDS_USE_CPP11
+    bool insert_impl(table_type& raw_table, const key_type key, const mapped_type &val)
+#endif // LFDS_USE_CPP11
+
     {
         const std::size_t hash = m_hash_func(key);
 
@@ -170,16 +174,14 @@ public:
             case key_item_type::unused:
             {
                 // the slot is empty so try to use it
-                key_item_type new_item =
-                { key, key_item_type::pending };
+                key_item_type new_item(key, key_item_type::pending);
 
                 if (node.atomic_cas_hash(item, new_item))
                 {
-                    m_value_allocator.construct(node.value(),
-                            std::forward<Args>(val)...);
+                    m_value_allocator.construct(node.value(), std_forward(Args, val));
                     node.state(key_item_type::allocated);
-                    raw_table.m_used.fetch_add(1, std::memory_order_relaxed);
-                    raw_table.m_size.fetch_add(1, std::memory_order_release);
+                    ++raw_table.m_used;
+                    ++raw_table.m_size;
                     return true;
                 }
                 // the slot has been updated by other thread so we have to start all over again
@@ -204,15 +206,13 @@ public:
             case key_item_type::touched:
                 if (m_eq_func(key, item.m_key))
                 {
-                    key_item_type new_item =
-                    { key, key_item_type::pending };
+                    key_item_type new_item(key, key_item_type::pending);
 
                     if (node.atomic_cas_hash(item, new_item))
                     {
-                        m_value_allocator.construct(node.value(),
-                                std::forward<Args>(val)...);
+                        m_value_allocator.construct(node.value(), std_forward(Args, val));
                         node.state(key_item_type::allocated);
-                        raw_table.m_size.fetch_add(1, std::memory_order_release);
+                        ++raw_table.m_size;
                         return true;
                     }
                     // the slot has been updated by other thread
@@ -267,8 +267,7 @@ public:
                 if (m_eq_func(key, item.m_key))
                 {
                     // reset readiness
-                    key_item_type new_item =
-                    { key, key_item_type::pending };
+                    key_item_type new_item(key, key_item_type::pending);
 
                     if (node.atomic_cas_hash(item, new_item))
                     {
@@ -277,7 +276,7 @@ public:
                         // destroy the node
                         m_value_allocator.destroy(node.value());
                         node.state(key_item_type::touched);
-                        raw_table.m_size.fetch_sub(1, std::memory_order_release);
+                        --raw_table.m_size;
                         return true;
                     }
                     // the item found but it is being erased in another thread;

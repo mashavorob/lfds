@@ -8,7 +8,8 @@
 #ifndef INCLUDE_STACK_BASE_WEAK_HPP_
 #define INCLUDE_STACK_BASE_WEAK_HPP_
 
-#include <atomic>
+#include "xtomic.hpp"
+#include "cas.hpp"
 #include "stack_node.hpp"
 
 namespace lfds
@@ -44,9 +45,9 @@ public:
         bool success;
         do
         {
-            node_type* expected = m_head.load(std::memory_order_relaxed);
+            node_type* expected = m_head.load(barriers::relaxed);
             p->m_next = expected;
-            success = std::atomic_compare_exchange_weak(&m_head, &expected, p);
+            success = m_head.cas(expected, p);
         } while (!success);
     }
     node_type* atomic_pop()
@@ -55,12 +56,13 @@ public:
         node_type* p;
         do
         {
-            p = m_head.load(std::memory_order_relaxed);
+            p = m_head.load(barriers::relaxed);
             if (!p)
             {
                 return nullptr;
             }
-            success = std::atomic_compare_exchange_weak(&m_head, &p, p->m_next);
+            node_type* n = p->m_next;
+            success = m_head.cas(p, n);
         } while (!success);
         return p;
     }
@@ -71,12 +73,12 @@ public:
         node_type* head = nullptr;
         do
         {
-            p = m_head.load(std::memory_order_relaxed);
+            p = m_head.load(barriers::relaxed);
             if (!p)
             {
                 return nullptr;
             }
-            success = std::atomic_compare_exchange_weak(&m_head, &p, head);
+            success = m_head.cas(p, head);
         } while (!success);
         return p;
     }
@@ -84,32 +86,32 @@ public:
     // Synchronous operations
     void push(node_type* p)
     {
-        p->m_next = m_head.load(std::memory_order_relaxed);
-        m_head.store(p, std::memory_order_relaxed);
+        p->m_next = m_head.load(barriers::relaxed);
+        m_head.store(p, barriers::relaxed);
     }
     node_type* pop()
     {
-        node_type* p = m_head.load(std::memory_order_relaxed);
+        node_type* p = m_head.load(barriers::relaxed);
         if (p)
         {
-            m_head.store(p->m_next, std::memory_order_relaxed);
+            m_head.store(p->m_next, barriers::relaxed);
             p->m_next = nullptr;
         }
         return p;
     }
     void swap(this_class & other)
     {
-        node_type* head1 = m_head.load(std::memory_order_relaxed);
-        node_type* head2 = other.m_head.load(std::memory_order_relaxed);
-        m_head.store(head2, std::memory_order_relaxed);
-        other.m_head.store(head1, std::memory_order_relaxed);
+        node_type* head1 = m_head.load(barriers::relaxed);
+        node_type* head2 = other.m_head.load(barriers::relaxed);
+        m_head.store(head2, barriers::relaxed);
+        other.m_head.store(head1, barriers::relaxed);
     }
     void set_head(node_type* p)
     {
-        m_head.store(p, std::memory_order_relaxed);
+        m_head.store(p, barriers::relaxed);
     }
 private:
-    std::atomic<node_type*> m_head;
+    xtomic<node_type*> m_head;
 };
 
 }

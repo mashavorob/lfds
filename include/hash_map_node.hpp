@@ -9,8 +9,8 @@
 #define INCLUDE_HASH_MAP_NODE_HPP_
 
 #include "cas.hpp"
-#include <atomic>
-#include <cstdint>
+#include "xtomic.hpp"
+#include "inttypes.hpp"
 
 namespace lfds
 {
@@ -111,8 +111,8 @@ public:
     typedef hash_item hash_item_type;
 
 private:
-    hash_node(const this_class&) = delete;
-    this_class& operator=(const this_class&) = delete;
+    hash_node(const this_class&); // = delete;
+    this_class& operator=(const this_class&); // = delete;
 public:
     hash_node() : m_hash(), m_refCount(0)
     {
@@ -157,22 +157,22 @@ public:
     }
     void add_ref() const
     {
-        m_refCount.fetch_add(1, std::memory_order_acquire);
+        m_refCount.fetch_add(1, barriers::release);
     }
     void release() const
     {
-        m_refCount.fetch_sub(1, std::memory_order_release);
+        m_refCount.fetch_sub(1, barriers::release);
     }
     void wait_for_release() const
     {
-        while ( m_refCount.load(std::memory_order_relaxed) ) ;
+        while ( m_refCount.load(barriers::relaxed) ) ;
     }
 
 private:
     char m_key[sizeof(key_type)];
     char m_value[sizeof(mapped_type)];
     volatile hash_item_type m_hash;
-    mutable std::atomic<int> m_refCount;
+    mutable xtomic<int> m_refCount;
 };
 
 }

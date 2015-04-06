@@ -75,8 +75,8 @@ public:
 
     struct ARGS
     {
-        const volatile flags_type * const flags;
-        IThreadTest * const impl;
+        const volatile flags_type * flags;
+        IThreadTest * impl;
         RESULT results;
         ARGS(const volatile flags_type* f, IThreadTest* i) : flags(f), impl(i)
         {

@@ -12,9 +12,11 @@
 #include "pool_buffer.hpp"
 #include "meta_utils.hpp"
 #include "ref_lock.hpp"
+#include "inttypes.hpp"
+#include "xtomic.hpp"
+#include "xfunctional.hpp"
+#include "cppbasics.hpp"
 
-#include <atomic>
-#include <cstdint>
 #include <cassert>
 
 namespace lfds
@@ -120,14 +122,29 @@ struct get_mask_by
 }
 
 template<class HashType, int BFactor>
-struct get_max_level
+struct get_max_level;
+
+template<class HashType>
+struct get_max_level<HashType, 16>
 {
-    static constexpr int value = get_nested_level<get_mask_by<HashType>::get(),
-            get_shift_size<BFactor>::value>::value;
+    enum
+    {
+        value = sizeof(HashType)*2
+    };
 };
 
+template<class HashType>
+struct get_max_level<HashType, 256>
+{
+    enum
+    {
+        value = sizeof(HashType)
+    };
+};
+
+
 typedef std::size_t counter_type;
-typedef std::atomic<counter_type> atomic_counter_type;
+typedef xtomic<counter_type> atomic_counter_type;
 
 enum NodeType
 {
@@ -149,7 +166,7 @@ struct Node
 class __attribute__((aligned(sizeof(void*)*2))) NodePtr
 {
 public:
-    typedef typename get_uint_by_size<sizeof(Node*) / 2>::type counter_type;
+    typedef get_uint_by_size<sizeof(Node*) / 2>::type counter_type;
 
     NodePtr() :
             m_node(nullptr),
@@ -160,13 +177,13 @@ public:
 
     NodePtr(Node* n, const NodePtr & other) :
             m_node(n),
-            m_abaCount(other.m_abaCount.load(std::memory_order_relaxed) + 1),
+            m_abaCount(other.m_abaCount.load(barriers::relaxed) + 1),
             m_refCount(0)
     {
     }
     NodePtr(const NodePtr & other) :
-            m_node(other.m_node.load(std::memory_order_relaxed)),
-            m_abaCount(other.m_abaCount.load(std::memory_order_relaxed)),
+            m_node(other.m_node.load(barriers::relaxed)),
+            m_abaCount(other.m_abaCount.load(barriers::relaxed)),
             m_refCount(0)
     {
     }
@@ -179,15 +196,15 @@ public:
     }
     Node* node()
     {
-        return m_node.load(std::memory_order_relaxed);
+        return m_node.load(barriers::relaxed);
     }
     const Node* node() const
     {
-        return m_node.load(std::memory_order_relaxed);
+        return m_node.load(barriers::relaxed);
     }
     void node(Node* p)
     {
-        m_node.store(p, std::memory_order_relaxed);
+        m_node.store(p, barriers::relaxed);
     }
     counter_type add_ref() const
     {
@@ -199,11 +216,11 @@ public:
     }
     bool isReferenced() const
     {
-        return m_refCount.load(std::memory_order_relaxed) != 0;
+        return m_refCount.load(barriers::relaxed) != 0;
     }
     void wait() const
     {
-        while (m_refCount.load(std::memory_order_relaxed) > 0)
+        while (m_refCount.load(barriers::relaxed) > 0)
             ;
     }
     bool atomic_cas(const NodePtr & expected, const NodePtr & replacement)
@@ -225,14 +242,14 @@ public:
     }
     counter_type getAbaCount() const
     {
-        return m_abaCount.load(std::memory_order_relaxed);
+        return m_abaCount.load(barriers::relaxed);
     }
     bool isEqual(const NodePtr & other) const
     {
-        return m_node.load(std::memory_order_relaxed)
-                == other.m_node.load(std::memory_order_relaxed)
-                && m_abaCount.load(std::memory_order_relaxed)
-                        == other.m_abaCount.load(std::memory_order_relaxed);
+        return m_node.load(barriers::relaxed)
+                == other.m_node.load(barriers::relaxed)
+                && m_abaCount.load(barriers::relaxed)
+                        == other.m_abaCount.load(barriers::relaxed);
     }
     bool operator==(const NodePtr & other) const
     {
@@ -243,9 +260,9 @@ public:
         return !isEqual(other);
     }
 private:
-    std::atomic<Node*> m_node;                      // generic node
-    std::atomic<counter_type> m_abaCount;           // aba protection
-    mutable std::atomic<counter_type> m_refCount;   // reference count
+    xtomic<Node*> m_node;                      // generic node
+    xtomic<counter_type> m_abaCount;           // aba protection
+    mutable xtomic<counter_type> m_refCount;   // reference count
 };
 
 // chain node
@@ -269,7 +286,7 @@ struct CNode: public Node
     l_type* m_next;
     hash_type m_hash;
 
-    std::atomic<bool> m_allocated;
+    xtomic<bool> m_allocated;
 
     key_type* key()
     {
@@ -291,8 +308,8 @@ private:
     char m_keyBuff[sizeof(key_type)] __attribute__((aligned(__alignof(key_type))));
     char m_valueBuff[sizeof(value_type)] __attribute__((aligned(__alignof(value_type))));
 private:
-    CNode(const l_type & other) = delete;
-    l_type & operator=(const l_type & other) = delete;
+    CNode(const l_type & other); // = delete;
+    l_type & operator=(const l_type & other); // = delete;
 };
 
 // branch node
@@ -302,7 +319,7 @@ struct BNode: public Node
     typedef Key key_type;
     typedef Value value_type;
     typedef HashType hash_type;
-    typedef std::atomic<hash_type> atomic_hash_type;
+    typedef xtomic<hash_type> atomic_hash_type;
     typedef NodePtr ptr_type;
     typedef BNode<key_type, value_type, hash_type, BFactor> b_type;
     typedef CNode<key_type, value_type, hash_type> c_type;
@@ -311,12 +328,12 @@ struct BNode: public Node
     static constexpr int SIZE = BFactor;
 
     b_type* m_parent;
-    mutable std::atomic<counter_type> m_refCount;
+    mutable xtomic<counter_type> m_refCount;
     ptr_type m_array[SIZE];
 
 private:
-    BNode(const b_type & other) = delete;
-    b_type & operator=(const b_type & other) = delete;
+    BNode(const b_type & other); // = delete;
+    b_type & operator=(const b_type & other); // = delete;
 public:
     BNode() :
             Node(branch),
@@ -336,7 +353,7 @@ public:
     }
     void wait()
     {
-        while (m_refCount.load(std::memory_order_relaxed))
+        while (m_refCount.load(barriers::relaxed))
             ;
     }
 };
@@ -386,9 +403,9 @@ private:
 
 }
 
-template<class Key, class Value, int BFactor = 16, class Hash = std::hash<Key>,
+template<class Key, class Value, int BFactor = 16, class Hash = typename get_hash<Key>::type,
         class Pred = std::equal_to<Key>,
-        class Allocator = std::allocator<Value>>
+        class Allocator = std::allocator<Value> >
 class hash_trie
 {
 public:
@@ -424,8 +441,8 @@ public:
     typedef std::size_t size_type;
 
 private:
-    hash_trie(const this_type &) = delete;
-    this_type& operator=(const this_type &) = delete;
+    hash_trie(const this_type &); // = delete;
+    this_type& operator=(const this_type &); // = delete;
 
     enum Return
     {
@@ -485,8 +502,12 @@ public:
         assert(false); // shit happens
         return false;
     }
+#if LFDS_USE_CPP11
     template<class ... Args>
     bool insert(const key_type & key, Args&&... val)
+#else
+    bool insert(const key_type & key, const mapped_type& val)
+#endif
     {
         constexpr hash_type mask = htrie::get_mask<BFACTOR>::value;
         constexpr int shift = htrie::get_shift_size<BFACTOR>::value;
@@ -504,7 +525,7 @@ public:
             n_type* p = ptr->node();
             if (!p)
             {
-                ret = insertChain(bn, ptr, p, hash, key, val...);
+                ret = insertChain(bn, ptr, p, hash, key, std_forward(Args, val));
             }
             else if (p->m_type == htrie::branch)
             {
@@ -513,7 +534,7 @@ public:
             }
             else if (p->m_type == htrie::chain)
             {
-                ret = insertBranch(bn, ptr, p, level, shash, hash, key, val...);
+                ret = insertBranch(bn, ptr, p, level, shash, hash, key, std_forward(Args, val));
             }
             switch (ret)
             {
@@ -593,7 +614,7 @@ public:
     }
     size_type size() const
     {
-        return m_size.load(std::memory_order_relaxed);
+        return m_size.load(barriers::relaxed);
     }
     // diagnosis
 public:
@@ -620,7 +641,7 @@ private:
         {
             if (cn->m_hash == hash && m_eqFunc(key, *cn->key()))
             {
-                if (!cn->m_allocated)
+                if (!cn->m_allocated.load(barriers::relaxed))
                 {
                     break;
                 }
@@ -631,6 +652,7 @@ private:
         }
         return false;
     }
+#if LFDS_USE_CPP11
     template<class ... Args>
     Return insertChain(b_lock& bn,
                        ptr_lock& ptr,
@@ -638,6 +660,14 @@ private:
                        const hash_type hash,
                        const key_type & key,
                        Args&&... val)
+#else
+    Return insertChain(b_lock& bn,
+                       ptr_lock& ptr,
+                       n_type* p,
+                       const hash_type hash,
+                       const key_type & key,
+                       const mapped_type& val)
+#endif
     {
         // check if the value already exists
         const c_type* cn = reinterpret_cast<c_type*>(p);
@@ -646,7 +676,7 @@ private:
         {
             if (cn->m_hash == hash && m_eqFunc(key, *cn->key()))
             {
-                bool result = cn->m_allocated.load(std::memory_order_relaxed);
+                bool result = cn->m_allocated.load(barriers::relaxed);
                 if (!result)
                 {
                     break;
@@ -660,7 +690,7 @@ private:
 
         cnn->m_hash = hash;
         m_keyAllocator.construct(cnn->key(), key);
-        m_mappedAllocator.construct(cnn->value(), val...);
+        m_mappedAllocator.construct(cnn->value(), std_forward(Args, val));
         cnn->m_next = reinterpret_cast<c_type*>(p);
 
         ptr_type ptre = *ptr;
@@ -683,6 +713,7 @@ private:
         }
         return ret;
     }
+#if LFDS_USE_CPP11
     template<class ... Args>
     Return insertBranch(b_lock& bn,
                         ptr_lock& ptr,
@@ -692,6 +723,16 @@ private:
                         const hash_type hash,
                         const key_type & key,
                         Args&&... val)
+#else
+    Return insertBranch(b_lock& bn,
+                        ptr_lock& ptr,
+                        n_type* p,
+                        int& level,
+                        hash_type& shash,
+                        const hash_type hash,
+                        const key_type & key,
+                        const mapped_type& val)
+#endif
     {
         // not empty chain is expected
         c_type* cn = reinterpret_cast<c_type*>(p);
@@ -699,7 +740,7 @@ private:
         // check if we can use it rather then transform it to a new branch
         if (!cn->m_hash == hash || level == NFACTOR)
         {
-            Return ret = insertChain(bn, ptr, p, hash, key, val...);
+            Return ret = insertChain(bn, ptr, p, hash, key, std_forward(Args, val));
             return ret;
         }
 
@@ -748,9 +789,9 @@ private:
         while (cn)
         {
             if (cn->m_hash == hash && m_eqFunc(key, *cn->key())
-                    && cn->m_allocated.load(std::memory_order_relaxed))
+                    && cn->m_allocated.load(barriers::relaxed))
             {
-                cn->m_allocated.store(false, std::memory_order_relaxed);
+                cn->m_allocated.store(false, barriers::relaxed);
                 break;
             }
             cn = cn->m_next;
@@ -760,7 +801,7 @@ private:
         // try to clear from the head
         cn = head;
 
-        while (cn && !cn->m_allocated.load(std::memory_order_relaxed))
+        while (cn && !cn->m_allocated.load(barriers::relaxed))
         {
             cn = cn->m_next;
         }
@@ -856,7 +897,7 @@ private:
     }
     bool dbgCheckRefrencesImpl(const b_type* bn) const
     {
-        if (bn->m_refCount.load(std::memory_order_relaxed))
+        if (bn->m_refCount.load(barriers::relaxed))
         {
             return true;
         }
@@ -898,8 +939,8 @@ private:
 
 private:
     b_type m_root;
-    std::atomic<size_type> m_size;
-    std::atomic<size_type> m_bsize;
+    xtomic<size_type> m_size;
+    xtomic<size_type> m_bsize;
 
     key_allocator_type m_keyAllocator;
     mapped_allocator_type m_mappedAllocator;

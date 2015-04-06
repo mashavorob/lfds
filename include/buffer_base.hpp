@@ -9,6 +9,7 @@
 #define INCLUDE_BUFFER_BASE_HPP_
 
 #include "stack_base_aba.hpp"
+#include "cppbasics.hpp"
 
 namespace lfds
 {
@@ -47,11 +48,21 @@ public:
         m_nodeAllocator.deallocate(p, count);
     }
 
+#if LFDS_USE_CPP11
     template<class ... Args>
     void construct_data(node_type* p, Args&&... data)
+#else // LFDS_USE_CPP11
+    void construct_data(node_type* p, const value_type &data)
+#endif // LFDS_USE_CPP11
     {
-        m_dataAllocator.construct(p->data(), std::forward<Args>(data)...);
+        m_dataAllocator.construct(p->data(), std_forward(Args, data));
     }
+#if !LFDS_USE_CPP11
+    void construct_data(node_type* p)
+    {
+        ::new (static_cast<void*>(p->data())) value_type();
+    }
+#endif // LFDS_USE_CPP11
     void destroy_data(node_type* p)
     {
         m_dataAllocator.destroy(p->data());
@@ -64,16 +75,31 @@ public:
     {
         return m_freeNodes.atomic_pop();
     }
+#if LFDS_USE_CPP11
     template<class ... Args>
     node_type* new_node(Args&&... data)
+#else
+    node_type* new_node(const value_type &data)
+#endif
     {
         node_type* p = popFreeNode();
         if (p)
         {
-            construct_data(p, std::forward<Args>(data)...);
+            construct_data(p, std_forward(Args, data));
         }
         return p;
     }
+#if !LFDS_USE_CPP11
+    node_type* new_node()
+    {
+        node_type* p = popFreeNode();
+        if (p)
+        {
+            construct_data(p);
+        }
+        return p;
+    }
+#endif
     void free_node(node_type* p)
     {
         destroy_data(p);

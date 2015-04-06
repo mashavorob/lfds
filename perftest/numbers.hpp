@@ -8,9 +8,12 @@
 #ifndef PERFTEST_NUMBERS_HPP_
 #define PERFTEST_NUMBERS_HPP_
 
+#include <inttypes.hpp>
+#include <xfunctional.hpp>
+#include <cppbasics.hpp>
+
 #include <cstdlib>
 #include <ctime>
-#include <cstdint>
 #include <set>
 #include <vector>
 
@@ -122,7 +125,7 @@ struct dummy_hash
         return m_hasher(val);
     }
 private:
-    std::hash<T> m_hasher;
+    typename get_hash<T>::type m_hasher;
 };
 
 namespace {
@@ -220,47 +223,47 @@ struct get_random_generator
 template<>
 struct get_random_generator<int8_t>
 {
-    typedef typename get_integral_random_generator<int8_t>::type type;
+    typedef get_integral_random_generator<int8_t>::type type;
 };
 template<>
 struct get_random_generator<uint8_t>
 {
-    typedef typename get_integral_random_generator<uint8_t>::type type;
+    typedef get_integral_random_generator<uint8_t>::type type;
 };
 
 template<>
 struct get_random_generator<int16_t>
 {
-    typedef typename get_integral_random_generator<int16_t>::type type;
+    typedef get_integral_random_generator<int16_t>::type type;
 };
 
 template<>
 struct get_random_generator<uint16_t>
 {
-    typedef typename get_integral_random_generator<uint16_t>::type type;
+    typedef get_integral_random_generator<uint16_t>::type type;
 };
 
 template<>
 struct get_random_generator<int32_t>
 {
-    typedef typename get_integral_random_generator<int32_t>::type type;
+    typedef get_integral_random_generator<int32_t>::type type;
 };
 
 template<>
 struct get_random_generator<uint32_t>
 {
-    typedef typename get_integral_random_generator<uint32_t>::type type;
+    typedef get_integral_random_generator<uint32_t>::type type;
 };
 template<>
 struct get_random_generator<int64_t>
 {
-    typedef typename get_integral_random_generator<int64_t>::type type;
+    typedef get_integral_random_generator<int64_t>::type type;
 };
 
 template<>
 struct get_random_generator<uint64_t>
 {
-    typedef typename get_integral_random_generator<uint64_t>::type type;
+    typedef get_integral_random_generator<uint64_t>::type type;
 };
 
 }

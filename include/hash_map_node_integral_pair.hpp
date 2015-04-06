@@ -12,8 +12,6 @@
 #include "paddings.hpp"
 #include "cas.hpp"
 
-#include <atomic>
-
 #pragma pack(push)
 #pragma pack(1)
 
@@ -67,7 +65,6 @@ struct get_state_size<KeySize, 0, true, false>
 template<int KeySize, int ValueSize>
 struct get_state_size<KeySize, ValueSize, false, false>
 {
-    static_assert(KeySize == ValueSize, "Incorrect using of get_state_size<> type");
     static const int value = KeySize + ValueSize;
 };
 
@@ -303,7 +300,7 @@ public:
     this_type & operator=(const volatile this_type & other)
     {
         m_data.m_state = other.m_data.m_state;
-        std::atomic_thread_fence(std::memory_order_acquire);
+        thread_fence(barriers::acquire);
         m_data.m_key = other.m_data.m_key;
         m_data.m_value = other.m_data.m_value;
         return *this;

@@ -8,7 +8,7 @@
 #ifndef INCLUDE_PADDINGS_HPP_
 #define INCLUDE_PADDINGS_HPP_
 
-#include <cstdint>
+#include "inttypes.hpp"
 
 #pragma pack(push)
 #pragma pack(1)
@@ -30,10 +30,10 @@ public:
     {
     }
 private:
-    padding_type(const this_type &) = delete;
-    padding_type(const volatile this_type &) = delete;
-    this_type & operator=(const this_type &) = delete;
-    this_type & operator=(const volatile this_type &) = delete;
+    padding_type(const this_type &); // = delete;
+    padding_type(const volatile this_type &); // = delete;
+    this_type & operator=(const this_type &); // = delete;
+    this_type & operator=(const volatile this_type &); // = delete;
 private:
     typedef padding_type<size - 1> nested_padding_type;
 private:
@@ -52,10 +52,10 @@ public:
     {
     }
 private:
-    padding_type(const this_type &) = delete;
-    padding_type(const volatile this_type &) = delete;
-    this_type & operator=(const this_type &) = delete;
-    this_type & operator=(const volatile this_type &) = delete;
+    padding_type(const this_type &); // = delete;
+    padding_type(const volatile this_type &); // = delete;
+    this_type & operator=(const this_type &); // = delete;
+    this_type & operator=(const volatile this_type &); // = delete;
 };
 
 // does not depend on nesting
@@ -70,10 +70,10 @@ public:
     {
     }
 private:
-    padding_type(const this_type &) = delete;
-    padding_type(const volatile this_type &) = delete;
-    this_type & operator=(const this_type &) = delete;
-    this_type & operator=(const volatile this_type &) = delete;
+    padding_type(const this_type &); // = delete;
+    padding_type(const volatile this_type &); // = delete;
+    this_type & operator=(const this_type &); // = delete;
+    this_type & operator=(const volatile this_type &); // = delete;
 private:
     int8_t m_dummy;
 };
@@ -88,10 +88,10 @@ public:
     {
     }
 private:
-    padding_type(const this_type &) = delete;
-    padding_type(const volatile this_type &) = delete;
-    this_type & operator=(const this_type &) = delete;
-    this_type & operator=(const volatile this_type &) = delete;
+    padding_type(const this_type &); // = delete;
+    padding_type(const volatile this_type &); // = delete;
+    this_type & operator=(const this_type &); // = delete;
+    this_type & operator=(const volatile this_type &); // = delete;
 private:
     int16_t m_dummy;
 };
@@ -107,10 +107,10 @@ public:
     {
     }
 private:
-    padding_type(const this_type &) = delete;
-    padding_type(const volatile this_type &) = delete;
-    this_type & operator=(const this_type &) = delete;
-    this_type & operator=(const volatile this_type &) = delete;
+    padding_type(const this_type &); // = delete;
+    padding_type(const volatile this_type &); // = delete;
+    this_type & operator=(const this_type &); // = delete;
+    this_type & operator=(const volatile this_type &); // = delete;
 private:
     int32_t m_dummy;
 };
@@ -126,10 +126,10 @@ public:
     {
     }
 private:
-    padding_type(const this_type &) = delete;
-    padding_type(const volatile this_type &) = delete;
-    this_type & operator=(const this_type &) = delete;
-    this_type & operator=(const volatile this_type &) = delete;
+    padding_type(const this_type &); // = delete;
+    padding_type(const volatile this_type &); // = delete;
+    this_type & operator=(const this_type &); // = delete;
+    this_type & operator=(const volatile this_type &); // = delete;
 private:
     typedef padding_type<4> nested_padding_type;
 private:

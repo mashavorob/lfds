@@ -8,9 +8,11 @@
 #ifndef INCLUDE_STACK_HPP_
 #define INCLUDE_STACK_HPP_
 
-#include <stack_base_aba.hpp>
+#include "stack_base_aba.hpp"
+#include "xtomic.hpp"
+#include "cppbasics.hpp"
+
 #include <utility>
-#include <atomic>
 
 #include "buffer_traits.hpp"
 
@@ -56,10 +58,14 @@ public:
         }
     }
 
+#if LFDS_USE_CPP11
     template<class ... Args>
     bool push(Args&&... val)
+#else
+    bool push(const value_type& val)
+#endif
     {
-        node_type* p = m_buff.new_node(std::forward<Args>(val)...);
+        node_type* p = m_buff.new_node(std_forward(Args, val));
         if (!p)
         {
             return false;
@@ -77,7 +83,7 @@ public:
             return false;
         }
         --m_size;
-        val = std::move(*p->data());
+        val = std_move(*p->data());
         m_buff.free_node(p);
         return true;
     }
@@ -88,13 +94,13 @@ public:
     }
     size_type size() const
     {
-        return m_size.load(std::memory_order_relaxed);
+        return m_size.load(barriers::relaxed);
     }
 
 private:
     buffer_type m_buff;
     stack_type m_stack;
-    std::atomic<size_type> m_size;
+    xtomic<size_type> m_size;
 };
 
 }

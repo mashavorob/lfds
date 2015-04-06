@@ -26,8 +26,8 @@ public:
     typedef typename buffer_type::node_type node_type;
 
 private:
-    pool_buffer(const this_type&) = delete;
-    this_type& operator=(const this_type&) = delete;
+    pool_buffer(const this_type&); // = delete;
+    this_type& operator=(const this_type&); // = delete;
 
 public:
     pool_buffer(size_type initialCapacity) : m_buffer(initialCapacity)

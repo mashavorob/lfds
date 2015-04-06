@@ -9,6 +9,7 @@
 #define INCLUDE_FIXED_BUFFER_HPP_
 
 #include "buffer_base.hpp"
+#include "cppbasics.hpp"
 
 namespace lfds
 {
@@ -31,7 +32,7 @@ public:
             m_capacity(capacity), m_reserved(nullptr)
     {
         m_reserved = m_base.allocate_nodes(m_capacity);
-        for (auto i = 0; i < m_capacity; ++i)
+        for (size_type i = 0; i < m_capacity; ++i)
         {
             m_base.pushFreeNode(m_reserved + i);
         }
@@ -41,12 +42,16 @@ public:
     {
         m_base.deallocate_nodes(m_reserved, m_capacity);
     }
-
+#if LFDS_USE_CPP11
     template<class ... Args>
     node_type* new_node(Args&&... data)
+#else
+    node_type* new_node(const value_type& data)
+#endif
     {
-        return m_base.new_node(std::forward<Args>(data)...);
+        return m_base.new_node(std_forward(Args, data));
     }
+
     void free_node(node_type* p)
     {
         m_base.free_node(p);

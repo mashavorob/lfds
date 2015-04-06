@@ -8,6 +8,8 @@
 #ifndef PERFTEST_PERFORMANCETEST_HPP_
 #define PERFTEST_PERFORMANCETEST_HPP_
 
+#include <cppbasics.hpp>
+
 #include <string>
 
 namespace lfds
@@ -26,11 +28,9 @@ public:
 class PerformanceTest
 {
 public:
-    PerformanceTest(IPerformanceTest* impl);
+    PerformanceTest(IPerformanceTest* impl = nullptr);
 
-    PerformanceTest(PerformanceTest && other);
-
-    PerformanceTest(const PerformanceTest & other) = delete;
+    void attach(IPerformanceTest* impl);
 
     ~PerformanceTest();
 
@@ -38,6 +38,9 @@ public:
     {
         return m_impl;
     }
+private:
+    PerformanceTest(PerformanceTest & other); // = delete
+
 private:
     IPerformanceTest* m_impl;
 };

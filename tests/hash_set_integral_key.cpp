@@ -140,7 +140,7 @@ TEST(HashSetIntegralKey, collision)
 {
     typedef int key_type;
     typedef int key_type; // prevent optimization
-    typedef lfds::hash_set<key_type, bad_hash<key_type>> hash_set; // same hash for all
+    typedef lfds::hash_set<key_type, bad_hash<key_type> > hash_set; // same hash for all
     typedef hash_set::size_type size_type;
 
     hash_set hs;

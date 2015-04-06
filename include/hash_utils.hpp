@@ -8,7 +8,7 @@
 #ifndef INCLUDE_HASH_UTILS_HPP_
 #define INCLUDE_HASH_UTILS_HPP_
 
-#include <functional>
+#include "xfunctional.hpp"
 
 namespace lfds
 {
@@ -17,7 +17,8 @@ namespace lfds
 template<class T>
 inline void hash_combine(std::size_t& seed, T const& v)
 {
-    seed ^= std::hash<T>()(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    typedef typename get_hash<T>::type hash_type;
+    seed ^= hash_type<T>()(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 }
 
 }

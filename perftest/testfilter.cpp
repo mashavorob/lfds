@@ -8,6 +8,8 @@
 #include "testfilter.hpp"
 #include "testlocator.hpp"
 
+#include <cppbasics.hpp>
+
 #include <algorithm>
 
 namespace lfds
@@ -89,13 +91,13 @@ void Filter::byLabels(ids_type & ids, const strs_type & labels)
     }
 
     const PerfTestLocator &locator = PerfTestLocator::getInstance();
-    ids_type::iterator i = ids.begin();
+    ids_type::iterator iter = ids.begin();
     ids_type::iterator end = ids.end();
     strs_type::const_iterator lend = labels.end();
 
-    while ( i != end )
+    while ( iter != end )
     {
-        const id_type id = *i;
+        const id_type id = *iter;
         const char** ll = locator.getTestLabels(id);
 
         bool found = false;
@@ -106,11 +108,11 @@ void Filter::byLabels(ids_type & ids, const strs_type & labels)
         }
         if ( !found )
         {
-            ids.erase(i++);
+            ids.erase(iter++);
         }
         else
         {
-            ++i;
+            ++iter;
         }
     }
 }

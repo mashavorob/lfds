@@ -8,11 +8,12 @@
 #ifndef INCLUDE_QUEUE_HPP_
 #define INCLUDE_QUEUE_HPP_
 
-#include <utility>
-
 #include "queue_base.hpp"
 #include "queue_spscfs.hpp"
 #include "buffer_traits.hpp"
+#include "cppbasics.hpp"
+
+#include <utility>
 
 namespace lfds
 {
@@ -58,10 +59,14 @@ public:
         }
     }
 
+#if LFDS_USE_CPP11
     template<class ... Args>
-    bool push(Args&&... val)
+    bool push(Args&&... data)
+#else
+    bool push(const value_type& data)
+#endif
     {
-        node_type* p = m_buff.new_node(std::forward<Args>(val)...);
+        node_type* p = m_buff.new_node(std_forward(Args, data));
         if (!p)
         {
             return false;
@@ -78,7 +83,7 @@ public:
         {
             return false;
         }
-        val = std::move(*p->data());
+        val = std_move(*p->data());
         m_buff.free_node(p);
         --m_size;
         return true;
@@ -91,12 +96,12 @@ public:
 
     size_type size() const
     {
-        return m_size.load(std::memory_order_relaxed);
+        return m_size.load(barriers::relaxed);
     }
 private:
     buffer_type m_buff;
     queue_type m_queue;
-    std::atomic<size_type> m_size;
+    xtomic<size_type> m_size;
 };
 
 template<class T, class Allocator>
@@ -121,10 +126,14 @@ public:
     {
     }
 
+#if LFDS_USE_CPP11
     template<class ... Args>
-    bool push(Args&&... args)
+    bool push(Args&&... data)
+#else
+    bool push(const value_type& data)
+#endif
     {
-        return m_queue.push(std::forward<Args>(args)...);
+        return m_queue.push(std_forward(Args, data));
     }
     bool pop(T & val)
     {

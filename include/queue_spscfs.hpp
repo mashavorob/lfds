@@ -8,7 +8,9 @@
 #ifndef INCLUDE_QUEUE_SPSCFS_HPP_
 #define INCLUDE_QUEUE_SPSCFS_HPP_
 
-#include <atomic>
+#include "xtomic.hpp"
+#include "cppbasics.hpp"
+
 #include <memory>
 #include <utility>
 
@@ -80,14 +82,18 @@ public:
         m_nodeAllocator.deallocate(m_buffer, m_capacity);
     }
 
+#if LFDS_USE_CPP11
     template<class ... Args>
     bool push(Args&&... data)
+#else
+    bool push(const value_type& data)
+#endif
     {
         node_type* p = raw_push();
         if (p)
         {
-            m_dataAllocator.construct(p->data(), std::forward<Args>(data)...);
-            m_size.fetch_add(1, std::memory_order_release);
+            m_dataAllocator.construct(p->data(), std_forward(Args, data));
+            ++m_size;
             return true;
         }
         return false;
@@ -97,21 +103,21 @@ public:
         node_type* p = raw_pop();
         if (p)
         {
-            val = std::move(*p->data());
+            val = std_move(*p->data());
             m_dataAllocator.destroy(p->data());
-            m_size.fetch_sub(1, std::memory_order_release);
+            --m_size;
             return true;
         }
         return false;
     }
     size_type size() const
     {
-        return m_size.load(std::memory_order_relaxed);
+        return m_size.load(barriers::relaxed);
     }
 private:
     node_type* raw_pop()
     {
-        size_type sz = m_size.load(std::memory_order_relaxed);
+        size_type sz = m_size.load(barriers::relaxed);
         if (!sz)
         {
             return nullptr;
@@ -125,7 +131,7 @@ private:
     }
     node_type* raw_push()
     {
-        size_type sz = m_size.load(std::memory_order_relaxed);
+        size_type sz = m_size.load(barriers::relaxed);
         if (sz == m_capacity)
         {
             return nullptr;
@@ -139,7 +145,7 @@ private:
     }
 private:
     const size_type m_capacity;
-    std::atomic<size_type> m_size;
+    xtomic<size_type> m_size;
     size_type m_head;
     size_type m_tail;
     node_type* m_buffer;

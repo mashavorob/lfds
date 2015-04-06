@@ -9,6 +9,7 @@
 #define INCLUDE_HASH_MAP_TABLE_BASE_HPP_
 
 #include "hash_table_base.hpp"
+#include "cppbasics.hpp"
 
 #include <vector>
 #include <utility>
@@ -48,12 +49,16 @@ public:
         // attempt to make a wait free find
         scoped_lock_type guard(base_type::m_constTable);
         const table_type* ptr = base_type::m_constTable.m_ptr.load(
-                std::memory_order_relaxed);
+                barriers::relaxed);
 
         return base_type::m_hashTable.find_impl(*ptr, key, value);
     }
+#if LFDS_USE_CPP11
     template<class ... Args>
     bool insert(const key_type & key, Args&&... val)
+#else // LFDS_USE_CPP11
+    bool insert(const key_type & key, const mapped_type& val)
+#endif // LFDS_USE_CPP11
     {
         // the lock prevents overwhelming by big number of concurrent insertions
         scoped_reserver_type reserver(base_type::m_concurrentInsertions);
@@ -63,7 +68,7 @@ public:
         table_type* ptr = base_type::acquire_table(base_type::m_mutableTable);
         scoped_lock_type guard(base_type::m_mutableTable, false);
 
-        return base_type::m_hashTable.insert_impl(*ptr, key, std::forward<Args>(val)...);
+        return base_type::m_hashTable.insert_impl(*ptr, key, std_forward(Args, val));
     }
 };
 

@@ -12,9 +12,11 @@
 #include "hash_map_table_integral_pair.hpp"
 #include "hash_map_table_base.hpp"
 #include "hash_map_table_integral_key.hpp"
+#include "xtraits.hpp"
+#include "xfunctional.hpp"
+#include "cppbasics.hpp"
 
 #include <functional>
-#include <type_traits>
 
 namespace lfds
 {
@@ -36,16 +38,17 @@ struct dummy_hash_tuple
 template<class Key, class Value>
 struct is_interal_pair
 {
-    static const bool value = std::is_integral<Key>::value
-            && std::is_integral<Value>::value
-            && sizeof(dummy_hash_tuple<Key, Value> ) <= 16;
+    enum
+    {
+        value = is_integral<Key>::value && is_integral<Value>::value
+                && (sizeof(dummy_hash_tuple<Key, Value> ) <= 16)
+    };
 };
 
-template<class Key, class Value, class Hash = std::hash<Key>,
+template<class Key, class Value, class Hash = typename get_hash<Key>::type,
         class Pred = std::equal_to<Key>,
-        class Allocator = std::allocator<Value>, bool =
-                std::is_integral<Key>::value, bool =
-                is_interal_pair<Key, Value>::value>
+        class Allocator = std::allocator<Value>, bool = is_integral<Key>::value,
+        bool = is_interal_pair<Key, Value>::value>
 struct hash_table_traits;
 
 template<class Key, class Value, class Hash, class Pred, class Allocator>
@@ -71,7 +74,7 @@ struct hash_table_traits<Key, Value, Hash, Pred, Allocator, true, true>
 //
 // Hash map
 //
-template<class Key, class Value, class Hash = std::hash<Key>,
+template<class Key, class Value, class Hash = typename get_hash<Key>::type,
         class Pred = std::equal_to<Key>, class Allocator = std::allocator<Value> >
 class hash_map
 {
@@ -90,12 +93,13 @@ public:
     static constexpr bool INTEGRAL_KEY = hash_table_type::INTEGRAL_KEY;
     static constexpr bool INTEGRAL_KEYVALUE = hash_table_type::INTEGRAL_KEYVALUE;
 private:
-    hash_map(const this_type&) = delete;
-    this_type& operator=(const this_type&) = delete;
+    hash_map(const this_type&); // = delete;
+    this_type& operator=(const this_type&); // = delete;
 
 public:
     hash_map(const size_type initialCapacity = 0) :
-            m_hash_table(), m_hash_table_base(m_hash_table, initialCapacity)
+            m_hash_table(),
+            m_hash_table_base(m_hash_table, initialCapacity)
     {
 
     }
@@ -107,10 +111,14 @@ public:
     {
         return m_hash_table_base.find(key, value);
     }
+#if LFDS_USE_CPP11
     template<class ... Args>
     bool insert(const key_type & key, Args&&... val)
+#else
+    bool insert(const key_type & key, const mapped_type& val)
+#endif
     {
-        return m_hash_table_base.insert(key, std::forward<Args>(val)...);
+        return m_hash_table_base.insert(key, std_forward(Args, val));
     }
     bool erase(const key_type & key)
     {

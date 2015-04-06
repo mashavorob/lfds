@@ -10,10 +10,10 @@
 #include "hash_map_data_adapter.hpp"
 
 #include <hash_map.hpp>
+#include <inttypes.hpp>
 
 #include <ctime>
 #include <cstdlib>
-#include <cstdint>
 
 
 /////////////////////////////////////////////////////////////////
@@ -210,7 +210,7 @@ TEST(HashMap_integral_pair, collision)
 {
     typedef int key_type;
     typedef int value_type;
-    typedef lfds::hash_map<key_type, value_type, bad_hash<key_type>> hash_map; // same hash for all
+    typedef lfds::hash_map<key_type, value_type, bad_hash<key_type> > hash_map; // same hash for all
     typedef hash_map::size_type size_type;
 
     hash_map hm;

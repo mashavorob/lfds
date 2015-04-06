@@ -9,6 +9,7 @@
 #define INCLUDE_DYNAMIC_BUFFER_HPP_
 
 #include "buffer_base.hpp"
+#include "cppbasics.hpp"
 
 namespace lfds
 {
@@ -33,7 +34,7 @@ public:
 public:
     dynamic_buffer(size_type initialCapacity)
     {
-        for ( size_type i = 0; i < initialCapacity; ++i )
+        for (size_type i = 0; i < initialCapacity; ++i)
         {
             node_type* node = m_base.allocate_nodes(1);
             m_base.pushFreeNode(node);
@@ -42,24 +43,40 @@ public:
     ~dynamic_buffer()
     {
         node_type* node = m_base.popFreeNode();
-        while ( node )
+        while (node)
         {
             m_base.deallocate_nodes(node, 1);
             node = m_base.popFreeNode();
         }
     }
 
+#if LFDS_USE_CPP11
     template<class ... Args>
     node_type* new_node(Args&&... data)
+#else
+    node_type* new_node(const value_type &data)
+#endif
     {
         node_type* node = m_base.popFreeNode();
-        if ( !node )
+        if (!node)
         {
             node = m_base.allocate_nodes(1);
         }
-        m_base.construct_data(node, std::forward<Args>(data)...);
+        m_base.construct_data(node, std_forward(Args, data));
         return node;
     }
+#if !LFDS_USE_CPP11
+    node_type* new_node()
+    {
+        node_type* node = m_base.popFreeNode();
+        if (!node)
+        {
+            node = m_base.allocate_nodes(1);
+        }
+        m_base.construct_data(node);
+        return node;
+    }
+#endif
     void free_node(node_type* p)
     {
         m_base.free_node(p);

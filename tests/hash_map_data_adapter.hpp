@@ -8,7 +8,8 @@
 #ifndef TESTS_HASH_MAP_DATA_ADAPTER_HPP_
 #define TESTS_HASH_MAP_DATA_ADAPTER_HPP_
 
-#include <functional>
+#include <cppbasics.hpp>
+#include <xfunctional.hpp>
 
 namespace lfds
 {
@@ -40,26 +41,34 @@ public:
     }
     std::size_t hash() const
     {
-        static const std::hash<T> hasher;
+        typename get_hash<T>::type hasher;
         return hasher(m_t);
     }
 public:
     T m_t;
 };
 }
-}
+template<class T>
+struct adapted_hash
+{
+public:
+    typedef typename get_hash<T>::type hash_type;
 
-namespace std
-{
-template<>
-struct hash<lfds::testing::adapter<int> > : public unary_function<
-        lfds::testing::adapter<int>, std::size_t>
-{
-    size_t operator()(const lfds::testing::adapter<int>& val) const
+    size_t operator()(const lfds::testing::adapter<T>& val) const
     {
-        return val.hash();
+        return m_hasher(val.m_t);
     }
+
+private:
+    hash_type m_hasher;
 };
+
+template<typename T>
+struct get_hash<lfds::testing::adapter<T> >
+{
+    typedef adapted_hash<T> type;
+};
+
 }
 
 template<class T>

@@ -12,7 +12,6 @@
 #include "cas.hpp"
 
 #include <cassert>
-#include <atomic>
 #include <functional>
 #include <vector>
 
@@ -131,8 +130,7 @@ public:
             case node_type::unused:
             {
                 // the slot is empty so try to use it
-                const node_type new_node =
-                { node_type::allocated, key, val };
+                const node_type new_node(node_type::allocated, key, val);
 
                 if (table[i].atomic_cas(node, new_node))
                 {
@@ -153,8 +151,7 @@ public:
             case node_type::touched:
                 if (eq_func(key, node.m_data.m_key))
                 {
-                    const node_type new_node =
-                    { node_type::allocated, key, val };
+                    const node_type new_node(node_type::allocated, key, val);
 
                     if (table[i].atomic_cas(node, new_node))
                     {

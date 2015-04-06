@@ -9,6 +9,8 @@
 #include "performancetest.hpp"
 #include "testfactory.hpp"
 
+#include <cppbasics.hpp>
+
 #include <stdexcept>
 
 
@@ -38,9 +40,9 @@ void PerfTestLocator::registerTest(PerfTestInfo* info)
     m_link = info;
 }
 
-PerformanceTest PerfTestLocator::getTest(const id_type id) const
+void PerfTestLocator::getTest(const id_type id, PerformanceTest & test) const
 {
-    return PerformanceTest(at(id)->m_factory->create());
+    test.attach(at(id)->m_factory->create());
 }
 
 const PerfTestInfo* PerfTestLocator::at(const id_type id) const

@@ -8,7 +8,7 @@
 #ifndef INCLUDE_META_UTILS_HPP_
 #define INCLUDE_META_UTILS_HPP_
 
-#include <cstdint>
+#include "inttypes.hpp"
 
 namespace lfds
 {

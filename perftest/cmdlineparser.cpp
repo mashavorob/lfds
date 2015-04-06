@@ -5,6 +5,8 @@
  *      Author: masha
  */
 
+#include <cppbasics.hpp>
+
 #include "cmdlineparser.hpp"
 #include "testfilter.hpp"
 #include "testlocator.hpp"

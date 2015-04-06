@@ -8,6 +8,8 @@
 #ifndef PERFTEST_TESTALLOCATOR_HPP_
 #define PERFTEST_TESTALLOCATOR_HPP_
 
+#include <cppbasics.hpp>
+
 #include <memory>
 
 namespace lfds
@@ -105,10 +107,14 @@ public:
     {
         return m_nestedAlloc.max_size();
     }
+#if LFDS_USE_CPP11
     template<class ... Args>
-    void construct(pointer p, Args&&... args)
+    void construct(pointer p, Args&&... val)
+#else
+    void construct(pointer p, const value_type & val)
+#endif
     {
-        m_nestedAlloc.construct(p, std::forward<Args>(args)...);
+        m_nestedAlloc.construct(p, std_forward(Args, val));
     }
     void destroy(pointer p)
     {

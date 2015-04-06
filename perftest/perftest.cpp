@@ -5,11 +5,13 @@
  *      Author: masha
  */
 
-#include "config.hpp"
 #include "testlocator.hpp"
 #include "testtree.hpp"
 #include "testfilter.hpp"
 #include "cmdlineparser.hpp"
+
+#include <cppbasics.hpp>
+
 
 #include <cassert>
 #include <iostream>
@@ -119,7 +121,8 @@ struct RunTest: public Generic
         const id_type id = *iter;
         const char* displayName = locator.getTestDisplayName(id);
         const char* units = locator.getTestUnits(id);
-        PerformanceTest test = locator.getTest(id);
+        PerformanceTest test;
+        locator.getTest(id, test);
 
         std::cout << "        " << displayName << ": running\r";
         std::cout.flush();

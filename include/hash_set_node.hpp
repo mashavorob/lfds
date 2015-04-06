@@ -9,8 +9,7 @@
 #define INCLUDE_HASH_SET_NODE_HPP_
 
 #include "cas.hpp"
-#include <atomic>
-#include <cstdint>
+#include "inttypes.hpp"
 
 namespace lfds
 {
@@ -97,8 +96,8 @@ public:
     typedef hash_set_item hash_item_type;
 
 private:
-    hash_set_node(const this_class&) = delete;
-    this_class& operator=(const this_class&) = delete;
+    hash_set_node(const this_class&); // = delete;
+    this_class& operator=(const this_class&); // = delete;
 public:
     hash_set_node() : m_hash()
     {

@@ -397,7 +397,7 @@ private:
 class MtAvgAggregator: public ITestAggregator
 {
 public:
-    typedef typename ITestAggregator::size_type size_type;
+    typedef ITestAggregator::size_type size_type;
 
     MtAvgAggregator() :
             m_count(0),
@@ -424,7 +424,7 @@ private:
 class MtMaxAggregator: public ITestAggregator
 {
 public:
-    typedef typename ITestAggregator::size_type size_type;
+    typedef ITestAggregator::size_type size_type;
 
     MtMaxAggregator() :
             m_first(true),
@@ -513,8 +513,8 @@ public:
         MultiThreadTest::setMult(static_cast<double>(Multiplier));
     }
 private:
-    MtTestImpl(const this_type&) = delete;
-    this_type& operator=(const this_type&) = delete;
+    MtTestImpl(const this_type&); // = delete;
+    this_type& operator=(const this_type&); // = delete;
 private:
     noiser_type m_noiser;
     worker_type m_worker;

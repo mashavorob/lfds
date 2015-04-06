@@ -9,6 +9,7 @@
 #define INCLUDE_HASH_MAP_NODE_INTEGRAL_KEY_HPP_
 
 #include "meta_utils.hpp"
+#include "xtomic.hpp"
 
 namespace lfds
 {
@@ -97,8 +98,8 @@ public:
     typedef typename key_item_type::state_type state_type;
 
 private:
-    hash_node_integral_key(const this_class&) = delete;
-    this_class& operator=(const this_class&) = delete;
+    hash_node_integral_key(const this_class&); // = delete;
+    this_class& operator=(const this_class&); // = delete;
 public:
     hash_node_integral_key() :
             m_key(), m_refCount(0)
@@ -137,22 +138,22 @@ public:
     }
     void add_ref() const
     {
-        m_refCount.fetch_add(1, std::memory_order_acquire);
+        ++m_refCount;
     }
     void release() const
     {
-        m_refCount.fetch_sub(1, std::memory_order_release);
+        --m_refCount;
     }
     void wait_for_release() const
     {
-        while (m_refCount.load(std::memory_order_relaxed))
+        while (m_refCount.load(barriers::relaxed))
             ;
     }
 
 private:
     volatile key_item_type m_key;
     char m_value[sizeof(mapped_type)];
-    mutable std::atomic<int> m_refCount;
+    mutable xtomic<int> m_refCount;
 };
 
 }

@@ -8,7 +8,7 @@
 #ifndef INCLUDE_TWO_LEVEL_LOCK_HPP_
 #define INCLUDE_TWO_LEVEL_LOCK_HPP_
 
-#include <atomic>
+#include "xtomic.hpp"
 
 namespace lfds
 {
@@ -26,17 +26,17 @@ public:
     void lock_weak()
     {
         ++m_acc_count;
-        if (m_del_count.load(std::memory_order_relaxed) == 0)
+        if (m_del_count.load(barriers::relaxed) == 0)
         {
             return;
         }
         bool success = false;
         do
         {
-            if (m_del_count.load(std::memory_order_relaxed) == 0)
+            if (m_del_count.load(barriers::relaxed) == 0)
             {
                 ++m_acc_count;
-                if (m_del_count.load(std::memory_order_relaxed) == 0)
+                if (m_del_count.load(barriers::relaxed) == 0)
                 {
                     success = true;
                 }
@@ -51,30 +51,30 @@ public:
     // strong lock, allows just exclusive access
     void unlock_weak()
     {
-        m_acc_count.fetch_sub(1, std::memory_order_relaxed);
+        m_acc_count.fetch_sub(1, barriers::relaxed);
     }
 
     void lock_exclusive()
     {
-        int count = m_del_count.fetch_add(1, std::memory_order_relaxed);
+        int count = m_del_count.fetch_add(1, barriers::relaxed);
 
         while (count)
         {
-            m_del_count.fetch_sub(1, std::memory_order_relaxed);
-            count = m_del_count.fetch_add(1, std::memory_order_relaxed);
+            m_del_count.fetch_sub(1, barriers::relaxed);
+            count = m_del_count.fetch_add(1, barriers::relaxed);
         }
-        while (m_acc_count.load(std::memory_order_relaxed))
+        while (m_acc_count.load(barriers::relaxed))
             ;
     }
 
     void unlock_exclusive()
     {
-        m_del_count.fetch_sub(1, std::memory_order_relaxed);
+        m_del_count.fetch_sub(1, barriers::relaxed);
     }
 
 private:
-    std::atomic<int> m_acc_count;
-    std::atomic<int> m_del_count;
+    xtomic<int> m_acc_count;
+    xtomic<int> m_del_count;
 };
 
 template<class Lock>

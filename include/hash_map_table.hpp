@@ -11,6 +11,7 @@
 #include "hash_map_node.hpp"
 #include "raw_hash_table.hpp"
 #include "ref_lock.hpp"
+#include "cppbasics.hpp"
 
 #include <utility>
 #include <algorithm>
@@ -68,7 +69,8 @@ public:
     hash_map_table()
     {
     }
-    void getSnapshot_imp(const table_type& raw_table, snapshot_type & snapshot) const
+    void getSnapshot_imp(const table_type& raw_table,
+                         snapshot_type & snapshot) const
     {
         const node_type* table = raw_table.m_table;
         const size_type capacity = raw_table.m_capacity;
@@ -89,8 +91,9 @@ public:
             }
         }
     }
-    bool find_impl(const table_type& raw_table, const key_type & key,
-            mapped_type & value) const
+    bool find_impl(const table_type& raw_table,
+                   const key_type & key,
+                   mapped_type & value) const
     {
         const size_type hash = m_hash_func(key);
 
@@ -160,8 +163,12 @@ public:
         return false;
     }
 
+#if LFDS_USE_CPP11
     template<class ... Args>
     bool insert_impl(table_type& raw_table, const key_type & key, Args&&... val)
+#else
+    bool insert_impl(table_type& raw_table, const key_type & key, const mapped_type &val)
+#endif
     {
         const size_type hash = m_hash_func(key);
 
@@ -183,13 +190,12 @@ public:
             case hash_item_type::unused:
             {
                 // the slot is empty so try to use it
-                hash_item_type new_item =
-                { hash, hash_item_type::pending };
+                hash_item_type new_item(hash, hash_item_type::pending);
 
                 if (node.atomic_cas_hash(item, new_item))
                 {
                     m_value_allocator.construct(node.value(),
-                            std::forward<Args>(val)...);
+                            std_forward(Args, val));
                     m_key_allocator.construct(node.key(), key);
                     node.set_state(hash_item_type::allocated);
 
@@ -220,13 +226,12 @@ public:
             case hash_item_type::touched:
                 if (m_eq_func(key, *node.key()))
                 {
-                    hash_item_type new_item =
-                    { hash, hash_item_type::pending2 };
+                    hash_item_type new_item(hash, hash_item_type::pending2);
 
                     if (node.atomic_cas_hash(item, new_item))
                     {
                         m_value_allocator.construct(node.value(),
-                                std::forward<Args>(val)...);
+                                std_forward(Args, val));
                         node.set_state(hash_item_type::allocated);
                         ++raw_table.m_size;
                         return true;
@@ -292,8 +297,7 @@ public:
                 if (m_eq_func(key, *node.key()))
                 {
                     // reset readiness
-                    hash_item_type new_item =
-                    { hash, hash_item_type::pending2 };
+                    hash_item_type new_item(hash, hash_item_type::pending2);
 
                     if (node.atomic_cas_hash(item, new_item))
                     {
@@ -346,9 +350,7 @@ public:
             {
                 key_type & key = *node.key();
                 mapped_type & val = *node.value();
-
-                insert_unique_key(dst, item.m_hash, std::forward<key_type>(key),
-                        std::forward<mapped_type>(val));
+                insert_unique_key(dst, item.m_hash, key, val);
             }
         }
     }
@@ -357,8 +359,10 @@ public:
     //    * exclusive access to the container
     //    * new key is unique
     //    * table has enough capacity to insert specified element
-    void insert_unique_key(table_type& dst, const size_type hash,
-            key_type && key, mapped_type && val)
+    void insert_unique_key(table_type& dst,
+                           const size_type hash,
+                           const key_type & key,
+                           const mapped_type & val)
     {
         const size_type capacity = dst.m_capacity;
 
@@ -374,10 +378,8 @@ public:
             {
                 node.set_item(hash, hash_item_type::allocated);
 
-                m_key_allocator.construct(node.key(),
-                        std::forward<key_type>(key));
-                m_value_allocator.construct(node.value(),
-                        std::forward<mapped_type>(val));
+                m_key_allocator.construct(node.key(), key);
+                m_value_allocator.construct(node.value(), val);
 
                 ++dst.m_size;
                 ++dst.m_used;

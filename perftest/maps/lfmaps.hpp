@@ -10,6 +10,7 @@
 
 #include <hash_map.hpp>
 #include <hash_trie.hpp>
+#include <xfunctional.hpp>
 
 namespace lfds
 {
@@ -20,7 +21,7 @@ namespace maps
 namespace adapter
 {
 
-template<class Key, class Value, class Hash = std::hash<Key>, class Allocator = std::allocator<Value>>
+template<class Key, class Value, class Hash = typename get_hash<Key>::type, class Allocator = std::allocator<Value> >
 class hash_map
 {
 public:
@@ -63,11 +64,11 @@ private:
 };
 
 
-template<class Key, class Value, int BFactor, class Allocator = std::allocator<Value>>
+template<class Key, class Value, int BFactor, class Allocator = std::allocator<Value> >
 class hash_trie
 {
 public:
-    typedef lfds::hash_trie<Key, Value, BFactor, std::hash<Key>, std::equal_to<Key>, Allocator> collection_type;
+    typedef lfds::hash_trie<Key, Value, BFactor, typename get_hash<Key>::type, std::equal_to<Key>, Allocator> collection_type;
     typedef typename collection_type::key_type key_type;
     typedef typename collection_type::mapped_type mapped_type;
     typedef typename collection_type::size_type size_type;

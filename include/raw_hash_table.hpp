@@ -8,6 +8,8 @@
 #ifndef INCLUDE_RAW_HASH_TABLE_HPP_
 #define INCLUDE_RAW_HASH_TABLE_HPP_
 
+#include "xtomic.hpp"
+
 #include <cstddef>
 
 namespace lfds {
@@ -21,8 +23,8 @@ struct hash_data_table
     node_type* m_table;
     size_type m_capacity;
     size_type m_highWatermark;
-    std::atomic<size_type> m_size;
-    std::atomic<size_type> m_used;
+    xtomic<size_type> m_size;
+    xtomic<size_type> m_used;
 };
 
 }

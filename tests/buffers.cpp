@@ -23,9 +23,9 @@ TEST(fixed_buffer, allocfree)
     buffer_type buff(1);
 
     node_type* node = buff.new_node(code_1);
-    EXPECT_NE(node, nullptr);
+    EXPECT_NE(node, static_cast<node_type*>(0));
     EXPECT_EQ(*node->data(), code_1);
-    EXPECT_EQ(buff.new_node(), nullptr);
+    EXPECT_EQ(buff.new_node(0), static_cast<node_type*>(0));
     buff.free_node(node);
 }
 
@@ -42,26 +42,26 @@ TEST(fixed_buffer, allocfree3)
     buffer_type buff(3);
 
     node_type* node1 = buff.new_node(code_1);
-    EXPECT_NE(node1, nullptr);
+    EXPECT_NE(node1, static_cast<node_type*>(0));
     EXPECT_EQ(*node1->data(), code_1);
 
     node_type* node2 = buff.new_node(code_2);
-    EXPECT_NE(node2, nullptr);
+    EXPECT_NE(node2, static_cast<node_type*>(0));
     EXPECT_EQ(*node2->data(), code_2);
 
     node_type* node3 = buff.new_node(code_3);
-    EXPECT_NE(node3, nullptr);
+    EXPECT_NE(node3, static_cast<node_type*>(0));
     EXPECT_EQ(*(node3->data()), code_3);
 
-    EXPECT_EQ(buff.new_node(), nullptr);
+    EXPECT_EQ(buff.new_node(0), static_cast<node_type*>(0));
 
     buff.free_node(node1);
 
     node_type* node4 = buff.new_node(code_4);
-    EXPECT_NE(node4, nullptr);
+    EXPECT_NE(node4, static_cast<node_type*>(0));
     EXPECT_EQ(*node4->data(), code_4);
 
-    EXPECT_EQ(buff.new_node(), nullptr);
+    EXPECT_EQ(buff.new_node(0), static_cast<node_type*>(0));
 
     buff.free_node(node2);
     buff.free_node(node3);
@@ -82,7 +82,7 @@ TEST(dynamic_buffer, allocfree)
     buffer_type buff(1);
 
     node_type* node = buff.new_node(code_1);
-    EXPECT_NE(node, nullptr);
+    EXPECT_NE(node, static_cast<node_type*>(0));
     EXPECT_EQ(*node->data(), code_1);
 
     buff.free_node(node);
@@ -101,17 +101,17 @@ TEST(dynamic_buffer, reuse_node)
     buffer_type buff(1);
 
     node_type* node1 = buff.new_node(code_1);
-    EXPECT_NE(node1, nullptr);
+    EXPECT_NE(node1, static_cast<node_type*>(0));
     EXPECT_EQ(*node1->data(), code_1);
 
     node_type* node2 = buff.new_node(code_2);
-    EXPECT_NE(node2, nullptr);
+    EXPECT_NE(node2, static_cast<node_type*>(0));
     EXPECT_EQ(*node2->data(), code_2);
 
     buff.free_node(node1);
 
     node_type* node3 = buff.new_node(code_3);
-    EXPECT_NE(node3, nullptr);
+    EXPECT_NE(node3, static_cast<node_type*>(0));
     EXPECT_EQ(*node3->data(), code_3);
     EXPECT_EQ(node1, node3); // node should be reused
 

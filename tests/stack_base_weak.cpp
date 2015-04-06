@@ -11,9 +11,10 @@
 TEST(stack_base_weak, pop)
 {
     typedef lfds::stack_base_weak<int> stack_type;
+    typedef stack_type::node_type node_type;
 
     stack_type stack;
-    EXPECT_EQ(stack.pop(), nullptr);
+    EXPECT_EQ(stack.pop(), static_cast<node_type*>(0));
 }
 
 TEST(stack_base_weak, push)
@@ -25,7 +26,7 @@ TEST(stack_base_weak, push)
     node_type a;
     stack.push(&a);
     EXPECT_EQ(stack.pop(), &a);
-    EXPECT_EQ(stack.pop(), nullptr);
+    EXPECT_EQ(stack.pop(), static_cast<node_type*>(0));
 }
 
 TEST(stack_base_weak, push3)
@@ -41,15 +42,16 @@ TEST(stack_base_weak, push3)
     EXPECT_EQ(stack.pop(), &a[2]);
     EXPECT_EQ(stack.pop(), &a[1]);
     EXPECT_EQ(stack.pop(), &a[0]);
-    EXPECT_EQ(stack.pop(), nullptr);
+    EXPECT_EQ(stack.pop(), static_cast<node_type*>(0));
 }
 
 TEST(stack_base_weak, atomic_pop)
 {
     typedef lfds::stack_base_weak<int> stack_type;
+    typedef stack_type::node_type node_type;
 
     stack_type stack;
-    EXPECT_EQ(stack.atomic_pop(), nullptr);
+    EXPECT_EQ(stack.atomic_pop(), static_cast<node_type*>(0));
 }
 
 TEST(stack_base_weak, atomic_push)
@@ -61,7 +63,7 @@ TEST(stack_base_weak, atomic_push)
     node_type a;
     stack.atomic_push(&a);
     EXPECT_EQ(stack.atomic_pop(), &a);
-    EXPECT_EQ(stack.atomic_pop(), nullptr);
+    EXPECT_EQ(stack.atomic_pop(), static_cast<node_type*>(0));
 }
 
 TEST(stack_base_weak, atomic_push3)
@@ -77,6 +79,6 @@ TEST(stack_base_weak, atomic_push3)
     EXPECT_EQ(stack.atomic_pop(), &a[2]);
     EXPECT_EQ(stack.atomic_pop(), &a[1]);
     EXPECT_EQ(stack.atomic_pop(), &a[0]);
-    EXPECT_EQ(stack.atomic_pop(), nullptr);
+    EXPECT_EQ(stack.atomic_pop(), static_cast<node_type*>(0));
 }
 

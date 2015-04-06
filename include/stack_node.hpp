@@ -8,6 +8,7 @@
 #ifndef STACK_NODE_HPP_
 #define STACK_NODE_HPP_
 
+#include "cppbasics.hpp"
 #include <cstddef>
 
 namespace lfds
@@ -35,7 +36,10 @@ public:
 
     static this_type* recover(T* p)
     {
-        const int offset = offsetof(this_type, m_data);
+        // workaround for offsetof bug in old GCC versions
+        static const this_type dummy;
+        static const int offset = &dummy.m_data[0] - reinterpret_cast<const char*>(&dummy);
+
         return reinterpret_cast<this_type*>(reinterpret_cast<char*>(p) - offset);
     }
 

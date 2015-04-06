@@ -10,7 +10,7 @@
 
 #include "stack_base_weak.hpp"
 #include "stack_base_aba.hpp"
-#include <atomic>
+#include "xtomic.hpp"
 
 namespace lfds
 {
@@ -65,7 +65,7 @@ public:
     node_type* atomic_pop()
     {
         // acquire consumer lock
-        counter_type count = m_lock.fetch_add(1, std::memory_order_acquire);
+        counter_type count = m_lock.fetch_add(1, barriers::release);
 
         // attempt to pop an item
         node_type* p = m_consumerEnd.atomic_pop();
@@ -75,11 +75,11 @@ public:
             m_consumerEnd.atomic_set_head(p);
             p = m_consumerEnd.atomic_pop();
         }
-        m_lock.fetch_sub(1, std::memory_order_relaxed);
+        m_lock.fetch_sub(1, barriers::relaxed);
         return p;
     }
 private:
-    std::atomic<counter_type> m_lock;
+    xtomic<counter_type> m_lock;
 public:
     producer_stack_type m_producerEnd;
     consumer_stack_type m_consumerEnd;

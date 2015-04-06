@@ -9,6 +9,7 @@
 #define INCLUDE_ABA_PTR_HPP_
 
 #include <cstddef>
+#include "cppbasics.hpp"
 #include "cas.hpp"
 
 namespace lfds

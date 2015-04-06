@@ -28,7 +28,7 @@ public:
     double doTest()
     {
         tester_type tester;
-        const Stopwatch<tester_type> stopwatch;
+        Stopwatch<tester_type> stopwatch;
 
         const double duration = stopwatch(tester);
         const double performance = duration/static_cast<double>(count)*static_cast<double>(mult);

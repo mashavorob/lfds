@@ -74,8 +74,8 @@ private:
     }
 private:
 
-    ref_lock(const this_type&) = delete;
-    this_type& operator=(const this_type&) = delete;
+    ref_lock(const this_type&); // = delete;
+    this_type& operator=(const this_type&); // = delete;
 
 private:
     T *m_obj;

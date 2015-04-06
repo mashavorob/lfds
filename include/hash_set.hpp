@@ -12,8 +12,8 @@
 #include "hash_set_table_base.hpp"
 #include "hash_set_table_integral_key.hpp"
 #include "hash_map.hpp"
-
-#include <type_traits>
+#include "xtraits.hpp"
+#include "xfunctional.hpp"
 
 namespace lfds
 {
@@ -22,7 +22,7 @@ namespace
 {
 
 // hash_set is an adapter for hash_map
-template<class T, class Hash, class Pred, class Allocator, bool = std::is_integral<T>::value>
+template<class T, class Hash, class Pred, class Allocator, bool = is_integral<T>::value>
 struct hash_set_table_selector;
 
 template<class T, class Hash, class Pred, class Allocator>
@@ -39,7 +39,7 @@ struct hash_set_table_selector<T, Hash, Pred, Allocator, true>
 }
 
 // hash_set is an adapter for hash_map
-template<class T, class Hash = std::hash<T>, class Pred = std::equal_to<T>,
+template<class T, class Hash = typename get_hash<T>::type, class Pred = std::equal_to<T>,
         class Allocator = std::allocator<T> >
 class hash_set
 {

@@ -7,6 +7,8 @@
 
 #include "performancetest.hpp"
 
+#include <cppbasics.hpp>
+
 namespace lfds
 {
 namespace perftest
@@ -23,10 +25,10 @@ PerformanceTest::PerformanceTest(IPerformanceTest* impl) :
 
 }
 
-PerformanceTest::PerformanceTest(PerformanceTest && other) :
-        m_impl(other.m_impl)
+void PerformanceTest::attach(IPerformanceTest* impl)
 {
-    other.m_impl = nullptr;
+    delete m_impl;
+    m_impl = impl;
 }
 
 PerformanceTest::~PerformanceTest()

@@ -11,7 +11,6 @@
 #include "hash_set_integral_key.hpp"
 
 #include <cassert>
-#include <atomic>
 #include <functional>
 #include <vector>
 
@@ -122,8 +121,7 @@ public:
             case node_type::unused:
             {
                 // the slot is empty so try to use it
-                const node_type new_node =
-                { key, node_type::allocated };
+                const node_type new_node(key, node_type::allocated);
 
                 if (atomic_cas(table[i], node, new_node))
                 {

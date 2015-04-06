@@ -10,10 +10,16 @@
 
 #include <testsync.hpp>
 #include <testallocator.hpp>
+#include <xfunctional.hpp>
+#include <cppbasics.hpp>
 
-#include <map>
-#include <unordered_map>
 #include <pthread.h>
+#include <map>
+#if LFDS_USE_CPP11
+#include <unordered_map>
+#else
+#include <tr1/unordered_map>
+#endif
 
 namespace lfds
 {
@@ -42,15 +48,36 @@ struct get_map_type<Key, Value, Allocator, false>
 template<class Key, class Value, class Allocator>
 struct get_map_type<Key, Value, Allocator, true>
 {
-    typedef std::unordered_map<Key, Value, std::hash<Key>, std::equal_to<Key>, Allocator> type;
+    typedef typename get_hash<Key>::type hash_type;
+#if LFDS_USE_CPP11
+    typedef std::unordered_map<Key, Value, hash_type, std::equal_to<Key>, Allocator> type;
+#else
+    typedef std::tr1::unordered_map<Key, Value, hash_type, std::equal_to<Key>, Allocator> type;
+#endif
 };
 
-template<class Map, bool Unordered>
-struct reserver;
+template<bool Unordered>
+struct get_reserve_implemented
+{
+    enum
+    {
+        value = false
+    };
+};
 
+#if LFDS_USE_CPP11
+template<>
+struct get_reserve_implemented<true>
+{
+    enum
+    {
+        value = true
+    };
+};
+#endif
 
-template<class Map>
-struct reserver<Map, false>
+template<class Map, bool Unordered, bool = get_reserve_implemented<Unordered>::value >
+struct reserver
 {
     typedef Map map_type;
     typedef typename map_type::size_type size_type;
@@ -60,12 +87,12 @@ struct reserver<Map, false>
     }
 };
 
-template<class Map>
-struct reserver<Map, true>
+template<class Map, bool Unordered>
+struct reserver<Map, Unordered, true>
 {
     typedef Map map_type;
     typedef typename map_type::size_type size_type;
-    static void reserve(map_type & map, const size_type size)
+    static void reserve(map_type& map, const size_type size)
     {
         map.reserve(size);
     }
@@ -73,7 +100,7 @@ struct reserver<Map, true>
 
 }
 
-template<class Key, class Value, bool Unordered, class Allocator = std::allocator<std::pair<const Key, Value>> >
+template<class Key, class Value, bool Unordered, class Allocator = std::allocator<std::pair<const Key, Value> > >
 class stdmap
 {
 public:
@@ -83,7 +110,7 @@ public:
     typedef typename collection_type::size_type size_type;
 
     static constexpr bool RESERVE_IMPLEMENTED = Unordered;
-    static constexpr bool ALLOCATOR_IMPLEMENTED = true;
+    static constexpr bool ALLOCATOR_IMPLEMENTED = get_reserve_implemented<Unordered>::value;
 
     typedef Allocator allocator_type;
     typedef counted_allocator<allocator_type> counted_allocator_type;

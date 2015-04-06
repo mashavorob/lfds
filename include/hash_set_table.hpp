@@ -155,8 +155,7 @@ public:
             case hash_item_type::unused:
             {
                 // the slot is empty so try to use it
-                hash_item_type new_item =
-                { hash, hash_item_type::pending };
+                hash_item_type new_item(hash, hash_item_type::pending);
 
                 if (atomic_cas(node.m_hash, item, new_item))
                 {
@@ -293,7 +292,7 @@ public:
             {
                 key_type & key = *node.key();
 
-                insert_unique_key(dst, item.m_hash, std::forward<key_type>(key));
+                insert_unique_key(dst, item.m_hash, key);
             }
         }
     }
@@ -303,7 +302,7 @@ public:
     //    * exclusive access to the container
     //    * new key is unique
     //    * table has enough capacity to insert specified element
-    void insert_unique_key(table_type& dst, const size_type hash, key_type && key)
+    void insert_unique_key(table_type& dst, const size_type hash, const key_type & key)
     {
         const size_type capacity = dst.m_capacity;
 
@@ -320,8 +319,7 @@ public:
                 node.m_hash.m_hash = hash;
                 node.m_hash.m_state = hash_item_type::allocated;
 
-                m_key_allocator.construct(node.key(),
-                        std::forward<key_type>(key));
+                m_key_allocator.construct(node.key(), key);
 
                 ++dst.m_size;
                 ++dst.m_used;

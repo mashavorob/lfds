@@ -85,7 +85,7 @@ public:
     {
         return at(id)->m_units;
     }
-    PerformanceTest getTest(const id_type id) const;
+    void getTest(const id_type id, PerformanceTest & test) const;
 
     const PerfTestInfo* at(const id_type id) const;
 private:

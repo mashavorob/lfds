@@ -9,6 +9,7 @@
 #define INCLUDE_HASH_SET_TABLE_BASE_HPP_
 
 #include "hash_table_base.hpp"
+#include "cppbasics.hpp"
 
 #include <vector>
 
@@ -44,12 +45,10 @@ public:
     {
         // attempt to make a wait free find
         scoped_lock_type guard(base_type::m_constTable);
-        const table_type* ptr = base_type::m_constTable.m_ptr.load(
-                std::memory_order_relaxed);
+        const table_type* ptr = base_type::m_constTable.m_ptr.load(barriers::relaxed);
 
         return base_type::m_hashTable.find_impl(*ptr, key);
     }
-    template<class ... Args>
     bool insert(const key_type & key)
     {
         // the reserver prevents overwhelming by big number of concurrent insertions

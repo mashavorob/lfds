@@ -10,10 +10,11 @@
 
 #include "ref_ptr.hpp"
 #include "ref_lock.hpp"
+#include "xtomic.hpp"
+#include "cppbasics.hpp"
 
 #include <cassert>
 #include <cstddef>
-#include <atomic>
 
 namespace lfds
 {
@@ -61,10 +62,10 @@ public:
         }
         counter_type get() const
         {
-            return m_count.load(std::memory_order_relaxed);
+            return m_count.load(barriers::relaxed);
         }
     private:
-        mutable std::atomic<counter_type> m_count;
+        mutable xtomic<counter_type> m_count;
     };
 
     typedef ref_lock<const table_ref_ptr_type> scoped_lock_type;
@@ -94,8 +95,8 @@ public:
     // };
 
 private:
-    hash_table_base(const this_type&) = delete;
-    this_type& operator=(const this_type&) = delete;
+    hash_table_base(const this_type&); // = delete;
+    this_type& operator=(const this_type&); // = delete;
 public:
     hash_table_base(hash_table_type & hashTable, size_type reserve) :
             m_constTable(), m_mutableTable(), m_currTable(0), m_hashTable(
@@ -103,14 +104,14 @@ public:
     {
         table_type* ptr = &m_tables[m_currTable];
         init_table(ptr, calcCapacity(reserve));
-        m_constTable.m_ptr.store(ptr, std::memory_order_relaxed);
-        m_mutableTable.m_ptr.store(ptr, std::memory_order_relaxed);
+        m_constTable.m_ptr.store(ptr, barriers::relaxed);
+        m_mutableTable.m_ptr.store(ptr, barriers::relaxed);
     }
     ~hash_table_base()
     {
-        table_type* ptr = m_constTable.m_ptr.load(std::memory_order_relaxed);
+        table_type* ptr = m_constTable.m_ptr.load(barriers::relaxed);
         assert(ptr);
-        assert(ptr == m_mutableTable.m_ptr.load(std::memory_order_relaxed));
+        assert(ptr == m_mutableTable.m_ptr.load(barriers::relaxed));
         destroy_table(ptr);
     }
 public:
@@ -121,9 +122,9 @@ public:
             // attempt to make a wait free find
             scoped_lock_type guard(m_constTable);
             const table_type* ptr = m_constTable.m_ptr.load(
-                    std::memory_order_relaxed);
+                    barriers::relaxed);
 
-            tmp.reserve(ptr->m_size.load(std::memory_order_relaxed));
+            tmp.reserve(ptr->m_size.load(barriers::relaxed));
             m_hashTable.getSnapshot_imp(*ptr, tmp);
         }
         snapshot.swap(tmp);
@@ -140,20 +141,20 @@ public:
 
         do
         {
-            ptr = r_ptr.m_ptr.load(std::memory_order_relaxed);
+            ptr = r_ptr.m_ptr.load(barriers::relaxed);
         } while (!ptr);
         ++r_ptr.m_refCount;
-        table_type* ptr2 = r_ptr.m_ptr.load(std::memory_order_relaxed);
+        table_type* ptr2 = r_ptr.m_ptr.load(barriers::relaxed);
 
         while (ptr != ptr2)
         {
             --r_ptr.m_refCount;
             do
             {
-                ptr = r_ptr.m_ptr.load(std::memory_order_relaxed);
+                ptr = r_ptr.m_ptr.load(barriers::relaxed);
             } while (!ptr);
             ++r_ptr.m_refCount;
-            ptr2 = r_ptr.m_ptr.load(std::memory_order_relaxed);
+            ptr2 = r_ptr.m_ptr.load(barriers::relaxed);
         }
         return ptr;
     }
@@ -161,12 +162,12 @@ public:
     {
         ptr->m_capacity = capacity;
         ptr->m_highWatermark = calcWatermark(capacity);
-        ptr->m_size = 0;
-        ptr->m_used = 0;
+        ptr->m_size.store(0, barriers::relaxed);
+        ptr->m_used.store(0, barriers::relaxed);
         ptr->m_table = m_node_allocator.allocate(capacity);
         for (size_type i = 0; i < capacity; ++i)
         {
-            m_node_allocator.construct(&ptr->m_table[i]);
+            ::new((void *)&ptr->m_table[i]) node_type();
         }
     }
     void destroy_table(table_type* ptr)
@@ -188,7 +189,7 @@ public:
 
         while (isAboveWatermark())
         {
-            ptr = m_mutableTable.m_ptr.load(std::memory_order_relaxed);
+            ptr = m_mutableTable.m_ptr.load(barriers::relaxed);
             table_ref_ptr_type expected(ptr, 0);
             success = ptr != nullptr
                     && m_mutableTable.atomic_cas(expected, zero_ptr);
@@ -232,36 +233,36 @@ public:
     {
         scoped_lock_type guard(m_constTable);
         const table_type* ptr = m_constTable.m_ptr.load(
-                std::memory_order_relaxed);
+                barriers::relaxed);
         return ptr->m_capacity;
     }
     size_type size() const
     {
         scoped_lock_type guard(m_constTable);
         const table_type* ptr = m_constTable.m_ptr.load(
-                std::memory_order_relaxed);
-        return ptr->m_size;
+                barriers::relaxed);
+        return ptr->m_size.load(barriers::relaxed);
     }
     size_type used() const
     {
         scoped_lock_type guard(m_constTable);
         const table_type* ptr = m_constTable.m_ptr.load(
-                std::memory_order_relaxed);
+                barriers::relaxed);
         return ptr->m_used;
     }
     size_type highWatermark() const
     {
         scoped_lock_type guard(m_constTable);
         const table_type* ptr = m_constTable.m_ptr.load(
-                std::memory_order_relaxed);
+                barriers::relaxed);
         return ptr->m_highWatermark;
     }
     bool isAboveWatermark()
     {
         scoped_lock_type guard(m_constTable);
         const table_type* ptr = m_constTable.m_ptr.load(
-                std::memory_order_relaxed);
-        return (ptr->m_used + m_concurrentInsertions.get())
+                barriers::relaxed);
+        return (ptr->m_used.load(barriers::relaxed) + m_concurrentInsertions.get())
                 >= ptr->m_highWatermark;
     }
 protected:

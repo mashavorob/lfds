@@ -37,8 +37,8 @@ public:
         pthread_mutex_unlock(&m_mutex);
     }
 private:
-    mutex(const mutex&) = delete;
-    mutex& operator=(const mutex&) = delete;
+    mutex(const mutex&); // = delete;
+    mutex& operator=(const mutex&); // = delete;
 private:
     mutable pthread_mutex_t m_mutex;
 };
@@ -56,8 +56,8 @@ public:
         m_mutex.unlock();
     }
 private:
-    guard(const guard&) = delete;
-    guard& operator=(const guard&) = delete;
+    guard(const guard&); // = delete;
+    guard& operator=(const guard&); // = delete;
 private:
     const mutex & m_mutex;
 };

@@ -10,8 +10,6 @@
 
 namespace lfds
 {
-namespace lfds
-{
 
 inline void thread_fence(barriers::erelease)
 {
@@ -49,19 +47,19 @@ public:
 
     }
 
-    void store(barriers::erelaxed, T val)
+    void store(T val, barriers::erelaxed)
     {
         __atomic_store_n(&m_val, val, __ATOMIC_RELAXED);
     }
-    void store(barriers::erelaxed, T val) volatile
+    void store(T val, barriers::erelaxed) volatile
     {
         __atomic_store_n(&m_val, val, __ATOMIC_RELAXED);
     }
-    void store(barriers::erelease, T val)
+    void store(T val, barriers::erelease)
     {
         __atomic_store_n(&m_val, val, __ATOMIC_RELEASE);
     }
-    void store(barriers::erelease, T val) volatile
+    void store(T val, barriers::erelease) volatile
     {
         __atomic_store_n(&m_val, val, __ATOMIC_RELEASE);
     }
@@ -100,19 +98,19 @@ public:
         return __atomic_fetch_add(&m_val, val, __ATOMIC_RELEASE);
     }
 
-    T fetch_sub(T add, barriers::erelaxed)
+    T fetch_sub(T val, barriers::erelaxed)
     {
         return __atomic_fetch_sub(&m_val, val, __ATOMIC_RELAXED);
     }
-    T fetch_sub(T add, barriers::erelaxed) volatile
+    T fetch_sub(T val, barriers::erelaxed) volatile
     {
         return __atomic_fetch_sub(&m_val, val, __ATOMIC_RELAXED);
     }
-    T fetch_sub(T add, barriers::erelease)
+    T fetch_sub(T val, barriers::erelease)
     {
         return __atomic_fetch_sub(&m_val, val, __ATOMIC_RELEASE);
     }
-    T fetch_sub(T add, barriers::erelease) volatile
+    T fetch_sub(T val, barriers::erelease) volatile
     {
         return __atomic_fetch_sub(&m_val, val, __ATOMIC_RELEASE);
     }
@@ -169,9 +167,6 @@ private:
     volatile T m_val;
 };
 
-
 }
-
-
 
 #endif /* INCLUDE_XTOMIC_MODERN_HPP_ */

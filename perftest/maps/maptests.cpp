@@ -23,7 +23,7 @@ namespace perftest
 namespace maps
 {
 
-typedef dummy_wrapper<int> slow_int_type;
+typedef dummy_wrapper<long long> slow_int_type;
 
 struct slow_hash
 {
@@ -241,7 +241,7 @@ private:
 };
 
 typedef adapter::hash_map<slow_int_type, slow_int_type, dummy_hash<slow_int_type::type> > generic_hash_map_type;
-typedef adapter::hash_map<int, slow_int_type> ikey_hash_map_type;
+typedef adapter::hash_map<long long, long long> ikey_hash_map_type;
 typedef adapter::hash_map<int, int> ipair_hash_map_type;
 typedef adapter::hash_trie<int, int, 16> hash_trie16_type;
 typedef adapter::hash_trie<int, int, 256> hash_trie256_type;

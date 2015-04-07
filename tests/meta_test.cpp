@@ -122,7 +122,6 @@ TEST(IntegralTypes, is_integral)
     EXPECT_TRUE(lfds::is_integral<const volatile char*>::value);
     EXPECT_TRUE(lfds::is_integral<double*>::value);
     EXPECT_TRUE(lfds::is_integral<void*>::value);
-    EXPECT_TRUE(lfds::is_integral<lfds::is_pointer<double>*>::value);
     EXPECT_TRUE(lfds::is_integral<char>::value);
     EXPECT_TRUE(lfds::is_integral<const char>::value);
     EXPECT_TRUE(lfds::is_integral<volatile char>::value);
@@ -149,6 +148,4 @@ TEST(IntegralTypes, is_integral)
     EXPECT_TRUE(lfds::is_integral<const bool>::value);
     EXPECT_TRUE(lfds::is_integral<volatile bool>::value);
     EXPECT_FALSE(lfds::is_integral<double>::value);
-    EXPECT_FALSE(lfds::is_integral<lfds::is_integral<bool> >::value);
-
 }

@@ -18,5 +18,9 @@ add_executable( perftest
 	maps/maptests.cpp
 	)
 	
-target_link_libraries (perftest ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries (
+    perftest
+    ${CMAKE_THREAD_LIBS_INIT}
+    rt
+    )
 	

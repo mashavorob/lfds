@@ -33,30 +33,6 @@ enum efull
 };
 }
 
-//
-// GCC prior v4.4 does not enforce SW barriers on atomic operations
-// so we have to do it manually.
-//
-// So functions atomic_prologue()/atomic_prologue() have different implementations
-// depending on GCC version: thread fence for GCC prior 4.4 and void otherwise.
-
-inline void atomic_prologue();
-
-inline void atomic_epilogue();
-
-class atomic_guard
-{
-public:
-    atomic_guard()
-    {
-        atomic_prologue();
-    }
-    ~atomic_guard()
-    {
-        atomic_epilogue();
-    }
-};
-
 }
 
 #if LFDS_USE_CPP11

@@ -36,39 +36,39 @@ TEST(FixedSizeQueue, pushpoppop)
 TEST(FixedSizeQueue, sequence)
 {
     int val = 0;
+    volatile bool res = false;
     typedef lfds::queue<int, true> queue_type;
 
     queue_type q(3);
 
-    EXPECT_TRUE(q.push(1));
-    EXPECT_TRUE(q.push(2));
-    EXPECT_TRUE(q.push(3));
-    EXPECT_FALSE(q.push(4));
+    res = q.push(1);
+    EXPECT_TRUE(res);
+    res = q.push(2);
+    EXPECT_TRUE(res);
+    res = q.push(3);
+    EXPECT_TRUE(res);
+    res = q.push(4);
+    EXPECT_FALSE(res);
+
 
     // multithreaded queue provides odd sequence
-    EXPECT_TRUE(q.pop(val));
+    res = q.pop(val);
+    EXPECT_TRUE(res);
     EXPECT_EQ(val, 3);
-    EXPECT_TRUE(q.pop(val));
+
+    std::cout << "Expect fail from here:" << std::endl
+            << "-------------------------------------------------------" << std::endl;
+    res = q.pop(val);
+    EXPECT_TRUE(res);
     EXPECT_EQ(val, 2);
-    EXPECT_TRUE(q.pop(val));
+
+    res = q.pop(val);
+    EXPECT_TRUE(res);
     EXPECT_EQ(val, 1);
 
-    EXPECT_FALSE(q.pop(val));
-
-    EXPECT_TRUE(q.push(1));
-    EXPECT_TRUE(q.push(2));
-    EXPECT_TRUE(q.push(3));
-    EXPECT_FALSE(q.push(4));
-
-    EXPECT_TRUE(q.pop(val));
-    EXPECT_EQ(val, 3);
-    EXPECT_TRUE(q.pop(val));
-    EXPECT_EQ(val, 2);
-    EXPECT_TRUE(q.pop(val));
+    res = q.pop(val);
+    EXPECT_FALSE(res);
     EXPECT_EQ(val, 1);
-
-    EXPECT_FALSE(q.pop(val));
-
 }
 
 TEST(DynamicSizeQueue, pop)

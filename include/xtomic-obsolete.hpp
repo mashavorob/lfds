@@ -23,16 +23,7 @@ inline void thread_fence(barriers::eacquire)
 
 inline void atomic_prologue()
 {
-#if LFDS_ENFORCE_SW_BARRIERS
     thread_fence(barriers::acquire);
-#endif
-}
-
-inline void atomic_epilogue()
-{
-#if LFDS_ENFORCE_SW_BARRIERS
-    thread_fence(barriers::release);
-#endif
 }
 
 template<class T>
@@ -106,12 +97,12 @@ public:
 
     T fetch_add(T add, barriers::erelease)
     {
-        atomic_guard guard;
+        atomic_prologue();
         return __sync_fetch_and_add(&m_val, add);
     }
     T fetch_add(T add, barriers::erelease) volatile
     {
-        atomic_guard guard;
+        atomic_prologue();
         return __sync_fetch_and_add(&m_val, add);
     }
 
@@ -130,18 +121,18 @@ public:
 
     T fetch_sub(T add, barriers::erelease)
     {
-        atomic_guard guard;
+        atomic_prologue();
         return __sync_fetch_and_sub(&m_val, add);
     }
     T fetch_sub(T add, barriers::erelease) volatile
     {
-        atomic_guard guard;
+        atomic_prologue();
         return __sync_fetch_and_sub(&m_val, add);
     }
 
     bool cas(const T e, const T n)
     {
-        atomic_guard guard;
+        atomic_prologue();
         return __sync_bool_compare_and_swap(&m_val, e, n);
     }
     bool cas(const this_type & e, const this_type & n)
@@ -152,43 +143,43 @@ public:
     // pre
     T operator++()
     {
-        atomic_guard guard;
+        atomic_prologue();
         return __sync_add_and_fetch(&m_val, static_cast<T>(1));
     }
     T operator++() volatile
     {
-        atomic_guard guard;
+        atomic_prologue();
         return __sync_add_and_fetch(&m_val, static_cast<T>(1));
     }
     T operator--()
     {
-        atomic_guard guard;
+        atomic_prologue();
         return __sync_sub_and_fetch(&m_val, static_cast<T>(1));
     }
     T operator--() volatile
     {
-        atomic_guard guard;
+        atomic_prologue();
         return __sync_sub_and_fetch(&m_val, static_cast<T>(1));
     }
     // post
     T operator++(int)
     {
-        atomic_guard guard;
+        atomic_prologue();
         return __sync_fetch_and_add(&m_val, static_cast<T>(1));
     }
     T operator++(int) volatile
     {
-        atomic_guard guard;
+        atomic_prologue();
         return __sync_fetch_and_add(&m_val, static_cast<T>(1));
     }
     T operator--(int)
     {
-        atomic_guard guard;
+        atomic_prologue();
         return __sync_fetch_and_sub(&m_val, static_cast<T>(1));
     }
     T operator--(int) volatile
     {
-        atomic_guard guard;
+        atomic_prologue();
         return __sync_fetch_and_sub(&m_val, static_cast<T>(1));
     }
 private:

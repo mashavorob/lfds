@@ -25,10 +25,6 @@ inline void atomic_prologue()
 {
 }
 
-inline void atomic_epilogue()
-{
-}
-
 template<class T>
 class xtomic
 {

@@ -22,8 +22,7 @@ struct PerfTestInfo
 {
     const char* m_group;
     const char* m_name;
-    const char* m_displayName;
-    const char** m_labels;
+    const char* m_param;
     const char* m_units;
     IPerfTestFactory* m_factory;
 
@@ -41,7 +40,7 @@ public:
 
     struct get_test_name
     {
-        const char* operator()(const id_type id)
+        std::string operator()(const id_type id)
         {
             return PerfTestLocator::getInstance().getTestName(id);
         }
@@ -49,9 +48,28 @@ public:
 
     struct get_test_group
     {
-        const char* operator()(const id_type id)
+        std::string operator()(const id_type id)
         {
             return PerfTestLocator::getInstance().getTestGroup(id);
+        }
+    };
+
+    struct get_test_param
+    {
+        std::string operator()(const id_type id)
+        {
+            return PerfTestLocator::getInstance().getTestParam(id);
+        }
+    };
+
+    struct get_test_full
+    {
+        std::string operator()(const id_type id)
+        {
+            const PerfTestLocator & locator =  PerfTestLocator::getInstance();
+
+            return std::string(locator.getTestGroup(id)) + "."
+                    + locator.getTestName(id) + "." + locator.getTestParam(id);
         }
     };
 
@@ -69,17 +87,13 @@ public:
     {
         return at(id)->m_name;
     }
-    const char* getTestDisplayName(const id_type id) const
+    const char* getTestParam(const id_type id) const
     {
-        return at(id)->m_displayName;
+        return at(id)->m_param;
     }
     const char* getTestGroup(const id_type id) const
     {
         return at(id)->m_group;
-    }
-    const char** getTestLabels(const id_type id) const
-    {
-        return at(id)->m_labels;
     }
     const char* getTestUnits(const id_type id) const
     {

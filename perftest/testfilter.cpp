@@ -7,6 +7,7 @@
 
 #include "testfilter.hpp"
 #include "testlocator.hpp"
+#include "wildcard.hpp"
 
 #include <cppbasics.hpp>
 
@@ -17,32 +18,48 @@ namespace lfds
 namespace perftest
 {
 
-namespace {
+namespace
+{
 
-template<class Accessor>
+template<class Accessor, bool byWildCard>
 struct remove_items
 {
     typedef Filter::strs_type strs_type;
+    typedef typename get_str_match<byWildCard>::type match_type;
 
     typedef typename ids_type::iterator iterator;
 
+    remove_items(bool invertFilter) : m_negFilter(invertFilter)
+    {
+
+    }
+
     void operator()(ids_type & ids, const strs_type & fields)
     {
-        if ( fields.empty() )
+        if (fields.empty())
         {
             return;
         }
 
         Accessor get;
+
         typename ids_type::iterator i = ids.begin();
         typename ids_type::iterator end = ids.end();
+        typename strs_type::const_iterator fbeg = fields.begin();
         typename strs_type::const_iterator fend = fields.end();
 
-        while ( i != end )
+        while (i != end)
         {
             const id_type id = *i;
-            const char* val = get(id);
-            if ( fields.find(val) == fend )
+            const std::string val = get(id);
+            typename strs_type::const_iterator fpos = std::find_if(fbeg, fend, match_type(val));
+            bool res = (fpos != fend);
+            if ( m_negFilter )
+            {
+                res = !res;
+            }
+
+            if (!res)
             {
                 ids.erase(i++);
             }
@@ -52,6 +69,8 @@ struct remove_items
             }
         }
     }
+private:
+    bool m_negFilter;
 };
 
 }
@@ -61,60 +80,32 @@ ids_type Filter::getAllTests()
     ids_type result;
     const id_type end = PerfTestLocator::getInstance().getSize();
 
-    for ( id_type i = 0; i != end; ++i )
+    for (id_type i = 0; i != end; ++i)
     {
         result.insert(i);
     }
     return result;
 }
 
-void Filter::byName(ids_type & ids, const strs_type & names)
+void Filter::byName(ids_type & ids, const strs_type & names, bool invertFilter)
 {
-    remove_items<PerfTestLocator::get_test_name> remove;
+    remove_items<PerfTestLocator::get_test_name, true> remove(invertFilter);
 
     remove(ids, names);
 }
 
-void Filter::byGroup(ids_type & ids, const strs_type & groups)
+void Filter::byGroup(ids_type & ids, const strs_type & groups, bool invertFilter)
 {
-    remove_items<PerfTestLocator::get_test_group> remove;
+    remove_items<PerfTestLocator::get_test_group, true> remove(invertFilter);
 
     remove(ids, groups);
 }
 
-
-void Filter::byLabels(ids_type & ids, const strs_type & labels)
+void Filter::byFull(ids_type & ids, const strs_type & groups, bool invertFilter)
 {
-    if ( labels.empty() )
-    {
-        return;
-    }
+    remove_items<PerfTestLocator::get_test_full, true> remove(invertFilter);
 
-    const PerfTestLocator &locator = PerfTestLocator::getInstance();
-    ids_type::iterator iter = ids.begin();
-    ids_type::iterator end = ids.end();
-    strs_type::const_iterator lend = labels.end();
-
-    while ( iter != end )
-    {
-        const id_type id = *iter;
-        const char** ll = locator.getTestLabels(id);
-
-        bool found = false;
-        for ( int i = 0; !found && ll[i]; ++ll )
-        {
-            const char* label = ll[i];
-            found = labels.find(label) != lend;
-        }
-        if ( !found )
-        {
-            ids.erase(iter++);
-        }
-        else
-        {
-            ++iter;
-        }
-    }
+    remove(ids, groups);
 }
 
 }

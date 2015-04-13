@@ -15,6 +15,7 @@ add_executable( perftest
 	testmultithread.cpp
 	testtree.cpp
 	timeutils.cpp
+	wildcard.cpp
 	maps/maptests.cpp
 	)
 	

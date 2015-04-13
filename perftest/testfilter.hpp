@@ -22,11 +22,39 @@ public:
 
     static ids_type getAllTests();
 
-    static void byName(ids_type & ids, const strs_type & names);
+    static void byName(ids_type & ids, const strs_type & names, bool invertFilter);
 
-    static void byGroup(ids_type & ids, const strs_type & groups);
+    static void byGroup(ids_type & ids, const strs_type & groups, bool invertFilter);
 
-    static void byLabels(ids_type & ids, const strs_type & labels);
+    static void byFull(ids_type & ids, const strs_type & groups, bool invertFilter);
+};
+
+struct filter_by_name
+{
+    typedef Filter::strs_type strs_type;
+
+    void operator()(ids_type & ids, const strs_type & filters, bool invertFilters) const
+    {
+        Filter::byName(ids, filters, invertFilters);
+    }
+};
+struct filter_by_group
+{
+    typedef Filter::strs_type strs_type;
+
+    void operator()(ids_type & ids, const strs_type & filters, bool invertFilters) const
+    {
+        Filter::byGroup(ids, filters, invertFilters);
+    }
+};
+struct filter_by_full
+{
+    typedef Filter::strs_type strs_type;
+
+    void operator()(ids_type & ids, const strs_type & filters, bool invertFilters) const
+    {
+        Filter::byFull(ids, filters, invertFilters);
+    }
 };
 
 }

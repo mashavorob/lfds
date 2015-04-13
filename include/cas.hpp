@@ -9,7 +9,6 @@
 #define INCLUDE_CAS_HPP_
 
 #include "inttypes.hpp"
-#include "xtomic.hpp"
 
 namespace lfds
 {

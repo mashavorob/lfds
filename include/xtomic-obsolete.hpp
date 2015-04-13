@@ -8,6 +8,8 @@
 #ifndef INCLUDE_XTOMIC_OBSOLETE_HPP_
 #define INCLUDE_XTOMIC_OBSOLETE_HPP_
 
+#include "cas.hpp"
+
 namespace lfds
 {
 
@@ -132,8 +134,7 @@ public:
 
     bool cas(const T e, const T n)
     {
-        atomic_prologue();
-        return __sync_bool_compare_and_swap(&m_val, e, n);
+        return atomic_cas(m_val, e, n);
     }
     bool cas(const this_type & e, const this_type & n)
     {

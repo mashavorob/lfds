@@ -31,14 +31,12 @@ class PerfTestFactoryImpl: public IPerfTestFactory
 public:
     PerfTestFactoryImpl(const char* group,
                         const char* name,
-                        const char* displayName,
-                        const char** labels,
+                        const char* param,
                         const char* units)
     {
         m_info.m_group = group;
         m_info.m_name = name;
-        m_info.m_displayName = displayName;
-        m_info.m_labels = labels;
+        m_info.m_param = param;
         m_info.m_units = units;
         m_info.m_factory = this;
         PerfTestLocator::registerTest(&m_info);

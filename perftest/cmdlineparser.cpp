@@ -10,11 +10,13 @@
 #include "cmdlineparser.hpp"
 #include "testfilter.hpp"
 #include "testlocator.hpp"
+#include "wildcard.hpp"
 
 #include <iostream>
 #include <string>
 #include <vector>
 #include <utility>
+#include <algorithm>
 #include <cassert>
 #include <cstring>
 
@@ -58,78 +60,74 @@ struct getAllGroups
     }
 };
 
-struct getAllLabels
+struct getAllFulls
 {
     strs_type operator()() const
     {
-        const PerfTestLocator & locator = PerfTestLocator::getInstance();
-        PerfTestLocator::size_type size = PerfTestLocator::getSize();
-        strs_type result;
-        for (id_type id = 0; id < size; ++id)
-        {
-            const char** labels = locator.getTestLabels(id);
-            for (int i = 0; labels[i]; ++i)
-            {
-                result.insert(labels[i]);
-            }
-        }
-        return result;
+        PerfTestLocator::get_test_full get_full;
+        return get_all(get_full);
     }
 };
 
-template<typename GetAll>
+template<typename GetAll, bool byWildCard>
 class Validator
 {
 private:
     typedef typename strs_type::const_iterator iterator;
+    typedef typename get_str_match<byWildCard>::type match_type;
 
 public:
-    Validator(GetAll getter = GetAll()) :
+    Validator(const char* msg) :
             m_getter(),
-            m_all(),
-            m_initialized(false)
+            m_msg(msg)
     {
 
     }
-    void operator()(const char* arg, const char* msg, const strs_type & coll)
+    void operator()(const char* arg, const strs_type & coll) const
     {
-        if ( !m_initialized )
-        {
-            m_all = m_getter();
-            m_initialized = true;
-        }
+        strs_type all = m_getter();
         iterator beg = coll.begin();
         iterator end = coll.end();
-        iterator endOfAll = m_all.end();
+        iterator begOfAll = all.begin();
+        iterator endOfAll = all.end();
 
-        for ( iterator i = beg; i != end; ++i )
+        for (iterator j = beg; j != end; ++j)
         {
-            const std::string & s = *i;
-            iterator pos = m_all.find(s);
-            if ( pos == endOfAll )
+            const std::string & filter = *j;
+            bool found = false;
+            for (iterator i = begOfAll; !found && i != endOfAll; ++i)
             {
-                std::cerr << msg << s << " in: " << arg << std::endl;
+                const std::string & test = *i;
+                found = found || match_type(test)(filter);
+            }
+            if (!found)
+            {
+                std::cerr << m_msg << " \"" << filter << "\" specified in: " << arg
+                        << std::endl;
             }
         }
     }
 private:
     GetAll m_getter;
-    strs_type m_all;
-    bool m_initialized;
-};
+    const char* m_msg;
+}
+;
 
 }
 
 static std::pair<std::string, const char*> parseParam(const char* arg)
 {
+    typedef std::pair<std::string, const char*> value_type;
     const char* pos = arg;
     while (*pos && *pos != '=')
+    {
         ++pos;
+    }
     const char* next = *pos ? pos + 1 : pos;
-    return std::make_pair(std::string(arg, pos), next);
+    return value_type(std::string(arg, pos), next);
 }
 
-static const char* s_sep = " \t,\'\"";
+static const char* s_sep = ",;";
 
 static const char* skip(const char* s)
 {
@@ -138,9 +136,20 @@ static const char* skip(const char* s)
     return s;
 }
 
-static void parseList(const char* val, std::set<std::string> & res)
+static void parseList(const char* val,
+                      std::set<std::string> & res,
+                      bool& invert)
 {
     const char* pos = skip(val);
+    if (*pos == '-')
+    {
+        invert = true;
+        ++pos;
+    }
+    else
+    {
+        invert = false;
+    }
     while (*pos)
     {
         const char* next = pos + 1;
@@ -219,49 +228,66 @@ void CommandLineParser::showHelp(const char* arg0)
 {
     std::cout << "Usage:" << std::endl << arg0
             << " [--duration=<duration>] run "
-            << "[--tests=<list>] [--groups=<groups>] [--labels=<labels>]"
+            << "[--objects=[-]<objects>] [--groups=[-]<groups>] [--filters=[-]<filters>]"
             << std::endl << "or" << std::endl << arg0 << " list-tests"
             << std::endl << "or" << std::endl << arg0 << " --help" << std::endl
             << "where:" << std::endl << "    run - executes tests" << std::endl
-            << "    <list> - comma separated list of tests\' names to run"
+            << "    <objects> - comma separated list of objects' names to test. Wild cards are supported."
             << std::endl
-            << "    <groups> - comma separated list of tests\' groups to run"
+            << "    <groups> - comma separated list of objects' groups to run. Wild cards are supported."
             << std::endl
-            << "    <labels> - comma separated list of tests\' labels to run"
+            << "    <filters> - comma separated list of fully qualified tests' names to run. Wild cards are supported."
+            << std::endl
+            << "    [-] - optional minus sign indicates that the filter is to be inverted"
             << std::endl << "    list-tests - display list of available tests"
-            << std::endl << "    --help - show this message" << std::endl;
+            << std::endl << "    --help - show this message" << std::endl
+            << "Note: fully qualified test's name consists of group, object and test separated by dot:"
+            << std::endl << "      <group-name>.<object-name>.<test-name>"
+            << std::endl;
+}
+
+template<class Validator, class Filter>
+inline void processList(const Validator & validator,
+                        const Filter & filter,
+                        const char* argv,
+                        const char* param,
+                        ids_type & tests)
+{
+    bool invert = false;
+    strs_type coll;
+    parseList(param, coll, invert);
+    validator(argv, coll);
+    filter(tests, coll, invert);
 }
 
 CommandLineParser::Command CommandLineParser::onRunTests(const int argc,
                                                          const char** argv,
                                                          ids_type & tests)
 {
-    Validator<getAllNames> validateNames;
-    Validator<getAllGroups> validateGroups;
-    Validator<getAllLabels> validateLabels;
-    strs_type names;
-    strs_type groups;
-    std::vector<strs_type> labels;
+    Validator<getAllNames, true> validateNames("unrecognized test name");
+    Validator<getAllGroups, true> validateGroups("unrecognized group");
+    Validator<getAllFulls, true> validateFilters(
+            ("unrecognized fully qualified test name"));
+    tests = Filter::getAllTests();
+
     std::string ereoneous;
     for (int i = 0; i < argc; ++i)
     {
         std::pair<std::string, const char*> pair = parseParam(argv[i]);
-        if (pair.first == "--tests")
+        if (pair.first == "--objects")
         {
-            parseList(pair.second, names);
-            validateNames(argv[i], "unrecognized test name ", names);
+            processList(validateNames, filter_by_name(), argv[i], pair.second,
+                    tests);
         }
         else if (pair.first == "--groups")
         {
-            parseList(pair.second, groups);
-            validateGroups(argv[i], "unrecognized group ", groups);
+            processList(validateGroups, filter_by_group(), argv[i], pair.second,
+                    tests);
         }
-        else if (pair.first == "--labels")
+        else if (pair.first == "--filters")
         {
-            strs_type buff;
-            parseList(pair.second, buff);
-            validateLabels(argv[i], "unrecognized label ", buff);
-            labels.push_back(buff);
+            processList(validateFilters, filter_by_full(), argv[i], pair.second,
+                    tests);
         }
         else
         {
@@ -269,18 +295,6 @@ CommandLineParser::Command CommandLineParser::onRunTests(const int argc,
                     << std::endl;
             return cmdError;
         }
-    }
-
-    tests = Filter::getAllTests();
-    Filter::byName(tests, names);
-    Filter::byGroup(tests, groups);
-    std::vector<strs_type>::const_iterator i = labels.begin();
-    std::vector<strs_type>::const_iterator end = labels.end();
-
-    for ( ; i != end; ++i )
-    {
-        const strs_type & buff = *i;
-        Filter::byLabels(tests, buff);
     }
 
     return cmdRunTests;

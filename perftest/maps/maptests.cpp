@@ -57,21 +57,13 @@ public:
 
     ir_registrar(const char* group, const char* name) :
         m_factory(group, name,
-                    "maximum insert time (with initial reserve)",
-                    getLabels(), "μs/op")
+                    "maximum insert time (with initial reserve)", "μs/op")
     {
 
     }
 
 private:
     factory_type m_factory;
-
-    static const char** getLabels()
-    {
-        static const char* labels[] =
-        { "time", "max", "insert", "st", "initial-reserve", "nexus", nullptr };
-        return labels;
-    }
 };
 
 template<class Map>
@@ -86,20 +78,13 @@ public:
     mem_registrar(const char* group, const char* name) :
         m_factory(group, name,
                     "memory consumption",
-                    getLabels(), "Mb")
+                    "Mb")
     {
 
     }
 
 private:
     factory_type m_factory;
-
-    static const char** getLabels()
-    {
-        static const char* labels[] =
-        { "mem", "nexus", nullptr };
-        return labels;
-    }
 };
 
 template<class Map, bool = Map::RESERVE_IMPLEMENTED>
@@ -175,18 +160,12 @@ public:
 
 public:
     registrar(const char* group, const char* name) :
-            m_avg_insert(group, name, "average insert time",
-                    getAvgInsertLabels(), "ns/op"),
-            m_max_insert(group, name, "maximum insert time",
-                    getMaxInsertLabels(), "μs/op"),
-            m_avg_erase(group, name, "average erase time", getAvgEraseLabels(),
-                    "ns/op"),
-            m_avg_find(group, name, "average find time", getAvgFindLabels(),
-                    "ns/op"),
-            m_mt_avg_find(group, name, "mt average find time",
-                    getMtAvgFindLabels(), "ns/op"),
-            m_mt_max_find(group, name, "mt maximum find time",
-                    getMtMaxFindLabels(), "μs/op"),
+            m_avg_insert(group, name, "average insert time", "ns/op"),
+            m_max_insert(group, name, "maximum insert time", "μs/op"),
+            m_avg_erase(group, name, "average erase time", "ns/op"),
+            m_avg_find(group, name, "average find time", "ns/op"),
+            m_mt_avg_find(group, name, "mt average find time", "ns/op"),
+            m_mt_max_find(group, name, "mt maximum find time", "μs/op"),
             m_ir_registrar(group, name),
             m_mem_registrar(group, name)
     {
@@ -201,57 +180,17 @@ private:
     mt_max_find_factory_type m_mt_max_find;
     ir_registrar_type m_ir_registrar;
     mem_registrar_type m_mem_registrar;
-
-    static const char** getAvgInsertLabels()
-    {
-        static const char* labels[] =
-        { "time", "avg", "insert", "st", "nexus", nullptr };
-        return labels;
-    }
-    static const char** getMaxInsertLabels()
-    {
-        static const char* labels[] =
-        { "time", "max", "insert", "st", "no-reserve", "nexus", nullptr };
-        return labels;
-    }
-    static const char** getAvgEraseLabels()
-    {
-        static const char* labels[] =
-        { "time", "avg", "erase", "st", "nexus", nullptr };
-        return labels;
-    }
-    static const char** getAvgFindLabels()
-    {
-        static const char* labels[] =
-        { "time", "avg", "find", "st", "nexus", nullptr };
-        return labels;
-    }
-    static const char** getMtAvgFindLabels()
-    {
-        static const char* labels[] =
-        { "time", "avg", "find", "mt", "nexus", nullptr };
-        return labels;
-    }
-    static const char** getMtMaxFindLabels()
-    {
-        static const char* labels[] =
-        { "time", "max", "find", "mt", "nexus", nullptr };
-        return labels;
-    }
 };
 
 typedef adapter::hash_map<slow_int_type, slow_int_type, dummy_hash<slow_int_type::type> > generic_hash_map_type;
 typedef adapter::hash_map<long long, long long> ikey_hash_map_type;
 typedef adapter::hash_map<int, int> ipair_hash_map_type;
-typedef adapter::hash_trie<int, int, 16> hash_trie16_type;
-typedef adapter::hash_trie<int, int, 256> hash_trie256_type;
+typedef adapter::hash_trie<int, int, 16> hash_trie_type;
 typedef adapter::stdmap<int, int, false> map_type;
 typedef adapter::stdmap<int, int, true> unorderd_map_type;
 
-static registrar<hash_trie16_type> r0_16("lock-free",
-        "hash_trie (b-factor=16)");
-static registrar<hash_trie256_type> r0_256("lock-free",
-        "hash_trie (b-factor=256)");
+static registrar<hash_trie_type> r0_16("lock-free",
+        "hash_trie");
 static registrar<generic_hash_map_type> r1("lock-free", "hash_map");
 static registrar<ikey_hash_map_type> r2("lock-free", "hash_map (integral key)");
 static registrar<ipair_hash_map_type> r3("lock-free",

@@ -63,54 +63,28 @@ void forEachGroup(const groups_type & groups, Pred pred)
 
 struct Generic
 {
-    void operator()(group_type::const_iterator iter)
-    {
-        const std::string & name = iter->first;
-        std::cout << "    name: " << name << ": " << std::endl;
-    }
-
-    void operator()(groups_type::const_iterator iter)
-    {
-        const std::string & name = iter->first;
-        std::cout << "Group: " << name << ": " << std::endl;
-    }
-};
-
-struct Display: public Generic
-{
     void operator()(ids_type::const_iterator iter)
     {
         const PerfTestLocator& locator = PerfTestLocator::getInstance();
 
         const id_type id = *iter;
-        const char* displayName = locator.getTestDisplayName(id);
-        const char** labels = locator.getTestLabels(id);
+        const char* paramName = locator.getTestParam(id);
 
-        std::cout << "        parameter:" << displayName << std::endl;
-        std::cout << "        labels: ";
-
-        if (labels[0])
-        {
-            std::cout << labels[0];
-            for (int i = 1; labels[i]; ++i)
-            {
-                std::cout << ", " << labels[i];
-            }
-        }
-        std::cout << std::endl << std::endl;
+        std::cout << "        parameter:" << paramName << std::endl;
     }
     void operator()(group_type::const_iterator iter)
     {
         const std::string & name = iter->first;
-        std::cout << "    name: " << name << ": " << std::endl;
+        std::cout << "    object: " << name << std::endl;
     }
 
     void operator()(groups_type::const_iterator iter)
     {
         const std::string & name = iter->first;
-        std::cout << "Group: " << name << ": " << std::endl;
+        std::cout << "group: " << name << std::endl;
     }
 };
+
 
 struct RunTest: public Generic
 {
@@ -119,7 +93,7 @@ struct RunTest: public Generic
         const PerfTestLocator& locator = PerfTestLocator::getInstance();
 
         const id_type id = *iter;
-        const char* displayName = locator.getTestDisplayName(id);
+        const char* displayName = locator.getTestParam(id);
         const char* units = locator.getTestUnits(id);
         PerformanceTest test;
         locator.getTest(id, test);
@@ -134,14 +108,12 @@ struct RunTest: public Generic
     }
     void operator()(group_type::const_iterator iter)
     {
-        const std::string & name = iter->first;
-        std::cout << "    name: " << name << ": " << std::endl;
+        (*static_cast<Generic*>(this))(iter);
     }
 
     void operator()(groups_type::const_iterator iter)
     {
-        const std::string & name = iter->first;
-        std::cout << "Group: " << name << ": " << std::endl;
+        (*static_cast<Generic*>(this))(iter);
     }
 
     static double normalize(double val)
@@ -171,7 +143,7 @@ void listTests()
 {
     groups_type groups = TestTree(Filter::getAllTests()).get();
 
-    Display display;
+    Generic display;
     forEachGroup(groups, display);
 }
 

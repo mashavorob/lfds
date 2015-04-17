@@ -12,6 +12,8 @@
 #include "xtomic.hpp"
 #include "inttypes.hpp"
 
+#include <cstddef>
+
 namespace lfds
 {
 

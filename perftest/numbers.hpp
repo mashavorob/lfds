@@ -130,7 +130,6 @@ private:
 
 namespace {
 
-
 class rand_base
 {
 public:

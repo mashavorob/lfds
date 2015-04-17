@@ -8,6 +8,8 @@
 #ifndef UTILS_UTILS_SYNC_HPP_
 #define UTILS_UTILS_SYNC_HPP_
 
+#include <cppbasics.hpp>
+
 #include <pthread.h>
 
 namespace lfds {

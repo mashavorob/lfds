@@ -65,17 +65,17 @@ public:
     node_type* atomic_pop()
     {
         // acquire consumer lock
-        counter_type count = m_lock.fetch_add(1, barriers::release);
+        const counter_type count = ++m_lock;
 
         // attempt to pop an item
         node_type* p = m_consumerEnd.atomic_pop();
-        if (!p && !count)
+        if (!p && count == 1)
         {
             p = m_producerEnd.atomic_remove_head();
             m_consumerEnd.atomic_set_head(p);
             p = m_consumerEnd.atomic_pop();
         }
-        m_lock.fetch_sub(1, barriers::relaxed);
+        --m_lock;
         return p;
     }
 private:
@@ -112,9 +112,7 @@ public:
 };
 
 template<class T, bool ManyProducer, bool ManyConsumer>
-struct basic_queue_traits
-{
-};
+struct basic_queue_traits;
 
 template<class T, bool ManyProducer>
 struct basic_queue_traits<T, ManyProducer, true>

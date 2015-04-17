@@ -7,12 +7,12 @@
 
 #include "gtest/gtest.h"
 
-#include "queue.hpp"
+#include <queue.hpp>
 
 TEST(FixedSizeQueue, pop)
 {
     int val;
-    typedef lfds::queue<int, true> queue_type;
+    typedef lfds::queue<int, lfds::Queue::FixedSize> queue_type;
 
     queue_type q(1);
 
@@ -22,7 +22,7 @@ TEST(FixedSizeQueue, pop)
 TEST(FixedSizeQueue, pushpoppop)
 {
     int val = 0;
-    typedef lfds::queue<int, true> queue_type;
+    typedef lfds::queue<int, lfds::Queue::FixedSize> queue_type;
 
     queue_type q(1);
 
@@ -37,7 +37,7 @@ TEST(FixedSizeQueue, sequence)
 {
     int val = 0;
     volatile bool res = false;
-    typedef lfds::queue<int, true> queue_type;
+    typedef lfds::queue<int, lfds::Queue::FixedSize> queue_type;
 
     queue_type q(3);
 
@@ -55,9 +55,6 @@ TEST(FixedSizeQueue, sequence)
     res = q.pop(val);
     EXPECT_TRUE(res);
     EXPECT_EQ(val, 3);
-
-    std::cout << "Expect fail from here:" << std::endl
-            << "-------------------------------------------------------" << std::endl;
     res = q.pop(val);
     EXPECT_TRUE(res);
     EXPECT_EQ(val, 2);
@@ -74,7 +71,7 @@ TEST(FixedSizeQueue, sequence)
 TEST(DynamicSizeQueue, pop)
 {
     int val;
-    typedef lfds::queue<int, false> queue_type;
+    typedef lfds::queue<int, lfds::Queue::DynamicSize> queue_type;
 
     queue_type q(1);
 
@@ -84,7 +81,7 @@ TEST(DynamicSizeQueue, pop)
 TEST(DynamicSizeQueue, pushpoppop)
 {
     int val = 0;
-    typedef lfds::queue<int, false> queue_type;
+    typedef lfds::queue<int, lfds::Queue::DynamicSize> queue_type;
 
     queue_type q(1);
 
@@ -97,7 +94,7 @@ TEST(DynamicSizeQueue, pushpoppop)
 TEST(DynamicSizeQueue, sequence)
 {
     int val = 0;
-    typedef lfds::queue<int, false> queue_type;
+    typedef lfds::queue<int, lfds::Queue::DynamicSize> queue_type;
 
     queue_type q(3);
 
@@ -122,7 +119,7 @@ TEST(DynamicSizeQueue, sequence)
 TEST(WaitFreeQueue, traits)
 {
     int val;
-    typedef lfds::queue<int, true, false, false> queue_type;
+    typedef lfds::queue<int, lfds::Queue::FixedSize, lfds::Queue::OneProducer, lfds::Queue::OneConsumer> queue_type;
 
     EXPECT_TRUE(queue_type::fixed_size);
     EXPECT_FALSE(queue_type::many_producers);
@@ -133,7 +130,7 @@ TEST(WaitFreeQueue, traits)
 TEST(WaitFreeQueue, pop)
 {
     int val;
-    typedef lfds::queue<int, true, false, false> queue_type;
+    typedef lfds::queue<int, lfds::Queue::FixedSize, lfds::Queue::OneProducer, lfds::Queue::OneConsumer> queue_type;
 
     queue_type q(1);
 
@@ -143,7 +140,7 @@ TEST(WaitFreeQueue, pop)
 TEST(WaitFreeQueue, pushpoppop)
 {
     int val = 0;
-    typedef lfds::queue<int, true, false, false> queue_type;
+    typedef lfds::queue<int, lfds::Queue::FixedSize, lfds::Queue::OneProducer, lfds::Queue::OneConsumer> queue_type;
 
     queue_type q(1);
 
@@ -157,7 +154,7 @@ TEST(WaitFreeQueue, pushpoppop)
 TEST(WaitFreeQueue, sequence)
 {
     int val = 0;
-    typedef lfds::queue<int, true, false, false> queue_type;
+    typedef lfds::queue<int, lfds::Queue::FixedSize, lfds::Queue::OneProducer, lfds::Queue::OneConsumer> queue_type;
 
     queue_type q(3);
 

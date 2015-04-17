@@ -80,7 +80,7 @@ class BenchmarkBase
 {
 public:
     // wait free data queue to pass inserted data to deleter thread
-    typedef lfds::queue<Data, true, true, true> queue_type;
+    typedef lfds::queue<Data, lfds::Queue::FixedSize> queue_type;
     typedef Set set_type;
     typedef typename set_type::key_type key_type;
     typedef get_random_data<Data> randomizer_type;

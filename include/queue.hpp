@@ -12,21 +12,90 @@
 #include "queue_spscfs.hpp"
 #include "buffer_traits.hpp"
 #include "cppbasics.hpp"
+#include "xtraits.hpp"
 
 #include <utility>
 
 namespace lfds
 {
 
-template<class T, bool FixedSize = true, bool ManyProducers = true,
-bool ManyConsumers = true, class Allocator = std::allocator<T> >
+struct Queue
+{
+    enum ESize {
+        FixedSize,
+        DynamicSize,
+    };
+
+    enum EMultiplicity {
+        ManyProducers,
+        OneProducer,
+        ManyConsumers,
+        OneConsumer,
+    };
+};
+
+namespace {
+
+template<Queue::ESize>
+struct is_queue_fixed_size;
+
+template<Queue::EMultiplicity>
+struct are_many_producers;
+
+template<Queue::EMultiplicity>
+struct are_many_consumers;
+
+template<>
+struct is_queue_fixed_size<Queue::FixedSize> : public integral_const<bool, true>
+{
+
+};
+
+template<>
+struct is_queue_fixed_size<Queue::DynamicSize> : public integral_const<bool, false>
+{
+
+};
+
+template<>
+struct are_many_producers<Queue::ManyProducers> : public integral_const<bool, true>
+{
+
+};
+
+template<>
+struct are_many_producers<Queue::OneProducer> : public integral_const<bool, true>
+{
+
+};
+
+template<>
+struct are_many_consumers<Queue::ManyConsumers> : public integral_const<bool, true>
+{
+
+};
+
+template<>
+struct are_many_consumers<Queue::OneConsumer> : public integral_const<bool, false>
+{
+
+};
+
+}
+
+template< typename T
+          , Queue::ESize SizeType = Queue::FixedSize
+          , Queue::EMultiplicity NumProducers = Queue::ManyProducers
+          , Queue::EMultiplicity NumConsumers = Queue::ManyConsumers
+          , typename Allocator = std::allocator<T>
+          >
 class queue
 {
 public:
     typedef T value_type;
-    typedef buffer_traits<T, Allocator, FixedSize> traits_type;
+    typedef buffer_traits<T, Allocator, is_queue_fixed_size<SizeType>::value > traits_type;
     typedef typename traits_type::buffer_type buffer_type;
-    typedef queue_base<T, ManyProducers, ManyConsumers> queue_type;
+    typedef queue_base<T, are_many_producers<NumProducers>::value, are_many_consumers<NumConsumers>::value > queue_type;
     typedef typename buffer_type::size_type size_type;
 
 public:
@@ -35,7 +104,7 @@ public:
     static const bool many_consumers = queue_type::many_consumers;
     static const bool wait_free = false;
 private:
-    typedef queue<T, FixedSize, ManyProducers, ManyConsumers, Allocator> this_class;
+    typedef queue<T, SizeType, NumProducers, NumConsumers, Allocator> this_class;
     typedef typename buffer_type::node_type node_type;
 
 private:
@@ -104,11 +173,11 @@ private:
     xtomic<size_type> m_size;
 };
 
-template<class T, class Allocator>
-class queue<T, true, false, false, Allocator>
+template<typename T, typename Allocator>
+class queue<T, Queue::FixedSize, Queue::OneProducer, Queue::OneConsumer, Allocator>
 {
 public:
-    typedef queue<T, true, false, false, Allocator> this_class;
+    typedef queue<T, Queue::FixedSize, Queue::OneProducer, Queue::OneConsumer, Allocator> this_class;
     typedef queue_spscfs<T, Allocator> queue_type;
     typedef typename queue_type::value_type value_type;
     typedef typename queue_type::size_type size_type;
@@ -145,6 +214,27 @@ public:
     }
 private:
     queue_type m_queue;
+};
+
+//
+// Some sugar
+//
+template<typename T, typename Allocator = std::allocator<T> >
+struct make_wait_free_queue
+{
+    typedef queue<T, Queue::FixedSize, Queue::OneProducer, Queue::OneConsumer, Allocator> type;
+};
+
+template<typename T, typename Allocator = std::allocator<T> >
+struct make_fixed_size_queue
+{
+    typedef queue<T, Queue::FixedSize, Queue::ManyProducers, Queue::ManyConsumers, Allocator> type;
+};
+
+template<typename T, typename Allocator = std::allocator<T> >
+struct make_dynamic_size_queue
+{
+    typedef queue<T, Queue::DynamicSize, Queue::ManyProducers, Queue::ManyConsumers, Allocator> type;
 };
 
 }

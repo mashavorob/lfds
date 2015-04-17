@@ -19,8 +19,13 @@ add_executable( unit-tests
     hash_map_integral_key.cpp
     hash_map_integral_pair.cpp
     hash_set_integral_key.cpp
+    hash_map_mt.cpp
     hash_trie.cpp
     stack_node.cpp
+    queue_one2one.cpp
+    queue_many2many.cpp
+    hash_map_mt.cpp
+    hash_set_mt.cpp
     )
 
 # Link test executable against gtest & gtest_main

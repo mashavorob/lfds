@@ -5,15 +5,62 @@
  *      Author: masha
  */
 
-#include <iostream>
-#include <queue>
-#include <chrono>
-
 #include "demo_queue.hpp"
 #include "counted_collection_wrapper.hpp"
 #include "std_queue_wrapper.hpp"
 #include "benchmark.hpp"
-#include "queue.hpp"
+
+#include <queue.hpp>
+#include <xtraits.hpp>
+
+#include <iostream>
+#include <queue>
+#include <chrono>
+
+template<bool FixedSize>
+struct get_size_type;
+
+template<bool ManyProducers>
+struct get_num_producers;
+
+template<bool ManyConsumers>
+struct get_num_consumers;
+
+template<>
+struct get_size_type<false> : public lfds::integral_const<lfds::Queue::ESize, lfds::Queue::DynamicSize>
+{
+
+};
+
+template<>
+struct get_size_type<true> : public lfds::integral_const<lfds::Queue::ESize, lfds::Queue::FixedSize>
+{
+
+};
+
+template<>
+struct get_num_producers<true> : public lfds::integral_const<lfds::Queue::EMultiplicity, lfds::Queue::ManyProducers>
+{
+
+};
+
+template<>
+struct get_num_producers<false> : public lfds::integral_const<lfds::Queue::EMultiplicity, lfds::Queue::OneProducer>
+{
+
+};
+
+template<>
+struct get_num_consumers<true> : public lfds::integral_const<lfds::Queue::EMultiplicity, lfds::Queue::ManyConsumers>
+{
+
+};
+
+template<>
+struct get_num_consumers<false> : public lfds::integral_const<lfds::Queue::EMultiplicity, lfds::Queue::OneConsumer>
+{
+
+};
 
 template<bool fixedSize>
 struct QueueCaptionImpl
@@ -42,7 +89,7 @@ struct QueueCaptionImpl<false>
 template<bool fixedSize>
 struct QueueRunnerImpl
 {
-    typedef lfds::queue<int, fixedSize> collection_type;
+    typedef lfds::queue<int, get_size_type<fixedSize>::value> collection_type;
     typedef counted_collection_wrapper<collection_type> counted_collection_type;
 
     std::size_t operator()()
@@ -87,8 +134,8 @@ class QueueDemonstrator
 {
 public:
     typedef std_queue_wrapper<std::queue<int> > ref_collection_type;
-    typedef lfds::queue<int, true, ManyProducers, ManyConsumers> fixed_collection_type;
-    typedef lfds::queue<int, false, ManyProducers, ManyConsumers> dynamic_collection_type;
+    typedef lfds::queue<int, lfds::Queue::FixedSize, get_num_producers<ManyProducers>::value, get_num_consumers<ManyConsumers>::value> fixed_collection_type;
+    typedef lfds::queue<int, lfds::Queue::DynamicSize, get_num_producers<ManyProducers>::value, get_num_consumers<ManyConsumers>::value> dynamic_collection_type;
 
 public:
     static const unsigned duration_seconds = 10;

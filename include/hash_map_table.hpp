@@ -19,14 +19,6 @@
 #include <functional>
 #include <vector>
 
-// thread-safe implementation of hash table with open addressing
-//
-// generic hash table is not "true lock free" object
-// it implements two kinds of operations:
-//        * lock free lookup
-//        * lock free insert when resizing is not required
-//        * resize with exclusive access
-//        * deleting items with exclusive access
 namespace lfds
 {
 

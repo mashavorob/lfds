@@ -37,6 +37,7 @@ public:
     typedef std::vector<value_type> snapshot_type;
 
     static constexpr bool INTEGRAL_KEY = true;
+    static constexpr bool INTEGRAL_VALUE = true;
     static constexpr bool INTEGRAL_KEYVALUE = true;
 
 private:

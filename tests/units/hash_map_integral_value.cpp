@@ -1,39 +1,36 @@
 /*
- * hash_map_integral_pair.cpp
+ * hash_map_integral_value.cpp
  *
- *  Created on: Feb 11, 2015
+ *  Created on: Apr 20, 2015
  *      Author: masha
  */
-
 #include <gtest/gtest.h>
 
-#include "hash_map_data_adapter.hpp"
-
 #include <hash_map.hpp>
-#include <inttypes.hpp>
+
+#include "hash_map_data_adapter.hpp"
 
 #include <ctime>
 #include <cstdlib>
 
+
+typedef long long key_type;
+typedef long long value_type; // prevent optimization
+typedef lfds::hash_map<key_type, value_type> hash_map; // same hash for all
+typedef hash_map::size_type size_type;
+typedef hash_map::snapshot_type snapshot_type;
+
 /////////////////////////////////////////////////////////////////
 // integral key
-TEST(HashMap_integral_pair, type_traits)
+TEST(HashMap_integral_value, type_traits)
 {
-    typedef int key_type;
-    typedef int value_type;
-    typedef lfds::hash_map<key_type, value_type> hash_map;
-
-    EXPECT_TRUE(hash_map::INTEGRAL_KEY);
-    EXPECT_TRUE(hash_map::INTEGRAL_KEYVALUE);
+    EXPECT_TRUE(hash_map::INTEGRAL_VALUE);
+    EXPECT_FALSE(hash_map::INTEGRAL_KEYVALUE);
 }
 
-TEST(HashMap_integral_pair, empty)
-{
-    typedef int key_type;
-    typedef int value_type;
-    typedef lfds::hash_map<key_type, value_type> hash_map;
-    typedef hash_map::size_type size_type;
 
+TEST(HashMap_integral_value, empty)
+{
     hash_map hm;
 
     bool res = false;
@@ -50,66 +47,8 @@ TEST(HashMap_integral_pair, empty)
     EXPECT_FALSE(res);
 }
 
-// just unsure that it is compilable
-template<class Key, class Value>
-struct compile_tester
+TEST(HashMap_integral_value, insert)
 {
-    typedef Key key_type;
-    typedef Value value_type;
-    typedef lfds::hash_map<key_type, value_type> hash_map_type;
-    typedef typename hash_map_type::size_type size_type;
-
-    void operator()() const
-    {
-        hash_map_type hm;
-
-        size_type size = 0;
-        value_type val;
-
-        hm.insert(1, -1);
-        hm.find(1, val);
-        hm.erase(1);
-        hm.size();
-
-        EXPECT_TRUE(hash_map_type::INTEGRAL_KEYVALUE);
-    }
-};
-
-TEST(HashMap_integral_pair, DataTypes)
-{
-    compile_tester<int8_t, int8_t>()();
-    compile_tester<int8_t, int16_t>()();
-    compile_tester<int8_t, int32_t>()();
-    compile_tester<int8_t, int64_t>()();
-    compile_tester<int16_t, int8_t>()();
-    compile_tester<int16_t, int16_t>()();
-    compile_tester<int16_t, int32_t>()();
-    compile_tester<int16_t, int64_t>()();
-    compile_tester<int32_t, int8_t>()();
-    compile_tester<int32_t, int16_t>()();
-    compile_tester<int32_t, int32_t>()();
-    compile_tester<int32_t, int64_t>()();
-    compile_tester<int64_t, int8_t>()();
-    compile_tester<int64_t, int16_t>()();
-    compile_tester<int64_t, int32_t>()();
-    EXPECT_TRUE(true);
-}
-
-TEST(HashMap_integral_pair, OutOfLimit)
-{
-    typedef compile_tester<int64_t, int64_t>::hash_map_type hash_map;
-    EXPECT_FALSE(hash_map::INTEGRAL_KEY);
-    EXPECT_TRUE(hash_map::INTEGRAL_VALUE);
-    EXPECT_FALSE(hash_map::INTEGRAL_KEYVALUE);
-}
-
-TEST(HashMap_integral_pair, insert)
-{
-    typedef int key_type;
-    typedef int value_type;
-    typedef lfds::hash_map<key_type, value_type> hash_map;
-    typedef hash_map::size_type size_type;
-
     hash_map hm;
 
     bool res = false;
@@ -122,13 +61,8 @@ TEST(HashMap_integral_pair, insert)
     EXPECT_EQ(size, 1);
 }
 
-TEST(HashMap_integral_pair, find)
+TEST(HashMap_integral_value, find)
 {
-    typedef int key_type;
-    typedef int value_type;
-    typedef lfds::hash_map<key_type, value_type> hash_map;
-    typedef hash_map::size_type size_type;
-
     hash_map hm;
 
     bool res = false;
@@ -153,13 +87,8 @@ TEST(HashMap_integral_pair, find)
     EXPECT_FALSE(res);
 }
 
-TEST(HashMap_integral_pair, erase)
+TEST(HashMap_integral_value, erase)
 {
-    typedef int key_type;
-    typedef int value_type;
-    typedef lfds::hash_map<key_type, value_type> hash_map;
-    typedef hash_map::size_type size_type;
-
     hash_map hm;
 
     bool res = false;
@@ -206,14 +135,11 @@ TEST(HashMap_integral_pair, erase)
     EXPECT_FALSE(res);
 }
 
-TEST(HashMap_integral_pair, collision)
+TEST(HashMap_integral_value, collision)
 {
-    typedef int key_type;
-    typedef int value_type;
-    typedef lfds::hash_map<key_type, value_type, bad_hash<key_type> > hash_map; // same hash for all
-    typedef hash_map::size_type size_type;
+    typedef lfds::hash_map<key_type, value_type, bad_hash<key_type>  > bad_hash_map; // same hash for all
 
-    hash_map hm;
+    bad_hash_map hm;
 
     bool res = false;
     size_type size = 0;
@@ -262,13 +188,8 @@ TEST(HashMap_integral_pair, collision)
     EXPECT_FALSE(res);
 }
 
-TEST(HashMap_integral_pair, reusekey)
+TEST(HashMap_integral_value, reusekey)
 {
-    typedef int key_type;
-    typedef int value_type;
-    typedef lfds::hash_map<key_type, value_type> hash_map;
-    typedef hash_map::size_type size_type;
-
     hash_map hm;
 
     bool res = false;
@@ -338,13 +259,8 @@ TEST(HashMap_integral_pair, reusekey)
     EXPECT_FALSE(res);
 }
 
-TEST(HashMap_integral_pair, rehash)
+TEST(HashMap_integral_value, rehash)
 {
-    typedef int key_type;
-    typedef int value_type;
-    typedef lfds::hash_map<key_type, value_type> hash_map;
-    typedef hash_map::size_type size_type;
-
     hash_map hm;
 
     size_type size = 0;
@@ -352,7 +268,7 @@ TEST(HashMap_integral_pair, rehash)
     bool result = false;
     value_type val;
 
-    size = hm.capacity() * 2 + 1;
+    size = hm.capacity()*2 + 1;
 
     for (int i = 1; i <= size; ++i)
     {
@@ -373,7 +289,7 @@ TEST(HashMap_integral_pair, rehash)
     {
         result = hm.find(i, val);
         EXPECT_TRUE(result);
-        if (result)
+        if ( result )
         {
             EXPECT_EQ(i + 100, val);
         }
@@ -382,13 +298,8 @@ TEST(HashMap_integral_pair, rehash)
     }
 }
 
-TEST(HashMap_integral_pair, random)
+TEST(HashMap_integral_value, random)
 {
-    typedef int key_type;
-    typedef int value_type;
-    typedef lfds::hash_map<key_type, value_type> hash_map;
-    typedef hash_map::size_type size_type;
-
     srand(time(nullptr));
 
     hash_map hm;
@@ -418,14 +329,54 @@ TEST(HashMap_integral_pair, random)
     EXPECT_EQ(count_inserted, count_found);
 }
 
-TEST(HashMap_integral_pair, snapshot_empty)
+// just unsure that it is compilable
+template<class Key, class Value>
+struct compile_tester
 {
-    typedef int key_type;
-    typedef int value_type;
-    typedef lfds::hash_map<key_type, value_type> hash_map;
-    typedef hash_map::size_type size_type;
-    typedef hash_map::snapshot_type snapshot_type;
+    typedef lfds::testing::adapter<Key> key_type;
+    typedef Value value_type; // prevent optimization
+    typedef lfds::hash_map<key_type, value_type> hash_map_type;
+    typedef typename hash_map_type::size_type size_type;
 
+    void operator()() const
+    {
+        hash_map_type hm;
+
+        size_type size = 0;
+        value_type val;
+
+        hm.insert(1, -1);
+        hm.find(1, val);
+        hm.erase(1);
+        hm.size();
+
+        EXPECT_FALSE(hash_map_type::INTEGRAL_KEY);
+        EXPECT_TRUE(hash_map_type::INTEGRAL_VALUE);
+        EXPECT_FALSE(hash_map_type::INTEGRAL_KEYVALUE);
+    }
+};
+
+TEST(HashMap_integral_value, DataTypes)
+{
+    compile_tester<int8_t, int8_t>()();
+    compile_tester<int8_t, int16_t>()();
+    compile_tester<int8_t, int32_t>()();
+    compile_tester<int8_t, int64_t>()();
+    compile_tester<int16_t, int8_t>()();
+    compile_tester<int16_t, int16_t>()();
+    compile_tester<int16_t, int32_t>()();
+    compile_tester<int16_t, int64_t>()();
+    compile_tester<int32_t, int8_t>()();
+    compile_tester<int32_t, int16_t>()();
+    compile_tester<int32_t, int32_t>()();
+    compile_tester<int32_t, int64_t>()();
+    compile_tester<int64_t, int8_t>()();
+    compile_tester<int64_t, int16_t>()();
+    compile_tester<int64_t, int32_t>()();
+}
+
+TEST(HashMap_integral_value, snapshot_empty)
+{
     snapshot_type snapshot;
     snapshot.push_back(std::make_pair(1, 1));
 
@@ -434,17 +385,10 @@ TEST(HashMap_integral_pair, snapshot_empty)
     hm.getSnapshot(snapshot);
 
     EXPECT_EQ(snapshot.size(), 0);
-
 }
 
-TEST(HashMap_integral_pair, snapshot)
+TEST(HashMap_integral_value, snapshot)
 {
-    typedef int key_type;
-    typedef int value_type;
-    typedef lfds::hash_map<key_type, value_type> hash_map;
-    typedef hash_map::size_type size_type;
-    typedef hash_map::snapshot_type snapshot_type;
-
     snapshot_type snapshot;
 
     hash_map hm;

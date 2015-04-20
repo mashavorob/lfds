@@ -17,6 +17,7 @@ add_executable( unit-tests
     hash_map.cpp
     hash_set.cpp
     hash_map_integral_key.cpp
+    hash_map_integral_value.cpp
     hash_map_integral_pair.cpp
     hash_set_integral_key.cpp
     hash_map_mt.cpp

@@ -20,14 +20,6 @@
 #include <functional>
 #include <vector>
 
-// thread-safe implementation of hash table with open addressing
-//
-// generic hash table is not "true lock free" object
-// it implements two kinds of operations:
-//        * lock free lookup
-//        * lock free insert when resizing is not required
-//        * resize with exclusive access
-//        * deleting items with exclusive access
 namespace lfds
 {
 
@@ -52,6 +44,7 @@ public:
     typedef std::vector<value_type> snapshot_type;
 
     static constexpr bool INTEGRAL_KEY = true;
+    static constexpr bool INTEGRAL_VALUE = false;
     static constexpr bool INTEGRAL_KEYVALUE = false;
 
 private:
@@ -73,15 +66,15 @@ public:
         for (size_type i = 0; i < capacity; ++i)
         {
             const node_type& node = table[i];
-            const key_item_type item = node.key();
+            const key_item_type item = node.getKey();
 
             if (item.m_state == key_item_type::allocated)
             {
                 scoped_node_ref_lock guard(node);
-                state_type state = node.state();
+                state_type state = node.getState();
                 if (state == key_item_type::allocated)
                 {
-                    snapshot.push_back(value_type(item.m_key, *node.value()));
+                    snapshot.push_back(value_type(item.m_key, *node.getValue()));
                 }
             }
         }
@@ -100,7 +93,7 @@ public:
                 i = 0;
             }
             const node_type& node = table[i];
-            const key_item_type item = node.key();
+            const key_item_type item = node.getKey();
 
             switch (item.m_state)
             {
@@ -125,10 +118,10 @@ public:
                 if (m_eq_func(key, item.m_key))
                 {
                     scoped_node_ref_lock guard(node);
-                    state_type state = node.state();
+                    state_type state = node.getState();
                     if (state == key_item_type::allocated)
                     {
-                        value = *node.value();
+                        value = *node.getValue();
                         return true;
                     }
                     else
@@ -166,7 +159,7 @@ public:
             }
 
             node_type& node = table[i];
-            const key_item_type item = node.key();
+            const key_item_type item = node.getKey();
 
             switch (item.m_state)
             {
@@ -175,10 +168,10 @@ public:
                 // the slot is empty so try to use it
                 key_item_type new_item(key, key_item_type::pending);
 
-                if (node.atomic_cas_hash(item, new_item))
+                if (node.atomic_cas(item, new_item))
                 {
-                    m_value_allocator.construct(node.value(), std_forward(Args, val));
-                    node.state(key_item_type::allocated);
+                    m_value_allocator.construct(node.getValue(), std_forward(Args, val));
+                    node.setState(key_item_type::allocated);
                     ++raw_table.m_used;
                     ++raw_table.m_size;
                     return true;
@@ -207,10 +200,10 @@ public:
                 {
                     key_item_type new_item(key, key_item_type::pending);
 
-                    if (node.atomic_cas_hash(item, new_item))
+                    if (node.atomic_cas(item, new_item))
                     {
-                        m_value_allocator.construct(node.value(), std_forward(Args, val));
-                        node.state(key_item_type::allocated);
+                        m_value_allocator.construct(node.getValue(), std_forward(Args, val));
+                        node.setState(key_item_type::allocated);
                         ++raw_table.m_size;
                         return true;
                     }
@@ -241,7 +234,7 @@ public:
                 i = 0;
             }
             node_type& node = table[i];
-            const key_item_type item = node.key();
+            const key_item_type item = node.getKey();
 
             switch (item.m_state)
             {
@@ -268,13 +261,13 @@ public:
                     // reset readiness
                     key_item_type new_item(key, key_item_type::pending);
 
-                    if (node.atomic_cas_hash(item, new_item))
+                    if (node.atomic_cas(item, new_item))
                     {
                         // wait for pending finds
                         node.wait_for_release();
                         // destroy the node
-                        m_value_allocator.destroy(node.value());
-                        node.state(key_item_type::touched);
+                        m_value_allocator.destroy(node.getValue());
+                        node.setState(key_item_type::touched);
                         --raw_table.m_size;
                         return true;
                     }
@@ -290,7 +283,7 @@ public:
     }
     void destroyNode_impl(node_type & node)
     {
-        key_item_type item = node.key();
+        key_item_type item = node.getKey();
         // pending and pending2 states are not allowed here
         assert(
                 item.m_state == key_item_type::allocated
@@ -298,7 +291,7 @@ public:
                         || item.m_state == key_item_type::unused);
         if (item.m_state == key_item_type::allocated)
         {
-            m_value_allocator.destroy(node.value());
+            m_value_allocator.destroy(node.getValue());
             item.m_state = key_item_type::touched;
         }
     }
@@ -308,11 +301,11 @@ public:
         for (size_type i = 0; i < src.m_capacity; ++i)
         {
             const node_type& node = src.m_table[i];
-            const key_item_type item = node.key();
+            const key_item_type item = node.getKey();
 
             if (item.m_state == key_item_type::allocated)
             {
-                const mapped_type & val = *node.value();
+                const mapped_type & val = *node.getValue();
                 insert_unique_key(dst, item.m_key, val);
             }
         }
@@ -336,11 +329,11 @@ private:
                 i = 0;
             }
             node_type& node = dst.m_table[i];
-            key_item_type item = node.key();
+            key_item_type item = node.getKey();
             if (item.m_state == key_item_type::unused)
             {
-                node.key(key, key_item_type::allocated);
-                m_value_allocator.construct(node.value(), val);
+                node.setKey(key, key_item_type::allocated);
+                m_value_allocator.construct(node.getValue(), val);
                 ++dst.m_size;
                 ++dst.m_used;
                 break;

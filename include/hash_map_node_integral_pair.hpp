@@ -87,14 +87,14 @@ struct get_state_type
     typedef typename get_int_by_size<size>::type type;
 };
 
-template<class Key, class Value, class State, bool PaddingAtTheEnd =
+template<typename Key, typename Value, typename State, bool PaddingAtTheEnd =
         !is_greater_size<Value, Key>::value, int PaddingSize = get_padding_size<
         Key, Value, State>::value>
 struct integral_item_data_fields;
 
 #define _DETAILED_CONSTRUCTOR_ 1
 
-template<class Key, class Value, class State>
+template<typename Key, typename Value, typename State>
 struct integral_item_data_fields<Key, Value, State, true, 0>
 {
     typedef State state_type;
@@ -123,7 +123,7 @@ struct integral_item_data_fields<Key, Value, State, true, 0>
     }
 };
 
-template<class Key, class Value, class State>
+template<typename Key, typename Value, typename State>
 struct integral_item_data_fields<Key, Value, State, false, 0>
 {
     typedef State state_type;
@@ -152,7 +152,7 @@ struct integral_item_data_fields<Key, Value, State, false, 0>
     }
 };
 
-template<class Key, class Value, class State, int PaddingSize>
+template<typename Key, typename Value, typename State, int PaddingSize>
 struct integral_item_data_fields<Key, Value, State, true, PaddingSize>
 {
     Key m_key;
@@ -180,7 +180,7 @@ struct integral_item_data_fields<Key, Value, State, true, PaddingSize>
     }
 };
 
-template<class Key, class Value, class State, int PaddingSize>
+template<typename Key, typename Value, typename State, int PaddingSize>
 struct integral_item_data_fields<Key, Value, State, false, PaddingSize>
 {
     Key m_key;
@@ -208,7 +208,7 @@ struct integral_item_data_fields<Key, Value, State, false, PaddingSize>
     }
 };
 
-template<class Key, class Value>
+template<typename Key, typename Value>
 struct hash_node_integral_pair
 {
 public:

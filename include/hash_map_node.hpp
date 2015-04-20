@@ -171,8 +171,8 @@ public:
     }
 
 private:
-    char m_key[sizeof(key_type)];
-    char m_value[sizeof(mapped_type)];
+    char m_key[sizeof(key_type)] __attribute__((aligned(__alignof(key_type))));
+    char m_value[sizeof(mapped_type)] __attribute__((aligned(__alignof(mapped_type))));
     volatile hash_item_type m_hash;
     mutable xtomic<int> m_refCount;
 };

@@ -13,6 +13,7 @@
 #include <timeutils.hpp>
 #include <testmem.hpp>
 #include <vector>
+#include <iostream>
 
 namespace lfds
 {
@@ -171,7 +172,12 @@ public:
         mapped_type val;
         for (; i != end; ++i)
         {
-            m_coll.find(*i, val);
+            bool res = m_coll.find(*i, val);
+            if ( !res )
+            {
+                std::cerr << "This code is normally unreachable, "
+                        << "its only purpose is to make a reference to " << val << std::endl;
+            }
         }
     }
 
@@ -295,7 +301,12 @@ public:
             {
                 i = begin;
             }
-            m_coll.find(key, val);
+            bool res = m_coll.find(key, val);
+            if ( !res )
+            {
+                std::cerr << "This code is normally unreachable, "
+                        << "its only purpose is to make a reference to " << val << std::endl;
+            }
             ++c;
         }
         clock_gettime(CLOCK_MONOTONIC, &endpoint);
@@ -374,7 +385,12 @@ public:
                 i = begin;
             }
             clock_gettime(CLOCK_MONOTONIC, &startpoint);
-            m_coll.find(key, val);
+            bool res = m_coll.find(key, val);
+            if ( !res )
+            {
+                std::cerr << "This code is normally unreachable, "
+                        << "its only purpose is to make a reference to " << val << std::endl;
+            }
             clock_gettime(CLOCK_MONOTONIC, &endpoint);
             timespec diff = endpoint - startpoint;
             if ((diff.tv_sec > max_diff.tv_sec)

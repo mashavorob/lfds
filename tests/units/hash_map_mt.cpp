@@ -43,7 +43,7 @@ TEST(HashMap_Generic, multithread)
 TEST(HashMap_IntegralKey, multithread)
 {
     typedef long long key_type;
-    typedef long long value_type;
+    typedef lfds::my::int_wrapper<long long> value_type;
 
     typedef lfds::hash_map<key_type, value_type> map_type;
     typedef lfds::testing::map_insert_erase<map_type, MapSize, NumRepetitions> test_type;
@@ -55,6 +55,28 @@ TEST(HashMap_IntegralKey, multithread)
     static map_type::size_type expected = 0;
 
     EXPECT_TRUE(map_type::INTEGRAL_KEY);
+    EXPECT_FALSE(map_type::INTEGRAL_KEYVALUE);
+
+    EXPECT_EQ(expected, test.getFailsOnInsert());
+    EXPECT_EQ(expected, test.getFailsOnFind());
+    EXPECT_EQ(expected, test.getFailsOnMissing());
+}
+
+TEST(HashMap_IntegralValue, multithread)
+{
+    typedef long long key_type;
+    typedef long long value_type;
+
+    typedef lfds::hash_map<key_type, value_type> map_type;
+    typedef lfds::testing::map_insert_erase<map_type, MapSize, NumRepetitions> test_type;
+
+    map_type map;
+    test_type test(map);
+    test.run();
+
+    static map_type::size_type expected = 0;
+
+    EXPECT_TRUE(map_type::INTEGRAL_VALUE);
     EXPECT_FALSE(map_type::INTEGRAL_KEYVALUE);
 
     EXPECT_EQ(expected, test.getFailsOnInsert());

@@ -17,7 +17,7 @@ namespace lfds
 // Eclipse Luna does not recognize alignas keyword regardless of any settings
 // It seems Eclipse's developers do not admit the bug so the only way
 // to avoid annoying error marks these macro are used
-template<class Key>
+template<typename Key>
 struct __attribute__((aligned(2*sizeof(Key)))) key_item
 {
     typedef key_item<Key> this_type;
@@ -87,13 +87,13 @@ struct __attribute__((aligned(2*sizeof(Key)))) key_item
     state_type m_state;
 };
 
-template<class Key, class Value>
+template<typename Key, typename Value>
 class hash_node_integral_key
 {
 public:
     typedef Key key_type;
     typedef Value mapped_type;
-    typedef hash_node<key_type, mapped_type> this_class;
+    typedef hash_node_integral_key<key_type, mapped_type> this_class;
     typedef key_item<Key> key_item_type;
     typedef typename key_item_type::state_type state_type;
 
@@ -106,32 +106,32 @@ public:
     {
 
     }
-    key_item_type key() const
+    const key_item_type getKey() const
     {
         return m_key;
     }
-    void key(const key_type keyValue, const state_type stateValue)
+    void setKey(const key_type keyValue, const state_type stateValue)
     {
         m_key.m_key = keyValue;
         m_key.m_state = stateValue;
     }
-    state_type state() const
+    state_type getState() const
     {
         return m_key.m_state;
     }
-    void state(const state_type val)
+    void setState(const state_type val)
     {
         m_key.m_state = val;
     }
-    mapped_type* value()
+    mapped_type* getValue()
     {
         return reinterpret_cast<mapped_type*>(m_value);
     }
-    const mapped_type* value() const
+    const mapped_type* getValue() const
     {
         return reinterpret_cast<const mapped_type*>(m_value);
     }
-    bool atomic_cas_hash(const key_item_type & expected,
+    bool atomic_cas(const key_item_type & expected,
             const key_item_type & newkey)
     {
         return lfds::atomic_cas(m_key, expected, newkey);
@@ -152,7 +152,7 @@ public:
 
 private:
     volatile key_item_type m_key;
-    char m_value[sizeof(mapped_type)];
+    char m_value[sizeof(mapped_type)] __attribute__((aligned(__alignof(mapped_type))));
     mutable xtomic<int> m_refCount;
 };
 

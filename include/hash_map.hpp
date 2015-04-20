@@ -10,8 +10,9 @@
 
 #include "hash_map_table.hpp"
 #include "hash_map_table_integral_pair.hpp"
-#include "hash_map_table_base.hpp"
+#include "hash_map_table_integral_value.hpp"
 #include "hash_map_table_integral_key.hpp"
+#include "hash_map_table_base.hpp"
 #include "xtraits.hpp"
 #include "xfunctional.hpp"
 #include "cppbasics.hpp"
@@ -45,28 +46,35 @@ struct is_interal_pair
     };
 };
 
-template<class Key, class Value, class Hash = typename get_hash<Key>::type,
-        class Pred = std::equal_to<Key>,
-        class Allocator = std::allocator<Value>, bool = is_integral<Key>::value,
-        bool = is_interal_pair<Key, Value>::value>
-struct hash_table_traits;
-
-template<class Key, class Value, class Hash, class Pred, class Allocator>
-struct hash_table_traits<Key, Value, Hash, Pred, Allocator, false, false>
+template<class Key
+        , class Value
+        , class Hash = typename get_hash<Key>::type
+        , class Pred = std::equal_to<Key>
+        , class Allocator = std::allocator<Value>
+        , bool IntegralKey = is_integral<Key>::value
+        , bool IntegralValue = is_integral<Value>::value
+        , bool IntegralKeyValue = is_interal_pair<Key, Value>::value>
+struct hash_table_traits
 {
     typedef lfds::hash_map_table<Key, Value, Hash, Pred, Allocator> type;
 };
 
-template<class Key, class Value, class Hash, class Pred, class Allocator>
-struct hash_table_traits<Key, Value, Hash, Pred, Allocator, true, false>
+template<class Key, class Value, class Hash, class Pred, class Allocator, bool IntegralKey, bool IntegralValue>
+struct hash_table_traits<Key, Value, Hash, Pred, Allocator, IntegralKey, IntegralValue, true>
 {
-    typedef lfds::hash_map_table_integral_key<Key, Value, Hash, Pred, Allocator> type;
+    typedef lfds::hash_map_table_integral_pair<Key, Value, Hash, Pred, Allocator> type;
+};
+
+template<class Key, class Value, class Hash, class Pred, class Allocator, bool IntegralKey>
+struct hash_table_traits<Key, Value, Hash, Pred, Allocator, IntegralKey, true, false>
+{
+    typedef lfds::hash_map_table_integral_value<Key, Value, Hash, Pred, Allocator> type;
 };
 
 template<class Key, class Value, class Hash, class Pred, class Allocator>
-struct hash_table_traits<Key, Value, Hash, Pred, Allocator, true, true>
+struct hash_table_traits<Key, Value, Hash, Pred, Allocator, true, false, false>
 {
-    typedef lfds::hash_map_table_integral_pair<Key, Value, Hash, Pred, Allocator> type;
+    typedef lfds::hash_map_table_integral_key<Key, Value, Hash, Pred, Allocator> type;
 };
 
 }
@@ -91,6 +99,7 @@ public:
     typedef typename hash_table_type::snapshot_type snapshot_type;
 
     static constexpr bool INTEGRAL_KEY = hash_table_type::INTEGRAL_KEY;
+    static constexpr bool INTEGRAL_VALUE = hash_table_type::INTEGRAL_VALUE;
     static constexpr bool INTEGRAL_KEYVALUE = hash_table_type::INTEGRAL_KEYVALUE;
 private:
     hash_map(const this_type&); // = delete;

@@ -183,7 +183,8 @@ private:
 };
 
 typedef adapter::hash_map<slow_int_type, slow_int_type, dummy_hash<slow_int_type::type> > generic_hash_map_type;
-typedef adapter::hash_map<long long, long long> ikey_hash_map_type;
+typedef adapter::hash_map<long long, slow_int_type> ikey_hash_map_type;
+typedef adapter::hash_map<long long, long long> ival_hash_map_type;
 typedef adapter::hash_map<long long, int> ipair_hash_map_type;
 typedef adapter::hash_trie<int, int, 16> hash_trie_type;
 typedef adapter::stdmap<int, int, false> map_type;
@@ -192,11 +193,12 @@ typedef adapter::stdmap<int, int, true> unorderd_map_type;
 static registrar<hash_trie_type> r0_16("lock-free",
         "hash_trie");
 static registrar<generic_hash_map_type> r1("lock-free", "hash_map");
-static registrar<ikey_hash_map_type> r2("lock-free", "hash_map (integral key)");
-static registrar<ipair_hash_map_type> r3("lock-free",
-        "hash_map (integral key-value pair)");
-static registrar<map_type> r4("std", "map");
-static registrar<unorderd_map_type> r5("std", "unordered_map");
+static registrar<ikey_hash_map_type> r2_1("lock-free", "hash_map<int64_t, generic>");
+static registrar<ival_hash_map_type> r2_2("lock-free", "hash_map<int64_t, int64_t>");
+static registrar<ipair_hash_map_type> r2_3("lock-free",
+        "hash_map<int64_t, int>");
+static registrar<map_type> r3("std", "map");
+static registrar<unorderd_map_type> r4("std", "unordered_map");
 
 }
 }

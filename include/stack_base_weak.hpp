@@ -66,7 +66,7 @@ public:
         } while (!success);
         return p;
     }
-    node_type* atomic_remove_head()
+    node_type* atomic_removeHead()
     {
         bool success;
         node_type* p;
@@ -106,7 +106,7 @@ public:
         m_head.store(head2, barriers::relaxed);
         other.m_head.store(head1, barriers::relaxed);
     }
-    void set_head(node_type* p)
+    void setHead(node_type* p)
     {
         m_head.store(p, barriers::relaxed);
     }

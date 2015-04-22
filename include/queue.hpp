@@ -94,7 +94,7 @@ class queue
 public:
     typedef T value_type;
     typedef buffer_traits<T, Allocator, is_queue_fixed_size<SizeType>::value > traits_type;
-    typedef typename traits_type::buffer_type buffer_type;
+    typedef typename traits_type::type buffer_type;
     typedef queue_base<T, are_many_producers<NumProducers>::value, are_many_consumers<NumConsumers>::value > queue_type;
     typedef typename buffer_type::size_type size_type;
 
@@ -123,7 +123,7 @@ public:
         node_type* p = m_queue.pop();
         while (p)
         {
-            m_buff.free_node(p);
+            m_buff.freeNode(p);
             p = m_queue.pop();
         }
     }
@@ -135,7 +135,7 @@ public:
     bool push(const value_type& data)
 #endif
     {
-        node_type* p = m_buff.new_node(std_forward(Args, data));
+        node_type* p = m_buff.newNode(std_forward(Args, data));
         if (!p)
         {
             return false;
@@ -152,15 +152,15 @@ public:
         {
             return false;
         }
-        val = std_move(*p->data());
-        m_buff.free_node(p);
+        val = std_move(*p->getData());
+        m_buff.freeNode(p);
         --m_size;
         return true;
     }
 
-    size_type capacity() const
+    size_type getCapacity() const
     {
-        return m_buff.capacity();
+        return m_buff.getCapacity();
     }
 
     size_type size() const

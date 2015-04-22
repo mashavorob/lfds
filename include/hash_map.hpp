@@ -48,7 +48,7 @@ struct is_interal_pair
 
 template<class Key
         , class Value
-        , class Hash = typename get_hash<Key>::type
+        , class Hash = typename getHash<Key>::type
         , class Pred = std::equal_to<Key>
         , class Allocator = std::allocator<Value>
         , bool IntegralKey = is_integral<Key>::value
@@ -82,7 +82,7 @@ struct hash_table_traits<Key, Value, Hash, Pred, Allocator, true, false, false>
 //
 // Hash map
 //
-template<class Key, class Value, class Hash = typename get_hash<Key>::type,
+template<class Key, class Value, class Hash = typename getHash<Key>::type,
         class Pred = std::equal_to<Key>, class Allocator = std::allocator<Value> >
 class hash_map
 {
@@ -137,9 +137,9 @@ public:
     {
         return m_hash_table_base.size();
     }
-    size_type capacity() const
+    size_type getCapacity() const
     {
-        return m_hash_table_base.capacity();
+        return m_hash_table_base.getCapacity();
     }
 
 private:

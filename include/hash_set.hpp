@@ -39,7 +39,7 @@ struct hash_set_table_selector<T, Hash, Pred, Allocator, true>
 }
 
 // hash_set is an adapter for hash_map
-template<class T, class Hash = typename get_hash<T>::type, class Pred = std::equal_to<T>,
+template<class T, class Hash = typename getHash<T>::type, class Pred = std::equal_to<T>,
         class Allocator = std::allocator<T> >
 class hash_set
 {
@@ -79,9 +79,9 @@ public:
     {
         return m_hash_table_base.size();
     }
-    size_type capacity() const
+    size_type getCapacity() const
     {
-        return m_hash_table_base.capacity();
+        return m_hash_table_base.getCapacity();
     }
 
 private:

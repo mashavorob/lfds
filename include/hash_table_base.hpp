@@ -52,7 +52,7 @@ public:
         {
 
         }
-        counter_type add_ref() const
+        counter_type addRef() const
         {
             return ++m_count;
         }
@@ -229,7 +229,7 @@ public:
             } while (!success);
         }
     }
-    size_type capacity() const
+    size_type getCapacity() const
     {
         scoped_lock_type guard(m_constTable);
         const table_type* ptr = m_constTable.m_ptr.load(
@@ -243,14 +243,14 @@ public:
                 barriers::relaxed);
         return ptr->m_size.load(barriers::relaxed);
     }
-    size_type used() const
+    size_type getUsed() const
     {
         scoped_lock_type guard(m_constTable);
         const table_type* ptr = m_constTable.m_ptr.load(
                 barriers::relaxed);
         return ptr->m_used;
     }
-    size_type highWatermark() const
+    size_type getHighWatermark() const
     {
         scoped_lock_type guard(m_constTable);
         const table_type* ptr = m_constTable.m_ptr.load(

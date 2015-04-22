@@ -21,32 +21,60 @@ typedef unsigned short int uint16_t;
 typedef unsigned int uint32_t;
 typedef unsigned long long int uint64_t;
 
-template<int>
-struct get_type_by_size;
+template<int size>
+struct get_int_by_size;
 
 template<>
-struct get_type_by_size<1>
+struct get_int_by_size<1>
 {
     typedef int8_t type;
 };
+
 template<>
-struct get_type_by_size<2>
+struct get_int_by_size<2>
 {
     typedef int16_t type;
 };
+
 template<>
-struct get_type_by_size<4>
+struct get_int_by_size<4>
 {
     typedef int32_t type;
 };
+
 template<>
-struct get_type_by_size<8>
+struct get_int_by_size<8>
 {
     typedef int64_t type;
 };
 
+template<int size>
+struct get_uint_by_size;
+
+template<>
+struct get_uint_by_size<1>
+{
+    typedef uint8_t type;
+};
+
+template<>
+struct get_uint_by_size<2>
+{
+    typedef int16_t type;
+};
+
+template<>
+struct get_uint_by_size<4>
+{
+    typedef uint32_t type;
+};
+
+template<>
+struct get_uint_by_size<8>
+{
+    typedef uint64_t type;
+};
+
 }
-
-
 
 #endif /* INCLUDE_INTTYPES_HPP_ */

@@ -31,7 +31,7 @@ public:
     BufferNode()
     {
     }
-    T* data()
+    T* getData()
     {
         return reinterpret_cast<T*>(m_data);
     }
@@ -75,7 +75,7 @@ public:
         node_type* p = raw_pop();
         while (p)
         {
-            m_dataAllocator.destroy(p->data());
+            m_dataAllocator.destroy(p->getData());
             --m_size;
             p = raw_pop();
         }
@@ -92,7 +92,7 @@ public:
         node_type* p = raw_push();
         if (p)
         {
-            m_dataAllocator.construct(p->data(), std_forward(Args, data));
+            m_dataAllocator.construct(p->getData(), std_forward(Args, data));
             ++m_size;
             return true;
         }
@@ -103,8 +103,8 @@ public:
         node_type* p = raw_pop();
         if (p)
         {
-            val = std_move(*p->data());
-            m_dataAllocator.destroy(p->data());
+            val = std_move(*p->getData());
+            m_dataAllocator.destroy(p->getData());
             --m_size;
             return true;
         }

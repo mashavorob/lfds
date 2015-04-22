@@ -21,7 +21,7 @@ struct CAS
 {
     bool operator()(volatile T* var, const T* oldVal, const T* newVal) const
     {
-        typedef typename get_type_by_size<sizeof(T)>::type data_type;
+        typedef typename get_int_by_size<sizeof(T)>::type data_type;
 
         volatile data_type* pVar = reinterpret_cast<volatile data_type*>(var);
         const data_type * pOldVal = reinterpret_cast<const data_type*>(oldVal);
@@ -67,6 +67,9 @@ struct CAS<T, 16>
         return result;
     }
 };
+
+// built in atomics are preferable
+#if 0
 
 template<class T>
 struct CAS<T, 8>
@@ -195,6 +198,7 @@ struct CAS<T, 1>
         return result;
     }
 };
+#endif // #if 0
 }
 
 template<class T>

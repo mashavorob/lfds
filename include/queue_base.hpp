@@ -71,8 +71,8 @@ public:
         node_type* p = m_consumerEnd.atomic_pop();
         if (!p && count == 1)
         {
-            p = m_producerEnd.atomic_remove_head();
-            m_consumerEnd.atomic_set_head(p);
+            p = m_producerEnd.atomic_removeHead();
+            m_consumerEnd.atomic_setHead(p);
             p = m_consumerEnd.atomic_pop();
         }
         --m_lock;
@@ -100,8 +100,8 @@ public:
         node_type* p = m_consumerEnd.pop();
         if (!p)
         {
-            p = inverter_type::invert(m_producerEnd.atomic_remove_head());
-            m_consumerEnd.set_head(p);
+            p = inverter_type::invert(m_producerEnd.atomic_removeHead());
+            m_consumerEnd.setHead(p);
             p = m_consumerEnd.pop();
         }
         return p;

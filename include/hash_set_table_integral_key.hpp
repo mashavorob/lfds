@@ -230,7 +230,7 @@ public:
             {
                 key_type & key = node.m_key;
 
-                insert_unique_key(dst, node);
+                insertUniqueKey(dst, node);
             }
         }
     }
@@ -239,7 +239,7 @@ public:
     //    * exclusive access to the container
     //    * new key is unique
     //    * table has enough capacity to insert specified element
-    void insert_unique_key(table_type& dst, const node_type& new_node)
+    void insertUniqueKey(table_type& dst, const node_type& new_node)
     {
         hash_func_type hash_func;
         const size_type hash = hash_func(new_node.m_key);

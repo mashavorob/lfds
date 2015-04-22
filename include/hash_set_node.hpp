@@ -103,11 +103,11 @@ public:
     {
 
     }
-    key_type* key()
+    key_type* getKey()
     {
         return reinterpret_cast<key_type*>(m_key);
     }
-    const key_type* key() const
+    const key_type* getKey() const
     {
         return reinterpret_cast<const key_type*>(m_key);
     }

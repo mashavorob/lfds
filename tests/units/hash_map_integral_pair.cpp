@@ -352,7 +352,7 @@ TEST(HashMap_integral_pair, rehash)
     bool result = false;
     value_type val;
 
-    size = hm.capacity() * 2 + 1;
+    size = hm.getCapacity() * 2 + 1;
 
     for (int i = 1; i <= size; ++i)
     {
@@ -363,7 +363,7 @@ TEST(HashMap_integral_pair, rehash)
         EXPECT_EQ(i + 100, val);
     }
 
-    count = hm.capacity();
+    count = hm.getCapacity();
 
     EXPECT_GT(count, size);
     count = hm.size();

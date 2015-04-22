@@ -20,7 +20,7 @@ class stack_base_aba
 {
 public:
     typedef stack_node<T> node_type;
-    typedef abaptr<node_type> node_ptr;
+    typedef aba_ptr<node_type> node_ptr;
 
 public:
     static const bool many_producers = true;
@@ -51,7 +51,7 @@ public:
             success = m_head.atomic_cas(expected, newhead);
         } while (!success);
     }
-    void atomic_set_head(node_type* p)
+    void atomic_setHead(node_type* p)
     {
         bool success;
         node_ptr expected;

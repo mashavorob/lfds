@@ -21,7 +21,7 @@ namespace maps
 namespace adapter
 {
 
-template<class Key, class Value, class Hash = typename get_hash<Key>::type, class Allocator = std::allocator<Value> >
+template<class Key, class Value, class Hash = typename getHash<Key>::type, class Allocator = std::allocator<Value> >
 class hash_map
 {
 public:
@@ -68,7 +68,7 @@ template<class Key, class Value, int BFactor, class Allocator = std::allocator<V
 class hash_trie
 {
 public:
-    typedef lfds::hash_trie<Key, Value, BFactor, typename get_hash<Key>::type, std::equal_to<Key>, Allocator> collection_type;
+    typedef lfds::hash_trie<Key, Value, BFactor, typename getHash<Key>::type, std::equal_to<Key>, Allocator> collection_type;
     typedef typename collection_type::key_type key_type;
     typedef typename collection_type::mapped_type mapped_type;
     typedef typename collection_type::size_type size_type;

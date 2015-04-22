@@ -41,7 +41,7 @@ public:
     }
     std::size_t hash() const
     {
-        typename get_hash<T>::type hasher;
+        typename getHash<T>::type hasher;
         return hasher(m_t);
     }
 public:
@@ -52,7 +52,7 @@ template<class T>
 struct adapted_hash
 {
 public:
-    typedef typename get_hash<T>::type hash_type;
+    typedef typename getHash<T>::type hash_type;
 
     size_t operator()(const lfds::testing::adapter<T>& val) const
     {
@@ -64,7 +64,7 @@ private:
 };
 
 template<typename T>
-struct get_hash<lfds::testing::adapter<T> >
+struct getHash<lfds::testing::adapter<T> >
 {
     typedef adapted_hash<T> type;
 };

@@ -136,7 +136,7 @@ public:
     {
         return lfds::atomic_cas(m_key, expected, newkey);
     }
-    void add_ref() const
+    void addRef() const
     {
         ++m_refCount;
     }
@@ -144,7 +144,7 @@ public:
     {
         --m_refCount;
     }
-    void wait_for_release() const
+    void waitForRelease() const
     {
         while (m_refCount.load(barriers::relaxed))
             ;

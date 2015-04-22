@@ -39,14 +39,14 @@ public:
 
     T* allocate()
     {
-        node_type* node = m_buffer.new_node();
-        value_type* p = node->data();
+        node_type* node = m_buffer.newNode();
+        value_type* p = node->getData();
         return p;
     }
     void deallocate(T* p)
     {
         node_type* node = node_type::recover(p);
-        m_buffer.free_node(node);
+        m_buffer.freeNode(node);
     }
 private:
     buffer_type m_buffer;

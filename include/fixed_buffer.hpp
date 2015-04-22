@@ -44,20 +44,20 @@ public:
     }
 #if LFDS_USE_CPP11
     template<class ... Args>
-    node_type* new_node(Args&&... data)
+    node_type* newNode(Args&&... data)
 #else
-    node_type* new_node(const value_type& data)
+    node_type* newNode(const value_type& data)
 #endif
     {
-        return m_base.new_node(std_forward(Args, data));
+        return m_base.newNode(std_forward(Args, data));
     }
 
-    void free_node(node_type* p)
+    void freeNode(node_type* p)
     {
-        m_base.free_node(p);
+        m_base.freeNode(p);
     }
 
-    size_type capacity() const
+    size_type getCapacity() const
     {
         return m_capacity;
     }

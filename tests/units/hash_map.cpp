@@ -290,7 +290,7 @@ TEST(HashMap, rehash)
     bool result = false;
     value_type val;
 
-    size = hm.capacity()*2 + 1;
+    size = hm.getCapacity()*2 + 1;
 
     for (int i = 1; i <= size; ++i)
     {
@@ -301,7 +301,7 @@ TEST(HashMap, rehash)
         EXPECT_EQ(i + 100, val.m_t);
     }
 
-    count = hm.capacity();
+    count = hm.getCapacity();
 
     EXPECT_GT(count, size);
     count = hm.size();

@@ -194,19 +194,19 @@ public:
     {
 
     }
-    Node* node()
+    Node* getNode()
     {
         return m_node.load(barriers::relaxed);
     }
-    const Node* node() const
+    const Node* getNode() const
     {
         return m_node.load(barriers::relaxed);
     }
-    void node(Node* p)
+    void setNode(Node* p)
     {
         m_node.store(p, barriers::relaxed);
     }
-    counter_type add_ref() const
+    counter_type addRef() const
     {
         return ++m_refCount;
     }
@@ -288,19 +288,19 @@ struct CNode: public Node
 
     xtomic<bool> m_allocated;
 
-    key_type* key()
+    key_type* getKey()
     {
         return reinterpret_cast<key_type*>(m_keyBuff);
     }
-    const key_type* key() const
+    const key_type* getKey() const
     {
         return reinterpret_cast<const key_type*>(m_keyBuff);
     }
-    value_type* value()
+    value_type* getValue()
     {
         return reinterpret_cast<value_type*>(m_valueBuff);
     }
-    const value_type* value() const
+    const value_type* getValue() const
     {
         return reinterpret_cast<const value_type*>(m_valueBuff);
     }
@@ -343,7 +343,7 @@ public:
 
     }
 
-    counter_type add_ref() const
+    counter_type addRef() const
     {
         return ++m_refCount;
     }
@@ -403,7 +403,7 @@ private:
 
 }
 
-template<class Key, class Value, int BFactor = 16, class Hash = typename get_hash<Key>::type,
+template<class Key, class Value, int BFactor = 16, class Hash = typename getHash<Key>::type,
         class Pred = std::equal_to<Key>,
         class Allocator = std::allocator<Value> >
 class hash_trie
@@ -485,7 +485,7 @@ public:
 
         for (;;)
         {
-            const n_type* p = ptr->node();
+            const n_type* p = ptr->getNode();
             if (!p)
             {
                 return false;
@@ -522,7 +522,7 @@ public:
 
         for (;;)
         {
-            n_type* p = ptr->node();
+            n_type* p = ptr->getNode();
             if (!p)
             {
                 ret = insertChain(bn, ptr, p, hash, key, std_forward(Args, val));
@@ -574,7 +574,7 @@ public:
 
         for (;;)
         {
-            n_type* p = ptr->node();
+            n_type* p = ptr->getNode();
             if (!p)
             {
                 return false;
@@ -639,13 +639,13 @@ private:
 
         while (cn)
         {
-            if (cn->m_hash == hash && m_eqFunc(key, *cn->key()))
+            if (cn->m_hash == hash && m_eqFunc(key, *cn->getKey()))
             {
                 if (!cn->m_allocated.load(barriers::relaxed))
                 {
                     break;
                 }
-                val = *cn->value();
+                val = *cn->getValue();
                 return true;
             }
             cn = cn->m_next;
@@ -674,7 +674,7 @@ private:
 
         while (cn)
         {
-            if (cn->m_hash == hash && m_eqFunc(key, *cn->key()))
+            if (cn->m_hash == hash && m_eqFunc(key, *cn->getKey()))
             {
                 bool result = cn->m_allocated.load(barriers::relaxed);
                 if (!result)
@@ -689,8 +689,8 @@ private:
         c_type* cnn = m_c_buffer.allocate();
 
         cnn->m_hash = hash;
-        m_keyAllocator.construct(cnn->key(), key);
-        m_mappedAllocator.construct(cnn->value(), std_forward(Args, val));
+        m_keyAllocator.construct(cnn->getKey(), key);
+        m_mappedAllocator.construct(cnn->getValue(), std_forward(Args, val));
         cnn->m_next = reinterpret_cast<c_type*>(p);
 
         ptr_type ptre = *ptr;
@@ -707,8 +707,8 @@ private:
         {
             ret = retry;
             // clear the mess up
-            m_keyAllocator.destroy(cnn->key());
-            m_mappedAllocator.destroy(cnn->value());
+            m_keyAllocator.destroy(cnn->getKey());
+            m_mappedAllocator.destroy(cnn->getValue());
             m_c_buffer.deallocate(cnn);
         }
         return ret;
@@ -756,7 +756,7 @@ private:
         b_type* bnn = m_b_buffer.allocate();
 
         bnn->m_parent = bn.get();
-        bnn->m_array[chainedIndex].node(cn);
+        bnn->m_array[chainedIndex].setNode(cn);
 
         ptr_type ptre = *ptr;
         ptr_type ptrn(bnn, ptre);
@@ -788,7 +788,7 @@ private:
 
         while (cn)
         {
-            if (cn->m_hash == hash && m_eqFunc(key, *cn->key())
+            if (cn->m_hash == hash && m_eqFunc(key, *cn->getKey())
                     && cn->m_allocated.load(barriers::relaxed))
             {
                 cn->m_allocated.store(false, barriers::relaxed);
@@ -825,8 +825,8 @@ private:
             for (int i = 0; i < BFACTOR; ++i)
             {
                 ptr_type & item = bn->m_array[i];
-                item.add_ref();
-                if (item.node() != nullptr)
+                item.addRef();
+                if (item.getNode() != nullptr)
                 {
                     do
                     {
@@ -908,7 +908,7 @@ private:
             {
                 return true;
             }
-            const n_type* node = bn->m_array[i].node();
+            const n_type* node = bn->m_array[i].getNode();
             if (!node || node->m_type != htrie::branch)
             {
                 continue;
@@ -926,7 +926,7 @@ private:
         size_type count = 1;
         for (int i = 0; i < BFACTOR; ++i)
         {
-            const n_type* node = bn->m_array[i].node();
+            const n_type* node = bn->m_array[i].getNode();
             if (!node || node->m_type != htrie::branch)
             {
                 continue;

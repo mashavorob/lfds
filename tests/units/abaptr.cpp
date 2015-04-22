@@ -9,30 +9,30 @@
 #include "gtest/gtest.h"
 
 
-TEST(abaptr, Negative)
+TEST(aba_ptr, Negative)
 {
     int val[] =
     { 0, 0 };
 
-    lfds::abaptr<int> a(val);
+    lfds::aba_ptr<int> a(val);
 
-    lfds::abaptr<int> expected = a;
+    lfds::aba_ptr<int> expected = a;
     ++a.m_counter;
 
-    lfds::abaptr<int> b(val + 1);
+    lfds::aba_ptr<int> b(val + 1);
     EXPECT_FALSE(a.atomic_cas(expected, b));
     EXPECT_EQ(a.m_ptr, val);
 }
 
-TEST(abaptr, Positive)
+TEST(aba_ptr, Positive)
 {
     int val[] =
     { 0, 0 };
 
-    lfds::abaptr<int> a(val);
+    lfds::aba_ptr<int> a(val);
 
-    lfds::abaptr<int> expected = a;
-    lfds::abaptr<int> b(val + 1);
+    lfds::aba_ptr<int> expected = a;
+    lfds::aba_ptr<int> b(val + 1);
     EXPECT_TRUE(a.atomic_cas(expected, b));
     EXPECT_EQ(a.m_ptr, val + 1);
 }

@@ -17,7 +17,7 @@ namespace lfds
 template<class T>
 inline void hash_combine(std::size_t& seed, T const& v)
 {
-    typedef typename get_hash<T>::type hash_type;
+    typedef typename getHash<T>::type hash_type;
     seed ^= hash_type<T>()(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 }
 

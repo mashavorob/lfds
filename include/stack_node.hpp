@@ -29,7 +29,7 @@ public:
     {
 
     }
-    T* data()
+    T* getData()
     {
         return reinterpret_cast<T*>(m_data);
     }

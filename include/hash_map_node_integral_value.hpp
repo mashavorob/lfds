@@ -30,7 +30,7 @@ struct __attribute__((aligned(sizeof(void*)*2))) mapped_value
 
     typedef mapped_value<Value> this_type;
     typedef Value value_type;
-    typedef typename get_type_by_size<sizeof(value_type)>::type state_type;
+    typedef typename get_int_by_size<sizeof(value_type)>::type state_type;
 
     mapped_value() :
             m_state(unused), m_value(0)

@@ -52,9 +52,9 @@ public:
 
 #if LFDS_USE_CPP11
     template<class ... Args>
-    node_type* new_node(Args&&... data)
+    node_type* newNode(Args&&... data)
 #else
-    node_type* new_node(const value_type &data)
+    node_type* newNode(const value_type &data)
 #endif
     {
         node_type* node = m_base.popFreeNode();
@@ -62,26 +62,26 @@ public:
         {
             node = m_base.allocate_nodes(1);
         }
-        m_base.construct_data(node, std_forward(Args, data));
+        m_base.constructData(node, std_forward(Args, data));
         return node;
     }
 #if !LFDS_USE_CPP11
-    node_type* new_node()
+    node_type* newNode()
     {
         node_type* node = m_base.popFreeNode();
         if (!node)
         {
             node = m_base.allocate_nodes(1);
         }
-        m_base.construct_data(node);
+        m_base.constructData(node);
         return node;
     }
 #endif
-    void free_node(node_type* p)
+    void freeNode(node_type* p)
     {
-        m_base.free_node(p);
+        m_base.freeNode(p);
     }
-    size_type capacity() const
+    size_type getCapacity() const
     {
         return size_type();
     }

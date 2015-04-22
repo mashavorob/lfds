@@ -54,7 +54,7 @@ struct __attribute__((aligned(sizeof(void*)*2))) ref_ptr
     {
         return lfds::atomic_cas(*this, expected, val);
     }
-    size_type add_ref() const
+    size_type addRef() const
     {
         return ++m_refCount;
     }

@@ -25,7 +25,7 @@ class stack
 public:
     typedef T value_type;
     typedef buffer_traits<T, Allocator, FixedSize> traits_type;
-    typedef typename traits_type::buffer_type buffer_type;
+    typedef typename traits_type::type buffer_type;
     typedef stack_base_aba<T> stack_type;
     typedef typename buffer_type::size_type size_type;
 private:
@@ -53,7 +53,7 @@ public:
         node_type* p = m_stack.pop();
         while (p)
         {
-            m_buff.free_node(p);
+            m_buff.freeNode(p);
             p = m_stack.pop();
         }
     }
@@ -65,7 +65,7 @@ public:
     bool push(const value_type& val)
 #endif
     {
-        node_type* p = m_buff.new_node(std_forward(Args, val));
+        node_type* p = m_buff.newNode(std_forward(Args, val));
         if (!p)
         {
             return false;
@@ -83,14 +83,14 @@ public:
             return false;
         }
         --m_size;
-        val = std_move(*p->data());
-        m_buff.free_node(p);
+        val = std_move(*p->getData());
+        m_buff.freeNode(p);
         return true;
     }
 
-    size_type capacity() const
+    size_type getCapacity() const
     {
-        return m_buff.capacity();
+        return m_buff.getCapacity();
     }
     size_type size() const
     {

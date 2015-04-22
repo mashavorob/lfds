@@ -69,15 +69,15 @@ public:
         for (size_type i = 0; i < capacity; ++i)
         {
             const node_type& node = table[i];
-            const hash_item_type item = node.get_hash();
+            const hash_item_type item = node.getHash();
 
             if (item.m_state == hash_item_type::allocated)
             {
                 scoped_ref_lock guard(node);
-                std::size_t state = node.get_state();
+                std::size_t state = node.getState();
                 if (state == hash_item_type::allocated)
                 {
-                    snapshot.push_back(value_type(*node.key(), *node.value()));
+                    snapshot.push_back(value_type(*node.getKey(), *node.getValue()));
                 }
             }
         }
@@ -99,7 +99,7 @@ public:
             }
 
             const node_type& node = table[i];
-            const hash_item_type item = node.get_hash();
+            const hash_item_type item = node.getHash();
 
             switch (item.m_state)
             {
@@ -116,27 +116,27 @@ public:
                 }
                 break;
             case hash_item_type::pending2:
-                if (m_eq_func(key, *node.key()))
+                if (m_eq_func(key, *node.getKey()))
                 {
                     // the item is being processed now, there is no reason to wait
                     return false;
                 }
                 break;
             case hash_item_type::touched:
-                if (m_eq_func(key, *node.key()))
+                if (m_eq_func(key, *node.getKey()))
                 {
                     // the item was erased recently
                     return false;
                 }
                 break;
             case hash_item_type::allocated:
-                if (m_eq_func(key, *node.key()))
+                if (m_eq_func(key, *node.getKey()))
                 {
                     scoped_ref_lock guard(node);
-                    std::size_t state = node.get_state();
+                    std::size_t state = node.getState();
                     if (state == hash_item_type::allocated)
                     {
-                        value = *node.value();
+                        value = *node.getValue();
                         return true;
                     }
                     else
@@ -174,7 +174,7 @@ public:
             }
 
             node_type& node = table[i];
-            const hash_item_type item = node.get_hash();
+            const hash_item_type item = node.getHash();
 
             switch (item.m_state)
             {
@@ -183,12 +183,12 @@ public:
                 // the slot is empty so try to use it
                 hash_item_type new_item(hash, hash_item_type::pending);
 
-                if (node.atomic_cas_hash(item, new_item))
+                if (node.atomic_cas(item, new_item))
                 {
-                    m_value_allocator.construct(node.value(),
+                    m_value_allocator.construct(node.getValue(),
                             std_forward(Args, val));
-                    m_key_allocator.construct(node.key(), key);
-                    node.set_state(hash_item_type::allocated);
+                    m_key_allocator.construct(node.getKey(), key);
+                    node.setState(hash_item_type::allocated);
 
                     ++raw_table.m_used;
                     ++raw_table.m_size;
@@ -208,22 +208,22 @@ public:
                 break;
             case hash_item_type::pending2:
             case hash_item_type::allocated:
-                if (m_eq_func(key, *node.key()))
+                if (m_eq_func(key, *node.getKey()))
                 {
                     // the item is allocated or concurrent insert/delete operation is in progress
                     return false;
                 }
                 break;
             case hash_item_type::touched:
-                if (m_eq_func(key, *node.key()))
+                if (m_eq_func(key, *node.getKey()))
                 {
                     hash_item_type new_item(hash, hash_item_type::pending2);
 
-                    if (node.atomic_cas_hash(item, new_item))
+                    if (node.atomic_cas(item, new_item))
                     {
-                        m_value_allocator.construct(node.value(),
+                        m_value_allocator.construct(node.getValue(),
                                 std_forward(Args, val));
-                        node.set_state(hash_item_type::allocated);
+                        node.setState(hash_item_type::allocated);
                         ++raw_table.m_size;
                         return true;
                     }
@@ -254,7 +254,7 @@ public:
             }
 
             node_type& node = table[i];
-            const hash_item_type item = node.get_hash();
+            const hash_item_type item = node.getHash();
 
             switch (item.m_state)
             {
@@ -271,32 +271,32 @@ public:
                 }
                 break;
             case hash_item_type::pending2:
-                if (m_eq_func(key, *node.key()))
+                if (m_eq_func(key, *node.getKey()))
                 {
                     // the item is being processed now, there is no reason to wait
                     return false;
                 }
                 break;
             case hash_item_type::touched:
-                if (m_eq_func(key, *node.key()))
+                if (m_eq_func(key, *node.getKey()))
                 {
                     // the item was erased recently
                     return false;
                 }
                 break;
             case hash_item_type::allocated:
-                if (m_eq_func(key, *node.key()))
+                if (m_eq_func(key, *node.getKey()))
                 {
                     // reset readiness
                     hash_item_type new_item(hash, hash_item_type::pending2);
 
-                    if (node.atomic_cas_hash(item, new_item))
+                    if (node.atomic_cas(item, new_item))
                     {
                         // wait for pending finds
-                        node.wait_for_release();
+                        node.waitForRelease();
                         // destroy the node
-                        m_value_allocator.destroy(node.value());
-                        node.set_state(hash_item_type::touched);
+                        m_value_allocator.destroy(node.getValue());
+                        node.setState(hash_item_type::touched);
                         --raw_table.m_size;
                         return true;
                     }
@@ -314,7 +314,7 @@ public:
 
     void destroyNode_impl(node_type & node)
     {
-        hash_item_type item = node.get_hash();
+        hash_item_type item = node.getHash();
         // pending and pending2 states are not allowed here
         assert(
                 item.m_state == hash_item_type::allocated
@@ -322,12 +322,12 @@ public:
                         || item.m_state == hash_item_type::unused);
         if (item.m_state == hash_item_type::allocated)
         {
-            m_value_allocator.destroy(node.value());
+            m_value_allocator.destroy(node.getValue());
             item.m_state = hash_item_type::touched;
         }
         if (item.m_state == hash_item_type::touched)
         {
-            m_key_allocator.destroy(node.key());
+            m_key_allocator.destroy(node.getKey());
         }
     }
     void rehash_impl(const table_type& src, table_type& dst)
@@ -335,13 +335,13 @@ public:
         for (size_type i = 0; i < src.m_capacity; ++i)
         {
             node_type& node = src.m_table[i];
-            const hash_item_type item = node.get_hash();
+            const hash_item_type item = node.getHash();
 
             if (item.m_state == hash_item_type::allocated)
             {
-                key_type & key = *node.key();
-                mapped_type & val = *node.value();
-                insert_unique_key(dst, item.m_hash, key, val);
+                key_type & key = *node.getKey();
+                mapped_type & val = *node.getValue();
+                insertUniqueKey(dst, item.m_hash, key, val);
             }
         }
     }
@@ -350,7 +350,7 @@ public:
     //    * exclusive access to the container
     //    * new key is unique
     //    * table has enough capacity to insert specified element
-    void insert_unique_key(table_type& dst,
+    void insertUniqueKey(table_type& dst,
                            const size_type hash,
                            const key_type & key,
                            const mapped_type & val)
@@ -364,13 +364,13 @@ public:
                 i = 0;
             }
             node_type& node = dst.m_table[i];
-            hash_item_type item = node.get_hash();
+            hash_item_type item = node.getHash();
             if (item.m_state == hash_item_type::unused)
             {
-                node.set_item(hash, hash_item_type::allocated);
+                node.setItem(hash, hash_item_type::allocated);
 
-                m_key_allocator.construct(node.key(), key);
-                m_value_allocator.construct(node.value(), val);
+                m_key_allocator.construct(node.getKey(), key);
+                m_value_allocator.construct(node.getValue(), val);
 
                 ++dst.m_size;
                 ++dst.m_used;

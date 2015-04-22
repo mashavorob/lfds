@@ -48,7 +48,7 @@ struct get_map_type<Key, Value, Allocator, false>
 template<class Key, class Value, class Allocator>
 struct get_map_type<Key, Value, Allocator, true>
 {
-    typedef typename get_hash<Key>::type hash_type;
+    typedef typename getHash<Key>::type hash_type;
 #if LFDS_USE_CPP11
     typedef std::unordered_map<Key, Value, hash_type, std::equal_to<Key>, Allocator> type;
 #else

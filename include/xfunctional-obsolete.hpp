@@ -14,7 +14,7 @@ namespace lfds
 {
 
 template<class T>
-struct get_hash
+struct getHash
 {
     typedef std::tr1::hash<T> type;
 };

@@ -19,13 +19,13 @@ struct buffer_traits;
 template<class T, class Allocator>
 struct buffer_traits<T, Allocator, true>
 {
-	typedef fixed_buffer<T, Allocator>	buffer_type;
+	typedef fixed_buffer<T, Allocator>	type;
 };
 
 template<class T, class Allocator>
 struct buffer_traits<T, Allocator, false>
 {
-	typedef dynamic_buffer<T, Allocator>	buffer_type;
+	typedef dynamic_buffer<T, Allocator>	type;
 };
 
 }

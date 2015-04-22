@@ -125,7 +125,7 @@ struct dummy_hash
         return m_hasher(val);
     }
 private:
-    typename get_hash<T>::type m_hasher;
+    typename getHash<T>::type m_hasher;
 };
 
 namespace {

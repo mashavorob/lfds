@@ -50,22 +50,22 @@ public:
 
 #if LFDS_USE_CPP11
     template<class ... Args>
-    void construct_data(node_type* p, Args&&... data)
+    void constructData(node_type* p, Args&&... data)
 #else // LFDS_USE_CPP11
-    void construct_data(node_type* p, const value_type &data)
+    void constructData(node_type* p, const value_type &data)
 #endif // LFDS_USE_CPP11
     {
-        m_dataAllocator.construct(p->data(), std_forward(Args, data));
+        m_dataAllocator.construct(p->getData(), std_forward(Args, data));
     }
 #if !LFDS_USE_CPP11
-    void construct_data(node_type* p)
+    void constructData(node_type* p)
     {
-        ::new (static_cast<void*>(p->data())) value_type();
+        ::new (static_cast<void*>(p->getData())) value_type();
     }
 #endif // LFDS_USE_CPP11
-    void destroy_data(node_type* p)
+    void destroyData(node_type* p)
     {
-        m_dataAllocator.destroy(p->data());
+        m_dataAllocator.destroy(p->getData());
     }
     void pushFreeNode(node_type* p)
     {
@@ -77,32 +77,32 @@ public:
     }
 #if LFDS_USE_CPP11
     template<class ... Args>
-    node_type* new_node(Args&&... data)
+    node_type* newNode(Args&&... data)
 #else
-    node_type* new_node(const value_type &data)
+    node_type* newNode(const value_type &data)
 #endif
     {
         node_type* p = popFreeNode();
         if (p)
         {
-            construct_data(p, std_forward(Args, data));
+            constructData(p, std_forward(Args, data));
         }
         return p;
     }
 #if !LFDS_USE_CPP11
-    node_type* new_node()
+    node_type* newNode()
     {
         node_type* p = popFreeNode();
         if (p)
         {
-            construct_data(p);
+            constructData(p);
         }
         return p;
     }
 #endif
-    void free_node(node_type* p)
+    void freeNode(node_type* p)
     {
-        destroy_data(p);
+        destroyData(p);
         pushFreeNode(p);
     }
 

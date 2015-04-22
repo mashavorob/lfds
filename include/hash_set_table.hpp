@@ -76,7 +76,7 @@ public:
 
             if (item.m_state == hash_item_type::allocated)
             {
-                snapshot.push_back(*node.key());
+                snapshot.push_back(*node.getKey());
             }
         }
     }
@@ -113,14 +113,14 @@ public:
                 }
                 break;
             case hash_item_type::touched:
-                if (eq_func(key, *node.key()))
+                if (eq_func(key, *node.getKey()))
                 {
                     // the item was erased recently
                     return false;
                 }
                 break;
             case hash_item_type::allocated:
-                if (eq_func(key, *node.key()))
+                if (eq_func(key, *node.getKey()))
                 {
                     return true;
                 }
@@ -159,7 +159,7 @@ public:
 
                 if (atomic_cas(node.m_hash, item, new_item))
                 {
-                    m_key_allocator.construct(node.key(), key);
+                    m_key_allocator.construct(node.getKey(), key);
                     node.m_hash.m_state = hash_item_type::allocated;
                     ++raw_table.m_size;
                     ++raw_table.m_used;
@@ -178,14 +178,14 @@ public:
                 }
                 break;
             case hash_item_type::allocated:
-                if (eq_func(key, *node.key()))
+                if (eq_func(key, *node.getKey()))
                 {
                     // the item is allocated or concurrent insert/delete operation is in progress
                     return false;
                 }
                 break;
             case hash_item_type::touched:
-                if (eq_func(key, *node.key()))
+                if (eq_func(key, *node.getKey()))
                 {
                     static constexpr std::size_t touched = hash_item_type::touched;
                     static constexpr std::size_t allocated = hash_item_type::allocated;
@@ -240,14 +240,14 @@ public:
                 }
                 break;
             case hash_item_type::touched:
-                if (eq_func(key, *node.key()))
+                if (eq_func(key, *node.getKey()))
                 {
                     // the item was erased recently
                     return false;
                 }
                 break;
             case hash_item_type::allocated:
-                if (eq_func(key, *node.key()))
+                if (eq_func(key, *node.getKey()))
                 {
                     static constexpr std::size_t touched = hash_item_type::touched;
                     static constexpr std::size_t allocated = hash_item_type::allocated;
@@ -278,7 +278,7 @@ public:
                         || item.m_state == hash_item_type::unused);
         if (item.m_state == hash_item_type::allocated || item.m_state == hash_item_type::touched)
         {
-            m_key_allocator.destroy(node.key());
+            m_key_allocator.destroy(node.getKey());
         }
     }
     void rehash_impl(const table_type& src, table_type& dst)
@@ -290,9 +290,9 @@ public:
 
             if (item.m_state == hash_item_type::allocated)
             {
-                key_type & key = *node.key();
+                key_type & key = *node.getKey();
 
-                insert_unique_key(dst, item.m_hash, key);
+                insertUniqueKey(dst, item.m_hash, key);
             }
         }
     }
@@ -302,7 +302,7 @@ public:
     //    * exclusive access to the container
     //    * new key is unique
     //    * table has enough capacity to insert specified element
-    void insert_unique_key(table_type& dst, const size_type hash, const key_type & key)
+    void insertUniqueKey(table_type& dst, const size_type hash, const key_type & key)
     {
         const size_type capacity = dst.m_capacity;
 
@@ -319,7 +319,7 @@ public:
                 node.m_hash.m_hash = hash;
                 node.m_hash.m_state = hash_item_type::allocated;
 
-                m_key_allocator.construct(node.key(), key);
+                m_key_allocator.construct(node.getKey(), key);
 
                 ++dst.m_size;
                 ++dst.m_used;

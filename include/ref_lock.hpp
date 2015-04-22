@@ -22,7 +22,7 @@ public:
     ref_lock(T& obj) :
             m_obj(&obj)
     {
-        m_obj->add_ref();
+        m_obj->addRef();
     }
     ref_lock(T& obj, bool initialLock) :
             m_obj(&obj)

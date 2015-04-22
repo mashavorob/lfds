@@ -264,7 +264,7 @@ public:
                     if (node.atomic_cas(item, new_item))
                     {
                         // wait for pending finds
-                        node.wait_for_release();
+                        node.waitForRelease();
                         // destroy the node
                         m_value_allocator.destroy(node.getValue());
                         node.setState(key_item_type::touched);
@@ -306,7 +306,7 @@ public:
             if (item.m_state == key_item_type::allocated)
             {
                 const mapped_type & val = *node.getValue();
-                insert_unique_key(dst, item.m_key, val);
+                insertUniqueKey(dst, item.m_key, val);
             }
         }
     }
@@ -317,7 +317,7 @@ private:
     //    * exclusive access to the container
     //    * new key is unique
     //    * table has enough capacity to insert specified element
-    void insert_unique_key(table_type& dst, const key_type key,
+    void insertUniqueKey(table_type& dst, const key_type key,
             const mapped_type & val)
     {
         const size_type capacity = dst.m_capacity;

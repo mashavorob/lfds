@@ -120,44 +120,44 @@ public:
     {
 
     }
-    key_type* key()
+    key_type* getKey()
     {
         return reinterpret_cast<key_type*>(m_key);
     }
-    const key_type* key() const
+    const key_type* getKey() const
     {
         return reinterpret_cast<const key_type*>(m_key);
     }
-    mapped_type* value()
+    mapped_type* getValue()
     {
         return reinterpret_cast<mapped_type*>(m_value);
     }
-    const mapped_type* value() const
+    const mapped_type* getValue() const
     {
         return reinterpret_cast<const mapped_type*>(m_value);
     }
-    hash_item_type get_hash() const
+    hash_item_type getHash() const
     {
         return m_hash;
     }
-    std::size_t get_state() const
+    std::size_t getState() const
     {
         return m_hash.m_state;
     }
-    void set_state(std::size_t state)
+    void setState(std::size_t state)
     {
         m_hash.m_state = state;
     }
-    void set_item(std::size_t hash, std::size_t state)
+    void setItem(std::size_t hash, std::size_t state)
     {
         m_hash.m_hash = hash;
         m_hash.m_state = state;
     }
-    bool atomic_cas_hash(const hash_item & expected, const hash_item & hash)
+    bool atomic_cas(const hash_item & expected, const hash_item & hash)
     {
         return lfds::atomic_cas(m_hash, expected, hash);
     }
-    void add_ref() const
+    void addRef() const
     {
         m_refCount.fetch_add(1, barriers::release);
     }
@@ -165,7 +165,7 @@ public:
     {
         m_refCount.fetch_sub(1, barriers::release);
     }
-    void wait_for_release() const
+    void waitForRelease() const
     {
         while ( m_refCount.load(barriers::relaxed) ) ;
     }

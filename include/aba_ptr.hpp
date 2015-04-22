@@ -38,32 +38,32 @@ namespace lfds
 //     x86 cmxchgNb requires N bytes alignment for its operand
 
 template<class T>
-class __attribute__((aligned(sizeof(void*)*2))) abaptr
+class __attribute__((aligned(sizeof(void*)*2))) aba_ptr
 {
 public:
     typedef std::size_t counter_type;
 
-    abaptr() : m_ptr(nullptr), m_counter(0)
+    aba_ptr() : m_ptr(nullptr), m_counter(0)
     {}
-    abaptr(T* ptr) : m_ptr(ptr), m_counter(0)
+    aba_ptr(T* ptr) : m_ptr(ptr), m_counter(0)
     {}
-    abaptr(T* ptr, counter_type counter) : m_ptr(ptr), m_counter(counter)
+    aba_ptr(T* ptr, counter_type counter) : m_ptr(ptr), m_counter(counter)
     {}
-    abaptr(const abaptr<T>& other)
+    aba_ptr(const aba_ptr<T>& other)
     {
         *this = other;
     }
-    abaptr(const volatile abaptr<T>& other)
+    aba_ptr(const volatile aba_ptr<T>& other)
     {
         *this = other;
     }
-    abaptr<T>& operator=(const volatile abaptr<T>& other)
+    aba_ptr<T>& operator=(const volatile aba_ptr<T>& other)
     {
         m_ptr = other.m_ptr;
         m_counter = other.m_counter;
         return *this;
     }
-    bool atomic_cas(const abaptr<T>& expected, const abaptr<T>& val) volatile
+    bool atomic_cas(const aba_ptr<T>& expected, const aba_ptr<T>& val) volatile
     {
         return lfds::atomic_cas(*this, expected, val);
     }

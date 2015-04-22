@@ -279,7 +279,7 @@ public:
             {
                 key_type & key = *node.getKey();
                 const mapped_type val = node.getValue().m_value;
-                insert_unique_key(dst, key, val);
+                insertUniqueKey(dst, key, val);
             }
         }
     }
@@ -288,7 +288,7 @@ public:
     //    * exclusive access to the container
     //    * new key is unique
     //    * table has enough capacity to insert specified element
-    void insert_unique_key(table_type& dst,
+    void insertUniqueKey(table_type& dst,
                            const key_type & key,
                            const mapped_type val)
     {

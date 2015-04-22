@@ -264,7 +264,7 @@ TEST(HashSetIntegralKey, rehash)
     size_type count = 0;
     bool result = false;
 
-    size = hs.capacity()*2 + 1;
+    size = hs.getCapacity()*2 + 1;
 
     for (int i = 1; i <= size; ++i)
     {
@@ -274,7 +274,7 @@ TEST(HashSetIntegralKey, rehash)
         EXPECT_TRUE(result);
     }
 
-    count = hs.capacity();
+    count = hs.getCapacity();
 
     EXPECT_GT(count, size);
     count = hs.size();

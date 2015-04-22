@@ -17,7 +17,7 @@ TEST(Stack_Node, recover)
 
     node_type node;
     node_type* pnode = &node;
-    int* pdata = pnode->data();
+    int* pdata = pnode->getData();
     node_type* prnode = node_type::recover(pdata);
     EXPECT_EQ(pnode, prnode);
 }

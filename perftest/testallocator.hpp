@@ -37,7 +37,7 @@ private:
     static std::size_t m_cbAllocated;
 };
 
-template<class Allocator>
+template<typename Allocator>
 class counted_allocator: private allocator_base
 {
 public:
@@ -55,7 +55,7 @@ public:
     typedef typename nested_allocator_type::difference_type difference_type;
 
     typedef std::allocator<value_type> t;
-    template<class Type>
+    template<typename Type>
     struct rebind
     {
         typedef typename nested_allocator_type::template rebind<Type>::other other_nested_allocator_type;
@@ -69,13 +69,15 @@ public:
 
     }
 
-    counted_allocator(const this_type& other) : m_nestedAlloc(other.getNested())
+    counted_allocator(const this_type& other) :
+            m_nestedAlloc(other.getNested())
     {
 
     }
 
     template<typename Alloc>
-    counted_allocator(const counted_allocator<Alloc>& other) : m_nestedAlloc(other.getNested())
+    counted_allocator(const counted_allocator<Alloc>& other) :
+            m_nestedAlloc(other.getNested())
     {
 
     }
@@ -108,7 +110,7 @@ public:
         return m_nestedAlloc.max_size();
     }
 #if LFDS_USE_CPP11
-    template<class ... Args>
+    template<typename ... Args>
     void construct(pointer p, Args&&... val)
 #else
     void construct(pointer p, const value_type & val)

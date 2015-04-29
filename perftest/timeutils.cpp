@@ -16,7 +16,7 @@ timespec operator-(const timespec &a, const timespec &b)
 {
     timespec res = a;
 
-    if ( res.tv_nsec < b.tv_nsec )
+    if (res.tv_nsec < b.tv_nsec)
     {
         --res.tv_sec;
         res.tv_nsec += NS_PER_SEC;
@@ -29,10 +29,10 @@ timespec operator-(const timespec &a, const timespec &b)
 
 double seconds(const timespec &a)
 {
-    return static_cast<double>(a.tv_sec) + static_cast<double>(a.tv_nsec)/static_cast<double>(NS_PER_SEC);
+    return static_cast<double>(a.tv_sec)
+            + static_cast<double>(a.tv_nsec) / static_cast<double>(NS_PER_SEC);
 }
 
 }
 }
-
 

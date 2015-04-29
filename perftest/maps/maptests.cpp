@@ -27,9 +27,10 @@ typedef dummy_wrapper<long long> slow_int_type;
 
 struct slow_hash
 {
+    typedef slow_int_type::type value_type;
     std::size_t operator()(const slow_int_type & val) const
     {
-        return static_cast<std::size_t>(static_cast<int>(val));
+        return static_cast<std::size_t>(static_cast<value_type>(val));
     }
     ;
 };
@@ -46,7 +47,7 @@ public:
     }
 };
 
-template<class Map>
+template<typename Map>
 class ir_registrar
 {
 public:
@@ -56,8 +57,8 @@ public:
     typedef PerfTestFactoryImpl<test_type> factory_type;
 
     ir_registrar(const char* group, const char* name) :
-        m_factory(group, name,
-                    "maximum insert time (with initial reserve)", "μs/op")
+            m_factory(group, name, "maximum insert time (with initial reserve)",
+                    "μs/op")
     {
 
     }
@@ -66,7 +67,7 @@ private:
     factory_type m_factory;
 };
 
-template<class Map>
+template<typename Map>
 class mem_registrar
 {
 public:
@@ -76,9 +77,7 @@ public:
     typedef PerfTestFactoryImpl<mem_test_type> factory_type;
 
     mem_registrar(const char* group, const char* name) :
-        m_factory(group, name,
-                    "memory consumption",
-                    "Mb")
+            m_factory(group, name, "memory consumption", "Mb")
     {
 
     }
@@ -87,38 +86,37 @@ private:
     factory_type m_factory;
 };
 
-template<class Map, bool = Map::RESERVE_IMPLEMENTED>
+template<typename Map, bool = Map::RESERVE_IMPLEMENTED>
 struct get_ir_registrar;
 
-template<class Map>
+template<typename Map>
 struct get_ir_registrar<Map, false>
 {
     typedef void_registrar type;
 };
 
-template<class Map>
+template<typename Map>
 struct get_ir_registrar<Map, true>
 {
     typedef ir_registrar<Map> type;
 };
 
-template<class Map, bool = Map::ALLOCATOR_IMPLEMENTED>
+template<typename Map, bool = Map::ALLOCATOR_IMPLEMENTED>
 struct get_mem_registrar;
 
-template<class Map>
+template<typename Map>
 struct get_mem_registrar<Map, false>
 {
     typedef void_registrar type;
 };
 
-template<class Map>
+template<typename Map>
 struct get_mem_registrar<Map, true>
 {
     typedef mem_registrar<Map> type;
 };
 
-
-template<class Map>
+template<typename Map>
 class registrar
 {
 public:
@@ -145,7 +143,6 @@ public:
             NANOSECONDS_PER_SEC, TYPICAL_SIZE> mt_avg_test;
     typedef MtTestImpl<map_type, noiser_type, max_worker_type, max_agg_type,
             MICROSECONDS_PER_SEC, TYPICAL_SIZE> mt_max_test;
-
 
     typedef PerfTestFactoryImpl<avg_insert_test_type> avg_insert_factory_type;
     typedef PerfTestFactoryImpl<max_insert_test_type> max_insert_factory_type;
@@ -182,21 +179,50 @@ private:
     mem_registrar_type m_mem_registrar;
 };
 
-typedef adapter::hash_map<slow_int_type, slow_int_type, dummy_hash<slow_int_type::type> > generic_hash_map_type;
-typedef adapter::hash_map<long long, slow_int_type> ikey_hash_map_type;
-typedef adapter::hash_map<long long, long long> ival_hash_map_type;
-typedef adapter::hash_map<long long, int> ipair_hash_map_type;
+namespace wise
+{
+typedef adapter::make_wise_hash_map<slow_int_type, slow_int_type,
+        dummy_hash<slow_int_type::type> >::type generic_hash_map_type;
+typedef adapter::make_wise_hash_map<long long, slow_int_type>::type ikey_hash_map_type;
+typedef adapter::make_wise_hash_map<long long, long long>::type ival_hash_map_type;
+typedef adapter::make_wise_hash_map<long long, int>::type ipair_hash_map_type;
+}
+namespace greedy
+{
+typedef adapter::make_greedy_hash_map<slow_int_type, slow_int_type,
+        dummy_hash<slow_int_type::type> >::type generic_hash_map_type;
+typedef adapter::make_greedy_hash_map<long long, slow_int_type>::type ikey_hash_map_type;
+typedef adapter::make_greedy_hash_map<long long, long long>::type ival_hash_map_type;
+typedef adapter::make_greedy_hash_map<long long, int>::type ipair_hash_map_type;
+}
 typedef adapter::hash_trie<int, int, 16> hash_trie_type;
 typedef adapter::stdmap<int, int, false> map_type;
 typedef adapter::stdmap<int, int, true> unorderd_map_type;
 
-static registrar<hash_trie_type> r0_16("lock-free",
-        "hash_trie");
-static registrar<generic_hash_map_type> r1("lock-free", "hash_map");
-static registrar<ikey_hash_map_type> r2_1("lock-free", "hash_map<int64_t, generic>");
-static registrar<ival_hash_map_type> r2_2("lock-free", "hash_map<int64_t, int64_t>");
+static registrar<hash_trie_type> r0_16("lock-free", "hash_trie");
+
+namespace wise
+{
+static registrar<generic_hash_map_type> r1("lock-free", "hash_map<generic, generic, memory_model::wise>");
+static registrar<ikey_hash_map_type> r2_1("lock-free",
+        "hash_map<int64_t, generic, memory_model::wise>");
+static registrar<ival_hash_map_type> r2_2("lock-free",
+        "hash_map<int64_t, int64_t, memory_model::wise>");
 static registrar<ipair_hash_map_type> r2_3("lock-free",
-        "hash_map<int64_t, int>");
+        "hash_map<int64_t, int, memory_model::wise>");
+}
+
+namespace greedy
+{
+static registrar<generic_hash_map_type> r1("lock-free", "hash_map<generic, generic, memory_model::greedy>");
+static registrar<ikey_hash_map_type> r2_1("lock-free",
+        "hash_map<int64_t, generic, memory_model::greedy>");
+static registrar<ival_hash_map_type> r2_2("lock-free",
+        "hash_map<int64_t, int64_t, memory_model::greedy>");
+static registrar<ipair_hash_map_type> r2_3("lock-free",
+        "hash_map<int64_t, int, memory_model::greedy>");
+}
+
 static registrar<map_type> r3("std", "map");
 static registrar<unorderd_map_type> r4("std", "unordered_map");
 

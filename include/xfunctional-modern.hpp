@@ -13,8 +13,8 @@
 namespace lfds
 {
 
-template<class T>
-struct getHash
+template<typename T>
+struct make_hash
 {
     typedef std::hash<T> type;
 };

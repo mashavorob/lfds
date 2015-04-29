@@ -60,7 +60,7 @@ struct remove_cv
 };
 
 template<typename T>
-struct is_unqualified_pointer : public integral_const<bool, false>
+struct is_unqualified_pointer: public integral_const<bool, false>
 {
 };
 
@@ -70,12 +70,13 @@ struct is_unqualified_pointer<T*> : public integral_const<bool, true>
 };
 
 template<typename T>
-struct is_pointer : public integral_const<bool, is_unqualified_pointer<typename remove_cv<T>::type>::value>
+struct is_pointer: public integral_const<bool,
+        is_unqualified_pointer<typename remove_cv<T>::type>::value>
 {
 };
 
 template<typename T>
-struct is_unqualified_integer : public integral_const<bool, false>
+struct is_unqualified_integer: public integral_const<bool, false>
 {
 };
 
@@ -85,25 +86,22 @@ struct is_unqualified_integer : public integral_const<bool, false>
         template<>\
         struct is_unqualified_integer<unsigned t> : public integral_const<bool, true> {}
 
-
-unquallified_int(char);
-unquallified_int(short);
-unquallified_int(int);
-unquallified_int(long);
-unquallified_int(long long);
+unquallified_int(char);unquallified_int(short);unquallified_int(int);unquallified_int(long);unquallified_int(long long);
 
 #undef unquallified_int
 
 template<>
-struct is_unqualified_integer<signed char> : public integral_const<bool, true> {};
+struct is_unqualified_integer<signed char> : public integral_const<bool, true>
+{};
 
 template<typename T>
-struct is_integer : public integral_const<bool, is_unqualified_integer<typename remove_cv<T>::type>::value>
+struct is_integer: public integral_const<bool,
+        is_unqualified_integer<typename remove_cv<T>::type>::value>
 {
 };
 
 template<typename T>
-struct is_unqualified_bool : public integral_const<bool, false>
+struct is_unqualified_bool: public integral_const<bool, false>
 {
 };
 
@@ -113,15 +111,14 @@ struct is_unqualified_bool<bool> : public integral_const<bool, true>
 };
 
 template<typename T>
-struct is_bool : public integral_const<bool, is_unqualified_bool<typename remove_cv<T>::type>::value>
+struct is_bool: public integral_const<bool,
+        is_unqualified_bool<typename remove_cv<T>::type>::value>
 {
 };
 
-
 template<typename T>
-struct is_integral : public integral_const<bool,
-    is_integer<T>::value || is_pointer<T>::value || is_bool<T>::value
-    >
+struct is_integral: public integral_const<bool,
+        is_integer<T>::value || is_pointer<T>::value || is_bool<T>::value>
 {
 };
 

@@ -17,7 +17,8 @@
 
 namespace lfds
 {
-template<class Key, class Value, class Hash, class Pred, class Allocator>
+template<typename Key, typename Value, typename Hash, typename Pred,
+        typename Allocator>
 class hash_map_table_integral_pair
 {
 public:
@@ -47,7 +48,8 @@ public:
     hash_map_table_integral_pair()
     {
     }
-    void getSnapshot_imp(const table_type& raw_table, snapshot_type & snapshot) const
+    void getSnapshot_imp(const table_type& raw_table,
+                         snapshot_type & snapshot) const
     {
         const node_type* table = raw_table.m_table;
         const size_type capacity = raw_table.m_capacity;
@@ -58,12 +60,14 @@ public:
 
             if (node.m_data.m_state == node_type::allocated)
             {
-                snapshot.push_back(value_type(node.m_data.m_key, node.m_data.m_value));
+                snapshot.push_back(
+                        value_type(node.m_data.m_key, node.m_data.m_value));
             }
         }
     }
-    bool find_impl(const table_type& raw_table, const key_type key,
-            mapped_type & value) const
+    bool find_impl(const table_type& raw_table,
+                   const key_type key,
+                   mapped_type & value) const
     {
         hash_func_type hash_func;
         equal_predicate_type eq_func;
@@ -107,8 +111,9 @@ public:
 
         return false;
     }
-    bool insert_impl(table_type& raw_table, const key_type key,
-            const mapped_type val)
+    bool insert_impl(table_type& raw_table,
+                     const key_type key,
+                     const mapped_type val)
     {
         hash_func_type hash_func;
         equal_predicate_type eq_func;

@@ -25,7 +25,7 @@ public:
     virtual IPerformanceTest* create() const = 0;
 };
 
-template<class Test>
+template<typename Test>
 class PerfTestFactoryImpl: public IPerfTestFactory
 {
 public:

@@ -14,7 +14,7 @@
 namespace lfds
 {
 
-template<class T, class Allocator>
+template<typename T, typename Allocator>
 class dynamic_buffer
 {
 public:
@@ -51,7 +51,7 @@ public:
     }
 
 #if LFDS_USE_CPP11
-    template<class ... Args>
+    template<typename ... Args>
     node_type* newNode(Args&&... data)
 #else
     node_type* newNode(const value_type &data)

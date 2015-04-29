@@ -12,9 +12,10 @@
 
 #include <cstddef>
 
-namespace lfds {
+namespace lfds
+{
 
-template<class Node>
+template<typename Node>
 struct hash_data_table
 {
     typedef Node node_type;
@@ -28,6 +29,5 @@ struct hash_data_table
 };
 
 }
-
 
 #endif /* INCLUDE_RAW_HASH_TABLE_HPP_ */

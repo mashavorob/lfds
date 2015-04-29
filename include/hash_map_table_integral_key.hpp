@@ -23,7 +23,8 @@
 namespace lfds
 {
 
-template<class Key, class Value, class Hash, class Pred, class Allocator>
+template<typename Key, typename Value, typename Hash, typename Pred,
+        typename Allocator>
 class hash_map_table_integral_key
 {
 public:
@@ -58,7 +59,8 @@ public:
     {
     }
 
-    void getSnapshot_imp(const table_type& raw_table, snapshot_type & snapshot) const
+    void getSnapshot_imp(const table_type& raw_table,
+                         snapshot_type & snapshot) const
     {
         const node_type* table = raw_table.m_table;
         const size_type capacity = raw_table.m_capacity;
@@ -74,12 +76,15 @@ public:
                 state_type state = node.getState();
                 if (state == key_item_type::allocated)
                 {
-                    snapshot.push_back(value_type(item.m_key, *node.getValue()));
+                    snapshot.push_back(
+                            value_type(item.m_key, *node.getValue()));
                 }
             }
         }
     }
-    bool find_impl(const table_type& raw_table, const key_type key, mapped_type & value) const
+    bool find_impl(const table_type& raw_table,
+                   const key_type key,
+                   mapped_type & value) const
     {
         const std::size_t hash = m_hash_func(key);
 
@@ -88,7 +93,7 @@ public:
 
         for (size_type i = hash % capacity;; ++i)
         {
-            if ( i == capacity )
+            if (i == capacity)
             {
                 i = 0;
             }
@@ -139,10 +144,12 @@ public:
         return false;
     }
 #if LFDS_USE_CPP11
-    template<class ... Args>
+    template<typename ... Args>
     bool insert_impl(table_type& raw_table, const key_type key, Args&&... val)
 #else // LFDS_USE_CPP11
-    bool insert_impl(table_type& raw_table, const key_type key, const mapped_type &val)
+    bool insert_impl(table_type& raw_table,
+                     const key_type key,
+                     const mapped_type &val)
 #endif // LFDS_USE_CPP11
 
     {
@@ -153,7 +160,7 @@ public:
 
         for (size_type i = hash % capacity;; ++i)
         {
-            if ( i == capacity )
+            if (i == capacity)
             {
                 i = 0;
             }
@@ -170,7 +177,8 @@ public:
 
                 if (node.atomic_cas(item, new_item))
                 {
-                    m_value_allocator.construct(node.getValue(), std_forward(Args, val));
+                    m_value_allocator.construct(node.getValue(),
+                            std_forward(Args, val));
                     node.setState(key_item_type::allocated);
                     ++raw_table.m_used;
                     ++raw_table.m_size;
@@ -202,7 +210,8 @@ public:
 
                     if (node.atomic_cas(item, new_item))
                     {
-                        m_value_allocator.construct(node.getValue(), std_forward(Args, val));
+                        m_value_allocator.construct(node.getValue(),
+                                std_forward(Args, val));
                         node.setState(key_item_type::allocated);
                         ++raw_table.m_size;
                         return true;
@@ -229,7 +238,7 @@ public:
 
         for (size_type i = hash % capacity;; ++i)
         {
-            if ( i == capacity )
+            if (i == capacity)
             {
                 i = 0;
             }
@@ -317,14 +326,15 @@ private:
     //    * exclusive access to the container
     //    * new key is unique
     //    * table has enough capacity to insert specified element
-    void insertUniqueKey(table_type& dst, const key_type key,
-            const mapped_type & val)
+    void insertUniqueKey(table_type& dst,
+                         const key_type key,
+                         const mapped_type & val)
     {
         const size_type capacity = dst.m_capacity;
         const size_type hash = m_hash_func(key);
         for (size_type i = hash % capacity;; ++i)
         {
-            if ( i == capacity )
+            if (i == capacity)
             {
                 i = 0;
             }

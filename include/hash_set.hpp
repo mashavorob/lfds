@@ -8,6 +8,7 @@
 #ifndef INCLUDE_HASH_SET_HPP_
 #define INCLUDE_HASH_SET_HPP_
 
+#include "memory_model.hpp"
 #include "hash_set_table.hpp"
 #include "hash_set_table_base.hpp"
 #include "hash_set_table_integral_key.hpp"
@@ -22,16 +23,17 @@ namespace
 {
 
 // hash_set is an adapter for hash_map
-template<class T, class Hash, class Pred, class Allocator, bool = is_integral<T>::value>
+template<typename T, typename Hash, typename Pred, typename Allocator, bool =
+        is_integral<T>::value>
 struct hash_set_table_selector;
 
-template<class T, class Hash, class Pred, class Allocator>
+template<typename T, typename Hash, typename Pred, typename Allocator>
 struct hash_set_table_selector<T, Hash, Pred, Allocator, false>
 {
     typedef hash_set_table<T, Hash, Pred, Allocator> type;
 };
 
-template<class T, class Hash, class Pred, class Allocator>
+template<typename T, typename Hash, typename Pred, typename Allocator>
 struct hash_set_table_selector<T, Hash, Pred, Allocator, true>
 {
     typedef hash_set_table_integral_key<T, Hash, Pred, Allocator> type;
@@ -39,8 +41,10 @@ struct hash_set_table_selector<T, Hash, Pred, Allocator, true>
 }
 
 // hash_set is an adapter for hash_map
-template<class T, class Hash = typename getHash<T>::type, class Pred = std::equal_to<T>,
-        class Allocator = std::allocator<T> >
+template<typename T, typename Hash = typename make_hash<T>::type,
+        typename Pred = std::equal_to<T>,
+        typename Allocator = std::allocator<T>, memory_model::type MemModel =
+                default_memory_model::value>
 class hash_set
 {
 public:
@@ -54,9 +58,11 @@ public:
     typedef typename hash_table_type::snapshot_type snapshot_type;
 
     static constexpr int INTEGRAL = hash_table_type::INTEGRAL;
+    static constexpr memory_model::type MEMORY_MODEL = MemModel;
 
     hash_set(size_type initialCapacity = 0) :
-        m_hash_table(), m_hash_table_base(m_hash_table, initialCapacity)
+            m_hash_table(),
+            m_hash_table_base(m_hash_table, initialCapacity)
     {
     }
     void getSnapshot(snapshot_type & snapshot) const
@@ -85,10 +91,26 @@ public:
     }
 
 private:
-    typedef hash_set_table_base<hash_table_type> hash_table_base_type;
+    //typedef hash_set_table_base<hash_table_type> hash_table_base_type;
+    typedef hash_set_table_base_traits<hash_table_type, MemModel> hash_set_table_base_traits_type;
+    typedef typename hash_set_table_base_traits_type::type hash_table_base_type;
 
     hash_table_type m_hash_table;
     hash_table_base_type m_hash_table_base;
+};
+
+template<typename T, typename Hash = typename make_hash<T>::type,
+        typename Pred = std::equal_to<T>, typename Allocator = std::allocator<T> >
+struct make_wise_hash_set
+{
+    typedef hash_set<T, Hash, Pred, Allocator, memory_model::wise> type;
+};
+
+template<typename T, typename Hash = typename make_hash<T>::type,
+        typename Pred = std::equal_to<T>, typename Allocator = std::allocator<T> >
+struct make_greedy_hash_set
+{
+    typedef hash_set<T, Hash, Pred, Allocator, memory_model::greedy> type;
 };
 
 }

@@ -10,7 +10,7 @@
 
 #include "test_events.hpp"
 
-template<class Collection>
+template<typename Collection>
 class test_producer
 {
 public:

@@ -18,7 +18,7 @@ namespace lfds
 namespace my
 {
 
-template<class T>
+template<typename T>
 class cqueue : private noncopyable
 {
 public:

@@ -26,7 +26,8 @@ public:
     typedef padding_type<size> this_type;
 public:
     padding_type() :
-            m_dummy(0), m_padding()
+            m_dummy(0),
+            m_padding()
     {
     }
 private:

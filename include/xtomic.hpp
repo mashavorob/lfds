@@ -45,7 +45,4 @@ enum efull
 
 #endif
 
-
-
-
 #endif /* INCLUDE_XTOMIC_HPP_ */

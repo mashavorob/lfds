@@ -19,11 +19,9 @@ class CommandLineParser
 {
 public:
 
-    enum Command {
-        cmdShowHelp,
-        cmdListTests,
-        cmdRunTests,
-        cmdError
+    enum Command
+    {
+        cmdShowHelp, cmdListTests, cmdRunTests, cmdError
     };
 
     static Command parse(const int argc, const char** argv, ids_type & tests);
@@ -35,7 +33,9 @@ public:
         return m_duration;
     }
 private:
-    static Command onRunTests(const int argc, const char** argv, ids_type & tests);
+    static Command onRunTests(const int argc,
+                              const char** argv,
+                              ids_type & tests);
 
 private:
     static int m_duration;

@@ -66,5 +66,4 @@ private:
 }
 }
 
-
 #endif /* PERFTEST_TESTSYNC_HPP_ */

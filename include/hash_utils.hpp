@@ -14,10 +14,10 @@ namespace lfds
 {
 
 // Code from boost
-template<class T>
+template<typename T>
 inline void hash_combine(std::size_t& seed, T const& v)
 {
-    typedef typename getHash<T>::type hash_type;
+    typedef typename make_hash<T>::type hash_type;
     seed ^= hash_type<T>()(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 }
 

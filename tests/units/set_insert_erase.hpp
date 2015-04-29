@@ -18,7 +18,7 @@ namespace lfds
 namespace testing
 {
 
-template<class Set, int SetSize, int Repetitions>
+template<typename Set, int SetSize, int Repetitions>
 class set_insert_erase
 {
 public:

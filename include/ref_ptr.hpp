@@ -14,8 +14,8 @@
 
 namespace lfds
 {
-template<class T>
-struct __attribute__((aligned(sizeof(void*)*2))) ref_ptr
+template<typename T>
+struct align_4_cas16 ref_ptr
 {
     typedef ref_ptr<T> this_type;
     typedef std::size_t size_type;
@@ -27,24 +27,26 @@ struct __attribute__((aligned(sizeof(void*)*2))) ref_ptr
     mutable atomic_counter m_refCount;
 
     ref_ptr() :
-            m_ptr(nullptr), m_refCount(0)
+            m_ptr(nullptr),
+            m_refCount(0)
     {
 
     }
-    ref_ptr(value_type* node, size_type refCount) :
-            m_ptr(node), m_refCount(refCount)
+    ref_ptr(value_type * const node, const size_type refCount) :
+            m_ptr(node),
+            m_refCount(refCount)
     {
 
     }
     ref_ptr(const volatile ref_ptr & other) :
-            m_ptr(other.m_ptr), m_refCount(other.m_refCount)
+            m_ptr(other.m_ptr),
+            m_refCount(other.m_refCount)
     {
 
     }
     ref_ptr & operator=(const volatile ref_ptr & other)
     {
-        m_ptr.store(other.m_ptr.load(barriers::relaxed),
-                barriers::relaxed);
+        m_ptr.store(other.m_ptr.load(barriers::relaxed), barriers::relaxed);
         m_refCount.store(other.m_refCount.load(barriers::relaxed),
                 barriers::relaxed);
         return *this;

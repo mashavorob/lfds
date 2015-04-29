@@ -16,12 +16,15 @@ namespace lfds
 namespace perftest
 {
 
-namespace {
+namespace
+{
 
 class Predicate
 {
 public:
-    Predicate(groups_type &groups) : m_groups(groups), m_locator(PerfTestLocator::getInstance())
+    Predicate(groups_type &groups) :
+            m_groups(groups),
+            m_locator(PerfTestLocator::getInstance())
     {
 
     }
@@ -46,6 +49,6 @@ TestTree::TestTree(const ids_type & plainSet)
     std::for_each(plainSet.begin(), plainSet.end(), Predicate(m_groups));
 }
 
-}}
-
+}
+}
 

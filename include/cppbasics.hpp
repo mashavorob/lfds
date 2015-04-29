@@ -25,6 +25,8 @@
 
 #endif // LFDS_USE_CPP11
 
-
+#define align_by(size) __attribute__((aligned((size))))
+#define align_as(type) __attribute__((aligned(__alignof(type))))
+#define align_4_cas16 align_by(sizeof(void*)*2)
 
 #endif /* INCLUDE_CPPBASICS_HPP_ */

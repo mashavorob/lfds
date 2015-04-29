@@ -11,7 +11,7 @@
 #include <atomic>
 #include <utility>
 
-template<class Collection>
+template<typename Collection>
 class counted_collection_wrapper
 {
 public:
@@ -36,7 +36,7 @@ public:
 
     }
 
-    template<class ... Args>
+    template<typename ... Args>
     bool push(Args&&... args)
     {
         bool success = m_coll.push(std::forward<Args>(args)...);

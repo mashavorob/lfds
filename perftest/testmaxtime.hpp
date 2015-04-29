@@ -8,7 +8,6 @@
 #ifndef PERFTEST_TESTMAXTIME_HPP_
 #define PERFTEST_TESTMAXTIME_HPP_
 
-
 #include "stopwatch.hpp"
 #include "performancetest.hpp"
 
@@ -22,7 +21,7 @@ struct get_timer_perf
     static const double value;
 };
 
-template<class Tester, unsigned int Multiplier>
+template<typename Tester, unsigned int Multiplier>
 class MaximumOpTimeTest: public IPerformanceTest
 {
 public:
@@ -38,10 +37,10 @@ public:
 
         double max_time = stopwatch(tester);
 
-        for ( unsigned int i = 0; i < count; ++i )
+        for (unsigned int i = 0; i < count; ++i)
         {
             const double t = stopwatch(tester);
-            if ( t > max_time )
+            if (t > max_time)
             {
                 max_time = t;
             }
@@ -49,13 +48,12 @@ public:
 
         max_time -= get_timer_perf::value;
 
-        const double performance = max_time*static_cast<double>(mult);
+        const double performance = max_time * static_cast<double>(mult);
         return performance;
     }
 };
 
 }
 }
-
 
 #endif /* PERFTEST_TESTMAXTIME_HPP_ */

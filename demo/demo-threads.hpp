@@ -25,7 +25,7 @@ public:
     virtual void Call() = 0;
 };
 
-template<class Callable>
+template<typename Callable>
 class ICallableImpl: public ICallable
 {
 public:
@@ -46,7 +46,7 @@ private:
 class thread
 {
 public:
-    template<class Callable>
+    template<typename Callable>
     thread(const Callable & pred) : m_impl(new ICallableImpl<Callable>(pred)), m_thread(0)
     {
 

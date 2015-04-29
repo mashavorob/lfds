@@ -22,7 +22,8 @@
 namespace lfds
 {
 
-template<class Key, class Value, class Hash, class Pred, class Allocator>
+template<typename Key, typename Value, typename Hash, typename Pred,
+        typename Allocator>
 class hash_map_table_integral_value
 {
 public:
@@ -42,12 +43,12 @@ public:
     typedef std::pair<key_type, mapped_type> value_type;
     typedef std::vector<value_type> snapshot_type;
 
-    static const bool INTEGRAL_KEY = false;
-    static const bool INTEGRAL_VALUE = true;
-    static const bool INTEGRAL_KEYVALUE = false;
+    static constexpr bool INTEGRAL_KEY = false;
+    static constexpr bool INTEGRAL_VALUE = true;
+    static constexpr bool INTEGRAL_KEYVALUE = false;
 
 //
-// template<class CompatibleKey, Key>
+// template<typename CompatibleKey, Key>
 // struct CompatiblePredicate : public binary_function<CompatibleKey, Key, bool>
 // {
 //      bool operator()(const CompatibleKey & key, const Key & value) const;
@@ -70,7 +71,9 @@ public:
             const value_item_type& item = node.getValue();
             if (item.m_state == value_item_type::allocated)
             {
-                snapshot.push_back(value_type(*node.getKey(), static_cast<mapped_type>(item.m_value)));
+                snapshot.push_back(
+                        value_type(*node.getKey(),
+                                static_cast<mapped_type>(item.m_value)));
             }
         }
     }
@@ -103,7 +106,7 @@ public:
                 // cannot continue until it is finished
                 // so start all over again
                 //continue;
-                break;
+                continue;
             case value_item_type::touched:
                 if (m_eq_func(key, *node.getKey()))
                 {
@@ -289,8 +292,8 @@ public:
     //    * new key is unique
     //    * table has enough capacity to insert specified element
     void insertUniqueKey(table_type& dst,
-                           const key_type & key,
-                           const mapped_type val)
+                         const key_type & key,
+                         const mapped_type val)
     {
         const size_type hash = m_hash_func(key);
         const size_type capacity = dst.m_capacity;

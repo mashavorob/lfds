@@ -16,7 +16,7 @@
 
 namespace lfds
 {
-template<class Key, class Hash, class Pred, class Allocator>
+template<typename Key, typename Hash, typename Pred, typename Allocator>
 class hash_set_table_integral_key
 {
 public:
@@ -41,7 +41,8 @@ public:
     hash_set_table_integral_key()
     {
     }
-    void getSnapshot_imp(const table_type& raw_table, snapshot_type & snapshot) const
+    void getSnapshot_imp(const table_type& raw_table,
+                         snapshot_type & snapshot) const
     {
         const node_type* table = raw_table.m_table;
         const size_type capacity = raw_table.m_capacity;

@@ -16,7 +16,7 @@
 #include "test_producer.hpp"
 #include "test_consumer.hpp"
 
-template<class Collection, class Duration>
+template<typename Collection, typename Duration>
 static double benchmark(Collection & coll, Duration d, unsigned producers,
         unsigned consumers)
 {

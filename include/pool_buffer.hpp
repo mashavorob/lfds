@@ -13,7 +13,7 @@
 namespace lfds
 {
 
-template<class T, class Allocator>
+template<typename T, typename Allocator>
 class pool_buffer
 {
 public:
@@ -30,7 +30,8 @@ private:
     this_type& operator=(const this_type&); // = delete;
 
 public:
-    pool_buffer(size_type initialCapacity) : m_buffer(initialCapacity)
+    pool_buffer(size_type initialCapacity) :
+            m_buffer(initialCapacity)
     {
     }
     ~pool_buffer()

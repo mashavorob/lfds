@@ -269,7 +269,7 @@ struct TemplateRunner
     }
 };
 
-template<class Runner>
+template<typename Runner>
 struct Benchmark
 {
     static const std::size_t repcount = 1000000000;

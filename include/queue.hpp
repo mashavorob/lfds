@@ -21,20 +21,19 @@ namespace lfds
 
 struct Queue
 {
-    enum ESize {
-        FixedSize,
-        DynamicSize,
+    enum ESize
+    {
+        FixedSize, DynamicSize,
     };
 
-    enum EMultiplicity {
-        ManyProducers,
-        OneProducer,
-        ManyConsumers,
-        OneConsumer,
+    enum EMultiplicity
+    {
+        ManyProducers, OneProducer, ManyConsumers, OneConsumer,
     };
 };
 
-namespace {
+namespace
+{
 
 template<Queue::ESize>
 struct is_queue_fixed_size;
@@ -52,50 +51,54 @@ struct is_queue_fixed_size<Queue::FixedSize> : public integral_const<bool, true>
 };
 
 template<>
-struct is_queue_fixed_size<Queue::DynamicSize> : public integral_const<bool, false>
+struct is_queue_fixed_size<Queue::DynamicSize> : public integral_const<bool,
+        false>
 {
 
 };
 
 template<>
-struct are_many_producers<Queue::ManyProducers> : public integral_const<bool, true>
+struct are_many_producers<Queue::ManyProducers> : public integral_const<bool,
+        true>
 {
 
 };
 
 template<>
-struct are_many_producers<Queue::OneProducer> : public integral_const<bool, true>
+struct are_many_producers<Queue::OneProducer> :
+                                                public integral_const<bool, true>
 {
 
 };
 
 template<>
-struct are_many_consumers<Queue::ManyConsumers> : public integral_const<bool, true>
+struct are_many_consumers<Queue::ManyConsumers> : public integral_const<bool,
+        true>
 {
 
 };
 
 template<>
-struct are_many_consumers<Queue::OneConsumer> : public integral_const<bool, false>
+struct are_many_consumers<Queue::OneConsumer> : public integral_const<bool,
+        false>
 {
 
 };
 
 }
 
-template< typename T
-          , Queue::ESize SizeType = Queue::FixedSize
-          , Queue::EMultiplicity NumProducers = Queue::ManyProducers
-          , Queue::EMultiplicity NumConsumers = Queue::ManyConsumers
-          , typename Allocator = std::allocator<T>
-          >
+template<typename T, Queue::ESize SizeType = Queue::FixedSize,
+        Queue::EMultiplicity NumProducers = Queue::ManyProducers,
+        Queue::EMultiplicity NumConsumers = Queue::ManyConsumers,
+        typename Allocator = std::allocator<T> >
 class queue
 {
 public:
     typedef T value_type;
-    typedef buffer_traits<T, Allocator, is_queue_fixed_size<SizeType>::value > traits_type;
+    typedef buffer_traits<T, Allocator, is_queue_fixed_size<SizeType>::value> traits_type;
     typedef typename traits_type::type buffer_type;
-    typedef queue_base<T, are_many_producers<NumProducers>::value, are_many_consumers<NumConsumers>::value > queue_type;
+    typedef queue_base<T, are_many_producers<NumProducers>::value,
+            are_many_consumers<NumConsumers>::value> queue_type;
     typedef typename buffer_type::size_type size_type;
 
 public:
@@ -114,7 +117,8 @@ private:
 public:
 
     queue(size_type capacity) :
-            m_buff(capacity), m_size(0)
+            m_buff(capacity),
+            m_size(0)
     {
     }
 
@@ -129,7 +133,7 @@ public:
     }
 
 #if LFDS_USE_CPP11
-    template<class ... Args>
+    template<typename ... Args>
     bool push(Args&&... data)
 #else
     bool push(const value_type& data)
@@ -174,10 +178,12 @@ private:
 };
 
 template<typename T, typename Allocator>
-class queue<T, Queue::FixedSize, Queue::OneProducer, Queue::OneConsumer, Allocator>
+class queue<T, Queue::FixedSize, Queue::OneProducer, Queue::OneConsumer,
+        Allocator>
 {
 public:
-    typedef queue<T, Queue::FixedSize, Queue::OneProducer, Queue::OneConsumer, Allocator> this_class;
+    typedef queue<T, Queue::FixedSize, Queue::OneProducer, Queue::OneConsumer,
+            Allocator> this_class;
     typedef queue_spscfs<T, Allocator> queue_type;
     typedef typename queue_type::value_type value_type;
     typedef typename queue_type::size_type size_type;
@@ -196,7 +202,7 @@ public:
     }
 
 #if LFDS_USE_CPP11
-    template<class ... Args>
+    template<typename ... Args>
     bool push(Args&&... data)
 #else
     bool push(const value_type& data)
@@ -222,19 +228,22 @@ private:
 template<typename T, typename Allocator = std::allocator<T> >
 struct make_wait_free_queue
 {
-    typedef queue<T, Queue::FixedSize, Queue::OneProducer, Queue::OneConsumer, Allocator> type;
+    typedef queue<T, Queue::FixedSize, Queue::OneProducer, Queue::OneConsumer,
+            Allocator> type;
 };
 
 template<typename T, typename Allocator = std::allocator<T> >
 struct make_fixed_size_queue
 {
-    typedef queue<T, Queue::FixedSize, Queue::ManyProducers, Queue::ManyConsumers, Allocator> type;
+    typedef queue<T, Queue::FixedSize, Queue::ManyProducers,
+            Queue::ManyConsumers, Allocator> type;
 };
 
 template<typename T, typename Allocator = std::allocator<T> >
 struct make_dynamic_size_queue
 {
-    typedef queue<T, Queue::DynamicSize, Queue::ManyProducers, Queue::ManyConsumers, Allocator> type;
+    typedef queue<T, Queue::DynamicSize, Queue::ManyProducers,
+            Queue::ManyConsumers, Allocator> type;
 };
 
 }

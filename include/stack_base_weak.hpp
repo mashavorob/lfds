@@ -16,7 +16,7 @@ namespace lfds
 {
 
 // base implementation for stack
-template<class T>
+template<typename T>
 class stack_base_weak
 {
 public:
@@ -47,8 +47,9 @@ public:
         {
             node_type* expected = m_head.load(barriers::relaxed);
             p->m_next = expected;
-            success = m_head.cas(expected, p);
-        } while (!success);
+            success = m_head.atomic_cas(expected, p);
+        }
+        while (!success);
     }
     node_type* atomic_pop()
     {
@@ -62,8 +63,9 @@ public:
                 return nullptr;
             }
             node_type* n = p->m_next;
-            success = m_head.cas(p, n);
-        } while (!success);
+            success = m_head.atomic_cas(p, n);
+        }
+        while (!success);
         return p;
     }
     node_type* atomic_removeHead()
@@ -78,8 +80,9 @@ public:
             {
                 return nullptr;
             }
-            success = m_head.cas(p, head);
-        } while (!success);
+            success = m_head.atomic_cas(p, head);
+        }
+        while (!success);
         return p;
     }
 

@@ -11,7 +11,7 @@
 #include <mutex>
 #include <utility>
 
-template<class Collection>
+template<typename Collection>
 class std_stack_wrapper
 {
 public:
@@ -38,7 +38,7 @@ public:
     {
     }
 
-    template<class ... Args>
+    template<typename ... Args>
     bool push(Args&&... args)
     {
         lock_type lock(m_mutex);

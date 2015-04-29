@@ -28,7 +28,7 @@ inline void atomic_prologue()
     thread_fence(barriers::acquire);
 }
 
-template<class T>
+template<typename T>
 class xtomic
 {
 public:
@@ -132,13 +132,13 @@ public:
         return __sync_fetch_and_sub(&m_val, add);
     }
 
-    bool cas(const T e, const T n)
+    bool atomic_cas(const T e, const T n)
     {
-        return atomic_cas(m_val, e, n);
+        return lfds::atomic_cas(m_val, e, n);
     }
-    bool cas(const this_type & e, const this_type & n)
+    bool atomic_cas(const this_type & e, const this_type & n)
     {
-        return cas(e.m_val, n.m_val);
+        return atomic_cas(e.m_val, n.m_val);
     }
 
     // pre

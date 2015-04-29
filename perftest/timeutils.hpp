@@ -24,5 +24,4 @@ double seconds(const timespec &a);
 }
 }
 
-
 #endif /* PERFTEST_TIMEUTILS_HPP_ */

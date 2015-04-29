@@ -27,7 +27,7 @@ static const unsigned SET_TEST_SIZE = 4000;
 static const unsigned SET_TEST_NUM_THREADS = 2;
 static const bool ALLOW_CONCURENT_MODIFICATIONS = true;
 
-template<class Data>
+template<typename Data>
 struct get_random_data
 {
     Data operator()() const;
@@ -47,7 +47,7 @@ struct get_random_data<int>
     }
 };
 
-template<class Queue, class Pred>
+template<typename Queue, typename Pred>
 struct fill_queue
 {
     typedef Queue queue_type;
@@ -75,7 +75,7 @@ private:
     Pred m_pred;
 };
 
-template<class Data, class Set>
+template<typename Data, typename Set>
 class BenchmarkBase
 {
 public:
@@ -147,7 +147,7 @@ struct result_type
     size_type m_result;
 };
 
-template<class Data, class Set>
+template<typename Data, typename Set>
 class Inserter: public BenchmarkBase<Data, Set>, public result_type
 {
 public:
@@ -180,7 +180,7 @@ public:
     }
 };
 
-template<class Data, class Set>
+template<typename Data, typename Set>
 class Deleter: public BenchmarkBase<Data, Set>, public result_type
 {
 public:
@@ -215,7 +215,7 @@ public:
     }
 };
 
-template<class Data, class Set>
+template<typename Data, typename Set>
 class Finder: public BenchmarkBase<Data, Set>, public result_type
 {
 public:
@@ -267,7 +267,7 @@ private:
     collection_type m_keys;
 };
 
-template<class Data, class Set>
+template<typename Data, typename Set>
 class Benchmark: public BenchmarkBase<Data, Set>
 {
 public:

@@ -12,7 +12,7 @@
 #include <unordered_set>
 #include <mutex>
 
-template<class Set>
+template<typename Set>
 class set_wrapper
 {
 public:
@@ -64,8 +64,8 @@ private:
     mutable std::mutex m_mutex;
 };
 
-template<class Key, class Less = std::less<Key>,
-        class Allocator = std::allocator<Key> >
+template<typename Key, typename Less = std::less<Key>,
+        typename Allocator = std::allocator<Key> >
 class std_set_wrapper
 {
 public:
@@ -99,8 +99,8 @@ private:
     wrapped_set_type m_set;
 };
 
-template<class Key, class Hash = std::hash<Key>,
-        class Pred = std::equal_to<Key>, class Allocator = std::allocator<Key > >
+template<typename Key, typename Hash = std::hash<Key>,
+        typename Pred = std::equal_to<Key>, typename Allocator = std::allocator<Key > >
 class std_unordered_set_wrapper
 {
 public:

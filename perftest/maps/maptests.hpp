@@ -25,7 +25,7 @@ namespace maps
 static const unsigned int TYPICAL_SIZE = static_cast<unsigned int>(5e5);
 static const unsigned int NUMBER_OF_REPETITIONS = static_cast<unsigned int>(1e6);
 
-template<class Map, unsigned int Repetitions = TYPICAL_SIZE>
+template<typename Map, unsigned int Repetitions = TYPICAL_SIZE>
 class AvgInsertTester
 {
 public:
@@ -38,7 +38,8 @@ public:
     typedef std::vector<key_type> vector_type;
 
 public:
-    AvgInsertTester()
+    AvgInsertTester() :
+            m_coll()
     {
         random_generator_type gen;
         gen(count, m_data);
@@ -60,7 +61,8 @@ private:
     collection_type m_coll;
 };
 
-template<class Map, bool InitialReservation, unsigned int Repetitions = TYPICAL_SIZE>
+template<typename Map, bool InitialReservation, unsigned int Repetitions =
+        TYPICAL_SIZE>
 class MaxInsertTester
 {
 public:
@@ -74,7 +76,9 @@ public:
 
 public:
     MaxInsertTester() :
-            m_val(), m_data(), m_coll(InitialReservation ? count : 0)
+            m_val(),
+            m_data(),
+            m_coll(InitialReservation ? count : 0)
     {
         random_generator_type gen;
         gen(count, m_data);
@@ -94,7 +98,7 @@ private:
     typename vector_type::const_iterator m_pos;
 };
 
-template<class Map, unsigned int Repetitions = NUMBER_OF_REPETITIONS>
+template<typename Map, unsigned int Repetitions = NUMBER_OF_REPETITIONS>
 class AvgEraseTester
 {
 public:
@@ -107,7 +111,8 @@ public:
     typedef std::vector<key_type> vector_type;
 
 public:
-    AvgEraseTester()
+    AvgEraseTester() :
+            m_coll(count)
     {
         random_generator_type gen;
         gen(count, m_data);
@@ -137,7 +142,7 @@ private:
     collection_type m_coll;
 };
 
-template<class Map, unsigned int Repetitions = NUMBER_OF_REPETITIONS>
+template<typename Map, unsigned int Repetitions = NUMBER_OF_REPETITIONS>
 class AvgFindTester
 {
 public:
@@ -150,7 +155,8 @@ public:
     typedef std::vector<key_type> vector_type;
 
 public:
-    AvgFindTester()
+    AvgFindTester() :
+            m_coll(count)
     {
         random_generator_type gen;
         gen(count, m_data);
@@ -173,10 +179,11 @@ public:
         for (; i != end; ++i)
         {
             bool res = m_coll.find(*i, val);
-            if ( !res )
+            if (!res)
             {
                 std::cerr << "This code is normally unreachable, "
-                        << "its only purpose is to make a reference to " << val << std::endl;
+                        << "its only purpose is to make a reference to " << val
+                        << std::endl;
             }
         }
     }
@@ -186,7 +193,7 @@ private:
     collection_type m_coll;
 };
 
-template<class Map>
+template<typename Map>
 class MtInsertNoiser: public IThreadTest
 {
 public:
@@ -238,7 +245,7 @@ private:
     random_generator_type m_gen;
 };
 
-template<class Map>
+template<typename Map>
 class MtAvgFindWorker: public IThreadTest
 {
 public:
@@ -302,10 +309,11 @@ public:
                 i = begin;
             }
             bool res = m_coll.find(key, val);
-            if ( !res )
+            if (!res)
             {
                 std::cerr << "This code is normally unreachable, "
-                        << "its only purpose is to make a reference to " << val << std::endl;
+                        << "its only purpose is to make a reference to " << val
+                        << std::endl;
             }
             ++c;
         }
@@ -322,7 +330,7 @@ private:
     vector_type m_sample;
 };
 
-template<class Map>
+template<typename Map>
 class MtMaxFindWorker: public IThreadTest
 {
 public:
@@ -386,10 +394,11 @@ public:
             }
             clock_gettime(CLOCK_MONOTONIC, &startpoint);
             bool res = m_coll.find(key, val);
-            if ( !res )
+            if (!res)
             {
                 std::cerr << "This code is normally unreachable, "
-                        << "its only purpose is to make a reference to " << val << std::endl;
+                        << "its only purpose is to make a reference to " << val
+                        << std::endl;
             }
             clock_gettime(CLOCK_MONOTONIC, &endpoint);
             timespec diff = endpoint - startpoint;
@@ -467,7 +476,7 @@ private:
     double m_duration;
 };
 
-template<class Map, unsigned int Size>
+template<typename Map, unsigned int Size>
 class MtTestBase
 {
 public:
@@ -480,7 +489,8 @@ public:
     typedef std::vector<key_type> vector_type;
 
 public:
-    MtTestBase()
+    MtTestBase() :
+            m_coll(Size)
     {
         random_generator_type gen;
         gen(SIZE, m_data);
@@ -501,7 +511,7 @@ protected:
     vector_type m_data;
 };
 
-template<class Map, class Noiser, class Worker, class Aggregator,
+template<typename Map, typename Noiser, typename Worker, typename Aggregator,
         int Multiplier, unsigned int Size>
 class MtTestImpl: public MultiThreadTest, private MtTestBase<Map, Size>
 {

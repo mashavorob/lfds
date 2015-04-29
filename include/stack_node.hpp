@@ -14,7 +14,7 @@
 namespace lfds
 {
 
-template<class T>
+template<typename T>
 class stack_node
 {
 public:
@@ -38,13 +38,14 @@ public:
     {
         // workaround for offsetof bug in old GCC versions
         static const this_type dummy;
-        static const int offset = &dummy.m_data[0] - reinterpret_cast<const char*>(&dummy);
+        static const int offset = &dummy.m_data[0]
+                - reinterpret_cast<const char*>(&dummy);
 
         return reinterpret_cast<this_type*>(reinterpret_cast<char*>(p) - offset);
     }
 
 private:
-    char m_data[sizeof(T)] __attribute__((aligned(__alignof(T))));
+    char m_data[sizeof(T)] align_as(T);
 };
 
 }

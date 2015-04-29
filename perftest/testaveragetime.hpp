@@ -16,7 +16,7 @@ namespace lfds
 namespace perftest
 {
 
-template<class Tester, unsigned int Multiplier>
+template<typename Tester, unsigned int Multiplier>
 class AverageOpTimeTest: public IPerformanceTest
 {
 public:
@@ -31,7 +31,8 @@ public:
         Stopwatch<tester_type> stopwatch;
 
         const double duration = stopwatch(tester);
-        const double performance = duration/static_cast<double>(count)*static_cast<double>(mult);
+        const double performance = duration / static_cast<double>(count)
+                * static_cast<double>(mult);
 
         return performance;
     }

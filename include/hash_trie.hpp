@@ -31,7 +31,7 @@ struct get_shift_size;
 template<int BFactor>
 struct get_mask;
 
-template<class HashType, int BFactor>
+template<typename HashType, int BFactor>
 struct get_max_level;
 
 template<>
@@ -109,7 +109,7 @@ struct get_nested_level<0, shift>
     static constexpr int value = 0;
 };
 
-template<class T>
+template<typename T>
 struct get_mask_by
 {
     typedef typename get_uint_by_size<sizeof(T)>::type u_type;
@@ -121,19 +121,19 @@ struct get_mask_by
 };
 }
 
-template<class HashType, int BFactor>
+template<typename HashType, int BFactor>
 struct get_max_level;
 
-template<class HashType>
+template<typename HashType>
 struct get_max_level<HashType, 16>
 {
     enum
     {
-        value = sizeof(HashType)*2
+        value = sizeof(HashType) * 2
     };
 };
 
-template<class HashType>
+template<typename HashType>
 struct get_max_level<HashType, 256>
 {
     enum
@@ -141,7 +141,6 @@ struct get_max_level<HashType, 256>
         value = sizeof(HashType)
     };
 };
-
 
 typedef std::size_t counter_type;
 typedef xtomic<counter_type> atomic_counter_type;
@@ -163,7 +162,7 @@ struct Node
     const NodeType m_type;
 };
 
-class __attribute__((aligned(sizeof(void*)*2))) NodePtr
+class align_4_cas16 NodePtr
 {
 public:
     typedef get_uint_by_size<sizeof(Node*) / 2>::type counter_type;
@@ -266,7 +265,7 @@ private:
 };
 
 // chain node
-template<class Key, class Value, class HashType>
+template<typename Key, typename Value, typename HashType>
 struct CNode: public Node
 {
     typedef Key key_type;
@@ -305,15 +304,15 @@ struct CNode: public Node
         return reinterpret_cast<const value_type*>(m_valueBuff);
     }
 private:
-    char m_keyBuff[sizeof(key_type)] __attribute__((aligned(__alignof(key_type))));
-    char m_valueBuff[sizeof(value_type)] __attribute__((aligned(__alignof(value_type))));
+    char m_keyBuff[sizeof(key_type)] align_as(key_type);
+    char m_valueBuff[sizeof(value_type)] align_as(value_type);
 private:
     CNode(const l_type & other); // = delete;
     l_type & operator=(const l_type & other); // = delete;
 };
 
 // branch node
-template<class Key, class Value, class HashType, int BFactor>
+template<typename Key, typename Value, typename HashType, int BFactor>
 struct BNode: public Node
 {
     typedef Key key_type;
@@ -358,10 +357,10 @@ public:
     }
 };
 
-template<class T, class Hash, int = sizeof(std::size_t)>
+template<typename T, typename Hash, int = sizeof(std::size_t)>
 struct hash_adapter;
 
-template<class T, class Hash>
+template<typename T, typename Hash>
 struct hash_adapter<T, Hash, 4>
 {
 public:
@@ -375,7 +374,7 @@ private:
     Hash m_hashFunc;
 };
 
-template<class T, class Hash>
+template<typename T, typename Hash>
 struct hash_adapter<T, Hash, 8>
 {
 private:
@@ -403,9 +402,10 @@ private:
 
 }
 
-template<class Key, class Value, int BFactor = 16, class Hash = typename getHash<Key>::type,
-        class Pred = std::equal_to<Key>,
-        class Allocator = std::allocator<Value> >
+template<typename Key, typename Value, int BFactor = 16,
+        typename Hash = typename make_hash<Key>::type,
+        typename Pred = std::equal_to<Key>, typename Allocator = std::allocator<
+                Value> >
 class hash_trie
 {
 public:
@@ -418,8 +418,8 @@ public:
 
     static constexpr int BFACTOR = BFactor; // branching factor
 
-    typedef hash_trie<key_type, mapped_type, BFACTOR, hash_base_type, predicate_type,
-            allocator_type> this_type;
+    typedef hash_trie<key_type, mapped_type, BFACTOR, hash_base_type,
+            predicate_type, allocator_type> this_type;
 
     typedef htrie::hash_adapter<key_type, hash_base_type> hash_func_type;
     typedef typename hash_func_type::hash_type hash_type;
@@ -503,7 +503,7 @@ public:
         return false;
     }
 #if LFDS_USE_CPP11
-    template<class ... Args>
+    template<typename ... Args>
     bool insert(const key_type & key, Args&&... val)
 #else
     bool insert(const key_type & key, const mapped_type& val)
@@ -525,7 +525,8 @@ public:
             n_type* p = ptr->getNode();
             if (!p)
             {
-                ret = insertChain(bn, ptr, p, hash, key, std_forward(Args, val));
+                ret = insertChain(bn, ptr, p, hash, key,
+                        std_forward(Args, val));
             }
             else if (p->m_type == htrie::branch)
             {
@@ -534,7 +535,8 @@ public:
             }
             else if (p->m_type == htrie::chain)
             {
-                ret = insertBranch(bn, ptr, p, level, shash, hash, key, std_forward(Args, val));
+                ret = insertBranch(bn, ptr, p, level, shash, hash, key,
+                        std_forward(Args, val));
             }
             switch (ret)
             {
@@ -653,13 +655,13 @@ private:
         return false;
     }
 #if LFDS_USE_CPP11
-    template<class ... Args>
+    template<typename ... Args>
     Return insertChain(b_lock& bn,
-                       ptr_lock& ptr,
-                       n_type* p,
-                       const hash_type hash,
-                       const key_type & key,
-                       Args&&... val)
+            ptr_lock& ptr,
+            n_type* p,
+            const hash_type hash,
+            const key_type & key,
+            Args&&... val)
 #else
     Return insertChain(b_lock& bn,
                        ptr_lock& ptr,
@@ -714,15 +716,15 @@ private:
         return ret;
     }
 #if LFDS_USE_CPP11
-    template<class ... Args>
+    template<typename ... Args>
     Return insertBranch(b_lock& bn,
-                        ptr_lock& ptr,
-                        n_type* p,
-                        int& level,
-                        hash_type& shash,
-                        const hash_type hash,
-                        const key_type & key,
-                        Args&&... val)
+            ptr_lock& ptr,
+            n_type* p,
+            int& level,
+            hash_type& shash,
+            const hash_type hash,
+            const key_type & key,
+            Args&&... val)
 #else
     Return insertBranch(b_lock& bn,
                         ptr_lock& ptr,
@@ -740,7 +742,8 @@ private:
         // check if we can use it rather then transform it to a new branch
         if (!cn->m_hash == hash || level == NFACTOR)
         {
-            Return ret = insertChain(bn, ptr, p, hash, key, std_forward(Args, val));
+            Return ret = insertChain(bn, ptr, p, hash, key,
+                    std_forward(Args, val));
             return ret;
         }
 

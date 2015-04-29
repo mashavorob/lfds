@@ -19,12 +19,10 @@ double MemConsumptionTest::doTest()
     m_tester->doTest();
     std::size_t cbAfter = allocator_base::getAllocated();
 
-    const double MbSize = 1024.*1024.;
-    const double memSize = static_cast<double>(cbAfter - cbBefore)/MbSize;
-    return memSize*m_mult;
+    const double MbSize = 1024. * 1024.;
+    const double memSize = static_cast<double>(cbAfter - cbBefore) / MbSize;
+    return memSize * m_mult;
 }
-
-
 
 }
 }

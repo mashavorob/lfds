@@ -16,7 +16,7 @@ namespace lfds
 namespace
 {
 
-template<class T, int = sizeof(T)>
+template<typename T, int = sizeof(T)>
 struct CAS
 {
     bool operator()(volatile T* var, const T* oldVal, const T* newVal) const
@@ -34,8 +34,7 @@ struct CAS
     }
 };
 
-
-template<class T>
+template<typename T>
 struct CAS<T, 16>
 {
     bool operator()(volatile T* var, const T* oldVal, const T* newVal) const
@@ -58,10 +57,10 @@ struct CAS<T, 16>
                 // input
                 // RDX:RAX is to be compared with *var
                 : "d" ( reinterpret_cast<const long long*>(oldVal)[1] ), "a" ( reinterpret_cast<const long long*>(oldVal)[0] )
-                  // load *newVal to RCX:RBX
+                // load *newVal to RCX:RBX
                 , "c" ( reinterpret_cast<const long long*>(newVal)[1] ),"b" ( reinterpret_cast<const long long*>(newVal)[0] )
                 // clobber list
-                : "cc", "memory" // flags register is to be modified
+                : "cc", "memory"// flags register is to be modified
         );
 
         return result;
@@ -69,9 +68,9 @@ struct CAS<T, 16>
 };
 
 // built in atomics are preferable
-#if 0
+#if 1
 
-template<class T>
+template<typename T>
 struct CAS<T, 8>
 {
     bool operator()(volatile T* var, const T* oldVal, const T* newVal) const
@@ -103,7 +102,7 @@ struct CAS<T, 8>
     }
 };
 
-template<class T>
+template<typename T>
 struct CAS<T, 4>
 {
     bool operator()(volatile T* var, const T* oldVal, const T* newVal) const
@@ -135,7 +134,7 @@ struct CAS<T, 4>
     }
 };
 
-template<class T>
+template<typename T>
 struct CAS<T, 2>
 {
     bool operator()(volatile T* var, const T* oldVal, const T* newVal) const
@@ -154,7 +153,7 @@ struct CAS<T, 2>
                 "setz %[res]\n\t"
                 // output
                 : [res] "=q" ( result )// write z flag to result
-                , [dest] "+m" ( *reinterpret_cast<volatile short*>(var) ) // var is bi-directional [in out]
+                , [dest] "+m" ( *reinterpret_cast<volatile short*>(var) )// var is bi-directional [in out]
                 // input
                 // ax is to be compared with *var
                 : [expected_val] "wa" ( *reinterpret_cast<const short*>(oldVal) )
@@ -167,7 +166,7 @@ struct CAS<T, 2>
     }
 };
 
-template<class T>
+template<typename T>
 struct CAS<T, 1>
 {
     bool operator()(volatile T* var, const T* oldVal, const T* newVal) const
@@ -201,7 +200,7 @@ struct CAS<T, 1>
 #endif // #if 0
 }
 
-template<class T>
+template<typename T>
 inline bool atomic_cas(volatile T & var, const T & oldVal, const T & newVal)
 {
     return CAS<T>()(&var, &oldVal, &newVal);

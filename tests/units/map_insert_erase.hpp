@@ -18,7 +18,7 @@ namespace lfds
 namespace testing
 {
 
-template<class Map, int MapSize, int Repetitions>
+template<typename Map, int MapSize, int Repetitions>
 class map_insert_erase
 {
 public:
@@ -182,6 +182,12 @@ private:
             if (!res || val != key)
             {
                 ++pThis->m_failsOnFind;
+                res = map.find(key, val);
+                std::cout << "map_insert_erase::erraser_end() fail on find detected."
+                        << "second check: " << (res ? "succeeded" : "failed") << std::endl;
+                res = map.find(key, val);
+                std::cout << "map_insert_erase::erraser_end() the third check was:"
+                        << (res ? "succeeded" : "failed") << std::endl;
             }
             res = map.erase(key);
             if (!res)

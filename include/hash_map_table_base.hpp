@@ -17,17 +17,15 @@
 namespace lfds
 {
 
-template<class HashTable>
-class hash_map_table_base: public hash_table_base<HashTable>
+template<typename HashTableBase>
+class hash_map_table_base: public HashTableBase
 {
 public:
 
-    typedef hash_map_table_base<HashTable> this_type;
-    typedef hash_table_base<HashTable> base_type;
+    typedef hash_map_table_base<HashTableBase> this_type;
+    typedef HashTableBase base_type;
 
     typedef typename base_type::hash_table_type hash_table_type;
-    typedef typename base_type::scoped_lock_type scoped_lock_type;
-    typedef typename base_type::scoped_reserver_type scoped_reserver_type;
     typedef typename hash_table_type::key_type key_type;
     typedef typename hash_table_type::mapped_type mapped_type;
     typedef typename hash_table_type::node_type node_type;
@@ -38,6 +36,12 @@ public:
     typedef std::pair<key_type, mapped_type> value_type;
     typedef std::vector<value_type> snapshot_type;
 
+private:
+    typedef typename base_type::const_guard_type const_guard_type;
+    typedef typename base_type::mutable_guard_type mutable_guard_type;
+    typedef typename base_type::insert_guard_type insert_guard_type;
+    typedef typename base_type::scoped_reserver_type scoped_reserver_type;
+
 public:
     hash_map_table_base(hash_table_type & hashTable, size_type reserve) :
             base_type(hashTable, reserve)
@@ -46,15 +50,13 @@ public:
 public:
     bool find(const key_type & key, mapped_type & value) const
     {
-        // attempt to make a wait free find
-        scoped_lock_type guard(base_type::m_constTable);
-        const table_type* ptr = base_type::m_constTable.m_ptr.load(
-                barriers::relaxed);
+        const table_type* ptr;
+        const_guard_type guard(base_type::getBase(), ptr);
 
         return base_type::m_hashTable.find_impl(*ptr, key, value);
     }
 #if LFDS_USE_CPP11
-    template<class ... Args>
+    template<typename ... Args>
     bool insert(const key_type & key, Args&&... val)
 #else // LFDS_USE_CPP11
     bool insert(const key_type & key, const mapped_type& val)
@@ -63,13 +65,21 @@ public:
         // the lock prevents overwhelming by big number of concurrent insertions
         scoped_reserver_type reserver(base_type::m_concurrentInsertions);
 
-        base_type::check_watermark();
+        base_type::checkWatermark();
 
-        table_type* ptr = base_type::acquire_table(base_type::m_mutableTable);
-        scoped_lock_type guard(base_type::m_mutableTable, false);
+        table_type* ptr;
+        mutable_guard_type guard(base_type::getBase(), ptr);
 
-        return base_type::m_hashTable.insert_impl(*ptr, key, std_forward(Args, val));
+        return base_type::m_hashTable.insert_impl(*ptr, key,
+                std_forward(Args, val));
     }
+};
+
+template<typename HashTable, bool greedy>
+struct get_hash_map_table_base_type
+{
+    typedef typename get_hash_table_base_type<HashTable, greedy>::type base_type;
+    typedef hash_map_table_base<base_type> type;
 };
 
 }

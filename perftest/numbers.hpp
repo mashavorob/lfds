@@ -22,7 +22,7 @@ namespace lfds
 namespace perftest
 {
 
-template<class T>
+template<typename T>
 class dummy_wrapper
 {
 public:
@@ -117,7 +117,7 @@ private:
     T m_t;
 };
 
-template<class T>
+template<typename T>
 struct dummy_hash
 {
     size_t operator()(const dummy_wrapper<T> & val) const
@@ -125,10 +125,11 @@ struct dummy_hash
         return m_hasher(val);
     }
 private:
-    typename getHash<T>::type m_hasher;
+    typename make_hash<T>::type m_hasher;
 };
 
-namespace {
+namespace
+{
 
 class rand_base
 {
@@ -153,8 +154,8 @@ private:
     }
 };
 
-template<class T>
-class random_generator_4 : private rand_base
+template<typename T>
+class random_generator_4: private rand_base
 {
 public:
     T operator()() const
@@ -163,14 +164,15 @@ public:
     }
 };
 
-template<class T>
-class random_generator_8 : private rand_base
+template<typename T>
+class random_generator_8: private rand_base
 {
 private:
     union DUMMY
     {
-        struct {
-            int a,b;
+        struct
+        {
+            int a, b;
         } s;
         T t;
     };
@@ -184,20 +186,19 @@ public:
     }
 };
 
-template<class T, int = sizeof(T)>
+template<typename T, int = sizeof(T)>
 struct get_integral_random_generator
 {
     typedef random_generator_4<T> type;
 };
 
-template<class T>
+template<typename T>
 struct get_integral_random_generator<T, 8>
 {
     typedef random_generator_8<T> type;
 };
 
-
-template<class T>
+template<typename T>
 class random_generator_complex
 {
 private:
@@ -213,7 +214,7 @@ private:
 
 };
 
-template<class T>
+template<typename T>
 struct get_random_generator
 {
     typedef random_generator_complex<T> type;
@@ -267,7 +268,7 @@ struct get_random_generator<uint64_t>
 
 }
 
-template<class T>
+template<typename T>
 class random_generator
 {
 private:
@@ -281,7 +282,7 @@ public:
     void operator()(const std::size_t count, std::vector<T> & res) const
     {
         std::set<T> uniques;
-        while ( uniques.size() < count )
+        while (uniques.size() < count)
         {
             uniques.insert(m_gen());
         }

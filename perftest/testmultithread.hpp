@@ -67,7 +67,9 @@ public:
         size_type count;
         double duration;
 
-        RESULT() : count(0), duration(0)
+        RESULT() :
+                count(0),
+                duration(0)
         {
 
         }
@@ -78,7 +80,9 @@ public:
         const volatile flags_type * flags;
         IThreadTest * impl;
         RESULT results;
-        ARGS(const volatile flags_type* f, IThreadTest* i) : flags(f), impl(i)
+        ARGS(const volatile flags_type* f, IThreadTest* i) :
+                flags(f),
+                impl(i)
         {
 
         }

@@ -30,7 +30,7 @@ namespace
 
 typedef std::set<std::string> strs_type;
 
-template<class Accessor>
+template<typename Accessor>
 static strs_type get_all(Accessor acc)
 {
     PerfTestLocator::size_type size = PerfTestLocator::getSize();
@@ -102,8 +102,8 @@ public:
             }
             if (!found)
             {
-                std::cerr << m_msg << " \"" << filter << "\" specified in: " << arg
-                        << std::endl;
+                std::cerr << m_msg << " \"" << filter << "\" specified in: "
+                        << arg << std::endl;
             }
         }
     }
@@ -246,7 +246,7 @@ void CommandLineParser::showHelp(const char* arg0)
             << std::endl;
 }
 
-template<class Validator, class Filter>
+template<typename Validator, typename Filter>
 inline void processList(const Validator & validator,
                         const Filter & filter,
                         const char* argv,

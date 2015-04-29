@@ -13,7 +13,7 @@
 #include <chrono>
 #include <iostream>
 
-template<class Value, bool builtin>
+template<typename Value, bool builtin>
 struct Runner
 {
     static const bool usebuiltin = builtin;
@@ -28,7 +28,7 @@ struct Runner
     }
 };
 
-template<class Value>
+template<typename Value>
 struct Runner<Value, true>
 {
     static const bool usebuiltin = true;
@@ -45,7 +45,7 @@ struct Runner<Value, true>
     }
 };
 
-template<class Value, bool usebuiltin, std::size_t = sizeof(Value)>
+template<typename Value, bool usebuiltin, std::size_t = sizeof(Value)>
 struct RunnerTraits
 {
     static const char* name()
@@ -60,7 +60,7 @@ struct RunnerTraits
     }
 };
 
-template<class Value>
+template<typename Value>
 struct RunnerTraits<Value, true, 8>
 {
     static const char* name()
@@ -74,7 +74,7 @@ struct RunnerTraits<Value, true, 8>
     }
 };
 
-template<class Value>
+template<typename Value>
 struct RunnerTraits<Value, false, 8>
 {
     static const char* name()
@@ -88,7 +88,7 @@ struct RunnerTraits<Value, false, 8>
     }
 };
 
-template<class Value>
+template<typename Value>
 struct RunnerTraits<Value, false, 16>
 {
     static const char* name()
@@ -102,7 +102,7 @@ struct RunnerTraits<Value, false, 16>
     }
 };
 
-template<class Value, bool builtin>
+template<typename Value, bool builtin>
 struct Benchmark
 {
     static const std::size_t repcount = 100000000;
@@ -139,7 +139,7 @@ struct Benchmark
     }
 };
 
-template<class Value>
+template<typename Value>
 void doBenchmark(const Value tag, const Value exp, const Value val,
         bool builtin)
 {

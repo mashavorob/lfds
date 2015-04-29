@@ -46,7 +46,7 @@ private:
     }
 };
 
-template<class T>
+template<typename T>
 class random_generator_4 : private rand_base
 {
 public:
@@ -56,7 +56,7 @@ public:
     }
 };
 
-template<class T>
+template<typename T>
 class random_generator_8 : private rand_base
 {
 private:
@@ -77,19 +77,19 @@ public:
     }
 };
 
-template<class T, int = sizeof(T)>
+template<typename T, int = sizeof(T)>
 struct get_integral_random_generator_type
 {
     typedef random_generator_4<T> type;
 };
 
-template<class T>
+template<typename T>
 struct get_integral_random_generator_type<T, 8>
 {
     typedef random_generator_8<T> type;
 };
 
-template<class T>
+template<typename T>
 class random_generator_complex
 {
 private:
@@ -105,23 +105,23 @@ private:
 
 };
 
-template<class T, bool Integer = is_integer<T>::value >
+template<typename T, bool Integer = is_integer<T>::value >
 struct select_random_generator_type;
 
-template<class T>
+template<typename T>
 struct select_random_generator_type<T, true>
 {
     typedef typename get_integral_random_generator_type<T>::type type;
 };
 
-template<class T>
+template<typename T>
 struct select_random_generator_type<T, false>
 {
     typedef random_generator_complex<T> type;
 };
 
 
-template<class T>
+template<typename T>
 struct get_random_generator_type
 {
     typedef typename select_random_generator_type<T>::type type;
@@ -129,7 +129,7 @@ struct get_random_generator_type
 
 }
 
-template<class T>
+template<typename T>
 class random_generator
 {
 private:

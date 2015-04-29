@@ -17,13 +17,13 @@ namespace lfds
 
 namespace
 {
-template<class Node, bool DoNotInvert>
+template<typename Node, bool DoNotInvert>
 struct node_inverter
 {
     static Node* invert(Node* p);
 };
 
-template<class Node>
+template<typename Node>
 struct node_inverter<Node, false>
 {
     static Node* invert(Node* p)
@@ -39,7 +39,7 @@ struct node_inverter<Node, false>
         return p1;
     }
 };
-template<class Node>
+template<typename Node>
 struct node_inverter<Node, true>
 {
     static Node* invert(Node* p)
@@ -48,7 +48,7 @@ struct node_inverter<Node, true>
     }
 };
 
-template<class T>
+template<typename T>
 class basic_queue_mc
 {
 public:
@@ -85,7 +85,7 @@ public:
     consumer_stack_type m_consumerEnd;
 };
 
-template<class T, bool ManyProducers>
+template<typename T, bool ManyProducers>
 class basic_queue_sc
 {
 public:
@@ -111,16 +111,16 @@ public:
     stack_type m_consumerEnd;
 };
 
-template<class T, bool ManyProducer, bool ManyConsumer>
+template<typename T, bool ManyProducer, bool ManyConsumer>
 struct basic_queue_traits;
 
-template<class T, bool ManyProducer>
+template<typename T, bool ManyProducer>
 struct basic_queue_traits<T, ManyProducer, true>
 {
     typedef basic_queue_mc<T> basic_queue;
 };
 
-template<class T, bool ManyProducer>
+template<typename T, bool ManyProducer>
 struct basic_queue_traits<T, ManyProducer, false>
 {
     typedef basic_queue_sc<T, ManyProducer> basic_queue;
@@ -129,8 +129,9 @@ struct basic_queue_traits<T, ManyProducer, false>
 }
 
 // many consumer version
-template<class T, bool ManyProducers, bool ManyConsumers>
-class queue_base: private basic_queue_traits<T, ManyProducers, ManyConsumers>::basic_queue
+template<typename T, bool ManyProducers, bool ManyConsumers>
+class queue_base:
+                  private basic_queue_traits<T, ManyProducers, ManyConsumers>::basic_queue
 {
 public:
     typedef queue_base<T, ManyProducers, ManyConsumers> this_class;

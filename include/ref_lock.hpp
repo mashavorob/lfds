@@ -13,7 +13,7 @@
 namespace lfds
 {
 
-template<class T>
+template<typename T>
 class ref_lock
 {
 public:

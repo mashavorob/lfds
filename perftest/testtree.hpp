@@ -32,5 +32,4 @@ private:
 }
 }
 
-
 #endif /* PERFTEST_TESTTREE_HPP_ */

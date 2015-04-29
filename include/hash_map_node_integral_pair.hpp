@@ -44,7 +44,7 @@ struct get_padding_size_by_size<KeySize, ValueSize, StateSize, false, true>
     const static int value = ValueSize - KeySize - StateSize;
 };
 
-template<class Key, class Value, class State>
+template<typename Key, typename Value, typename State>
 struct get_padding_size
 {
     const static int value = get_padding_size_by_size<sizeof(Key),
@@ -80,7 +80,7 @@ struct get_state_size<KeySize, ValueSize, false, true>
     static const int value = KeySize;
 };
 
-template<class Key, class Value>
+template<typename Key, typename Value>
 struct get_state_type
 {
     static const int size = get_state_size<sizeof(Key), sizeof(Value)>::value;
@@ -105,19 +105,26 @@ struct integral_item_data_fields<Key, Value, State, true, 0>
 
 #if _DETAILED_CONSTRUCTOR_
     integral_item_data_fields(const State state) :
-            m_key(), m_value(state), m_state()
+            m_key(),
+            m_value(state),
+            m_state()
     {
 
     }
     integral_item_data_fields(const State state, const Key key) :
-            m_key(key), m_value(), m_state(state)
+            m_key(key),
+            m_value(),
+            m_state(state)
     {
 
     }
 #endif
-    integral_item_data_fields(const State state, const Key key,
-            const Value value) :
-            m_key(key), m_value(value), m_state(state)
+    integral_item_data_fields(const State state,
+                              const Key key,
+                              const Value value) :
+            m_key(key),
+            m_value(value),
+            m_state(state)
     {
 
     }
@@ -134,19 +141,26 @@ struct integral_item_data_fields<Key, Value, State, false, 0>
 
 #if _DETAILED_CONSTRUCTOR_
     integral_item_data_fields(const State state) :
-            m_key(), m_state(state), m_value()
+            m_key(),
+            m_state(state),
+            m_value()
     {
 
     }
     integral_item_data_fields(const State state, const Key key) :
-            m_key(key), m_state(state), m_value()
+            m_key(key),
+            m_state(state),
+            m_value()
     {
 
     }
 #endif
-    integral_item_data_fields(const State state, const Key key,
-            const Value value) :
-            m_key(key), m_state(state), m_value(value)
+    integral_item_data_fields(const State state,
+                              const Key key,
+                              const Value value) :
+            m_key(key),
+            m_state(state),
+            m_value(value)
     {
 
     }
@@ -162,19 +176,29 @@ struct integral_item_data_fields<Key, Value, State, true, PaddingSize>
 
 #if _DETAILED_CONSTRUCTOR_
     integral_item_data_fields(const State state) :
-            m_key(), m_value(), m_state(state), m_padding()
+            m_key(),
+            m_value(),
+            m_state(state),
+            m_padding()
     {
 
     }
     integral_item_data_fields(const State state, const Key key) :
-            m_key(key), m_value(), m_state(state), m_padding()
+            m_key(key),
+            m_value(),
+            m_state(state),
+            m_padding()
     {
 
     }
 #endif
-    integral_item_data_fields(const State state, const Key key,
-            const Value value) :
-            m_key(key), m_value(value), m_state(state), m_padding()
+    integral_item_data_fields(const State state,
+                              const Key key,
+                              const Value value) :
+            m_key(key),
+            m_value(value),
+            m_state(state),
+            m_padding()
     {
 
     }
@@ -190,19 +214,29 @@ struct integral_item_data_fields<Key, Value, State, false, PaddingSize>
 
 #if _DETAILED_CONSTRUCTOR_
     integral_item_data_fields(const State state) :
-            m_key(), m_state(state), m_padding(), m_value()
+            m_key(),
+            m_state(state),
+            m_padding(),
+            m_value()
     {
 
     }
     integral_item_data_fields(const State state, const Key key) :
-            m_key(key), m_state(state), m_padding(), m_value()
+            m_key(key),
+            m_state(state),
+            m_padding(),
+            m_value()
     {
 
     }
 #endif
-    integral_item_data_fields(const State state, const Key key,
-            const Value value) :
-            m_key(key), m_state(state), m_padding(), m_value(value)
+    integral_item_data_fields(const State state,
+                              const Key key,
+                              const Value value) :
+            m_key(key),
+            m_state(state),
+            m_padding(),
+            m_value(value)
     {
 
     }
@@ -254,8 +288,9 @@ public:
     {
 
     }
-    hash_node_integral_pair(const state_type state, const key_type key,
-            const mapped_type value) :
+    hash_node_integral_pair(const state_type state,
+                            const key_type key,
+                            const mapped_type value) :
             m_data(state, key, value)
     {
 

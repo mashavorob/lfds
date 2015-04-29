@@ -8,6 +8,7 @@
 #ifndef INCLUDE_HASH_MAP_HPP_
 #define INCLUDE_HASH_MAP_HPP_
 
+#include "memory_model.hpp"
 #include "hash_map_table.hpp"
 #include "hash_map_table_integral_pair.hpp"
 #include "hash_map_table_integral_value.hpp"
@@ -28,7 +29,7 @@ namespace lfds
 namespace
 {
 
-template<class Key, class Value>
+template<typename Key, typename Value, bool = (sizeof(Key) < sizeof(Value))>
 struct dummy_hash_tuple
 {
     Key m_key;
@@ -36,7 +37,15 @@ struct dummy_hash_tuple
     int8_t m_dummy;
 };
 
-template<class Key, class Value>
+template<typename Key, typename Value>
+struct dummy_hash_tuple<Key, Value, true>
+{
+    Key m_key;
+    int8_t m_dummy;
+    Value m_value;
+};
+
+template<typename Key, typename Value>
 struct is_interal_pair
 {
     enum
@@ -46,32 +55,36 @@ struct is_interal_pair
     };
 };
 
-template<class Key
-        , class Value
-        , class Hash = typename getHash<Key>::type
-        , class Pred = std::equal_to<Key>
-        , class Allocator = std::allocator<Value>
-        , bool IntegralKey = is_integral<Key>::value
-        , bool IntegralValue = is_integral<Value>::value
-        , bool IntegralKeyValue = is_interal_pair<Key, Value>::value>
+template<typename Key, typename Value,
+        typename Hash = typename make_hash<Key>::type,
+        typename Pred = std::equal_to<Key>, typename Allocator = std::allocator<
+                Value>, bool IntegralKey = is_integral<Key>::value,
+        bool IntegralValue = is_integral<Value>::value, bool IntegralKeyValue =
+                is_interal_pair<Key, Value>::value>
 struct hash_table_traits
 {
     typedef lfds::hash_map_table<Key, Value, Hash, Pred, Allocator> type;
 };
 
-template<class Key, class Value, class Hash, class Pred, class Allocator, bool IntegralKey, bool IntegralValue>
-struct hash_table_traits<Key, Value, Hash, Pred, Allocator, IntegralKey, IntegralValue, true>
+template<typename Key, typename Value, typename Hash, typename Pred,
+        typename Allocator, bool IntegralKey, bool IntegralValue>
+struct hash_table_traits<Key, Value, Hash, Pred, Allocator, IntegralKey,
+        IntegralValue, true>
 {
     typedef lfds::hash_map_table_integral_pair<Key, Value, Hash, Pred, Allocator> type;
 };
 
-template<class Key, class Value, class Hash, class Pred, class Allocator, bool IntegralKey>
-struct hash_table_traits<Key, Value, Hash, Pred, Allocator, IntegralKey, true, false>
+template<typename Key, typename Value, typename Hash, typename Pred,
+        typename Allocator, bool IntegralKey>
+struct hash_table_traits<Key, Value, Hash, Pred, Allocator, IntegralKey, true,
+        false>
 {
-    typedef lfds::hash_map_table_integral_value<Key, Value, Hash, Pred, Allocator> type;
+    typedef lfds::hash_map_table_integral_value<Key, Value, Hash, Pred,
+            Allocator> type;
 };
 
-template<class Key, class Value, class Hash, class Pred, class Allocator>
+template<typename Key, typename Value, typename Hash, typename Pred,
+        typename Allocator>
 struct hash_table_traits<Key, Value, Hash, Pred, Allocator, true, false, false>
 {
     typedef lfds::hash_map_table_integral_key<Key, Value, Hash, Pred, Allocator> type;
@@ -82,18 +95,24 @@ struct hash_table_traits<Key, Value, Hash, Pred, Allocator, true, false, false>
 //
 // Hash map
 //
-template<class Key, class Value, class Hash = typename getHash<Key>::type,
-        class Pred = std::equal_to<Key>, class Allocator = std::allocator<Value> >
+template<typename Key, typename Value,
+        typename Hash = typename make_hash<Key>::type,
+        typename Pred = std::equal_to<Key>, typename Allocator = std::allocator<
+                Value>, memory_model::type MemModel =
+                default_memory_model::value>
 class hash_map
 {
 public:
 
-    typedef hash_map<Key, Value, Hash, Pred, Allocator> this_type;
+    typedef hash_map<Key, Value, Hash, Pred, Allocator, MemModel> this_type;
     typedef hash_table_traits<Key, Value, Hash, Pred, Allocator> hash_table_traits_type;
 
     typedef typename hash_table_traits_type::type hash_table_type;
     typedef typename hash_table_type::key_type key_type;
     typedef typename hash_table_type::mapped_type mapped_type;
+    typedef typename hash_table_type::hash_func_type hash_func_type;
+    typedef typename hash_table_type::equal_predicate_type equal_predicate_type;
+    typedef typename hash_table_type::allocator_type allocator_type;
     typedef typename hash_table_type::size_type size_type;
     typedef typename hash_table_type::value_type value_type;
     typedef typename hash_table_type::snapshot_type snapshot_type;
@@ -101,6 +120,7 @@ public:
     static constexpr bool INTEGRAL_KEY = hash_table_type::INTEGRAL_KEY;
     static constexpr bool INTEGRAL_VALUE = hash_table_type::INTEGRAL_VALUE;
     static constexpr bool INTEGRAL_KEYVALUE = hash_table_type::INTEGRAL_KEYVALUE;
+    static constexpr memory_model::type MEMORY_MODEL = MemModel;
 private:
     hash_map(const this_type&); // = delete;
     this_type& operator=(const this_type&); // = delete;
@@ -121,7 +141,7 @@ public:
         return m_hash_table_base.find(key, value);
     }
 #if LFDS_USE_CPP11
-    template<class ... Args>
+    template<typename ... Args>
     bool insert(const key_type & key, Args&&... val)
 #else
     bool insert(const key_type & key, const mapped_type& val)
@@ -143,10 +163,30 @@ public:
     }
 
 private:
-    typedef hash_map_table_base<hash_table_type> hash_table_base_type;
+    //typedef hash_map_table_base<hash_table_type> hash_table_base_type;
+    typedef hash_map_table_base_traits<hash_table_type, MemModel> hash_map_table_base_traits_type;
+    typedef typename hash_map_table_base_traits_type::type hash_table_base_type;
 
     hash_table_type m_hash_table;
     hash_table_base_type m_hash_table_base;
+};
+
+template<typename Key, typename Value,
+        typename Hash = typename make_hash<Key>::type,
+        typename Pred = std::equal_to<Key>, typename Allocator = std::allocator<
+                Value> >
+struct make_wise_hash_map
+{
+    typedef hash_map<Key, Value, Hash, Pred, Allocator, memory_model::wise> type;
+};
+
+template<typename Key, typename Value,
+        typename Hash = typename make_hash<Key>::type,
+        typename Pred = std::equal_to<Key>, typename Allocator = std::allocator<
+                Value> >
+struct make_greedy_hash_map
+{
+    typedef hash_map<Key, Value, Hash, Pred, Allocator, memory_model::greedy> type;
 };
 
 }

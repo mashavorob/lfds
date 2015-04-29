@@ -14,7 +14,7 @@
 namespace lfds
 {
 
-template<class Buffer>
+template<typename Buffer>
 class buffer_base
 {
 public:
@@ -49,7 +49,7 @@ public:
     }
 
 #if LFDS_USE_CPP11
-    template<class ... Args>
+    template<typename ... Args>
     void constructData(node_type* p, Args&&... data)
 #else // LFDS_USE_CPP11
     void constructData(node_type* p, const value_type &data)
@@ -76,7 +76,7 @@ public:
         return m_freeNodes.atomic_pop();
     }
 #if LFDS_USE_CPP11
-    template<class ... Args>
+    template<typename ... Args>
     node_type* newNode(Args&&... data)
 #else
     node_type* newNode(const value_type &data)
@@ -105,7 +105,6 @@ public:
         destroyData(p);
         pushFreeNode(p);
     }
-
 
 private:
     data_allocator_type m_dataAllocator;

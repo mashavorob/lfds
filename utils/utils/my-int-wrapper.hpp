@@ -16,7 +16,7 @@ namespace lfds
 namespace my
 {
 
-template<class T>
+template<typename T>
 class int_wrapper
 {
 public:
@@ -111,7 +111,7 @@ private:
     T m_t;
 };
 
-template<class T>
+template<typename T>
 struct int_wrapper_hash
 {
     size_t operator()(const int_wrapper<T> & val) const
@@ -119,7 +119,44 @@ struct int_wrapper_hash
         return m_hasher(val);
     }
 private:
-    typename getHash<T>::type m_hasher;
+    typename lfds::make_hash<T>::type m_hasher;
+};
+
+template<typename T>
+struct make_hash
+{
+    typedef typename lfds::make_hash<T>::type type;
+};
+
+template<typename T>
+struct make_hash< int_wrapper<T> >
+{
+    typedef int_wrapper_hash<T> type;
+};
+
+
+template<typename T>
+struct remove_wrapper
+{
+    typedef T type;
+};
+
+template<typename T>
+struct remove_wrapper<lfds::my::int_wrapper<T> >
+{
+    typedef T type;
+};
+
+template<typename T, typename Int>
+struct make_value_type
+{
+    typedef Int type;
+};
+
+template<typename T, typename Int>
+struct make_value_type<lfds::my::int_wrapper<T>, Int>
+{
+    typedef lfds::my::int_wrapper<Int> type;
 };
 
 }

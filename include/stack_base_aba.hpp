@@ -15,7 +15,7 @@ namespace lfds
 {
 
 // base implementation for stack
-template<class T>
+template<typename T>
 class stack_base_aba
 {
 public:
@@ -49,7 +49,8 @@ public:
             newhead.m_counter = expected.m_counter + 1;
             p->m_next = expected.m_ptr;
             success = m_head.atomic_cas(expected, newhead);
-        } while (!success);
+        }
+        while (!success);
     }
     void atomic_setHead(node_type* p)
     {
@@ -61,7 +62,8 @@ public:
             expected.m_counter = m_head.m_counter;
             newhead.m_counter = expected.m_counter + 1;
             success = m_head.atomic_cas(expected, newhead);
-        } while (!success);
+        }
+        while (!success);
     }
     node_type* atomic_pop()
     {
@@ -78,7 +80,8 @@ public:
             newhead.m_ptr = expected.m_ptr->m_next;
             newhead.m_counter = expected.m_counter + 1;
             success = m_head.atomic_cas(expected, newhead);
-        } while (!success);
+        }
+        while (!success);
         return expected.m_ptr;
     }
     void push(node_type* p)
@@ -99,7 +102,7 @@ public:
     }
 
     static void copy_upsidedown(stack_base_aba<T> & from,
-            stack_base_aba<T> & to)
+                                stack_base_aba<T> & to)
     {
         node_type* node = from.m_head.m_ptr;
         node_type* newhead = to.m_head.m_ptr;

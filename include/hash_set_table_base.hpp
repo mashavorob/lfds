@@ -15,17 +15,16 @@
 
 namespace lfds
 {
-template<class HashTable>
-class hash_set_table_base: public hash_table_base<HashTable>
+
+template<typename BaseHashTable>
+class hash_set_table_base: public BaseHashTable
 {
 public:
 
-    typedef hash_set_table_base<HashTable> this_type;
-    typedef hash_table_base<HashTable> base_type;
+    typedef hash_set_table_base<BaseHashTable> this_type;
+    typedef BaseHashTable base_type;
 
     typedef typename base_type::hash_table_type hash_table_type;
-    typedef typename base_type::scoped_lock_type scoped_lock_type;
-    typedef typename base_type::scoped_reserver_type scoped_reserver_type;
     typedef typename hash_table_type::key_type key_type;
     typedef typename hash_table_type::node_type node_type;
     typedef typename hash_table_type::allocator_type allocator_type;
@@ -34,6 +33,11 @@ public:
 
     typedef std::vector<key_type> snapshot_type;
 
+private:
+    typedef typename base_type::const_guard_type const_guard_type;
+    typedef typename base_type::mutable_guard_type mutable_guard_type;
+    typedef typename base_type::insert_guard_type insert_guard_type;
+    typedef typename base_type::scoped_reserver_type scoped_reserver_type;
 
 public:
     hash_set_table_base(hash_table_type & hashTable, size_type reserve) :
@@ -43,9 +47,8 @@ public:
 public:
     bool find(const key_type & key) const
     {
-        // attempt to make a wait free find
-        scoped_lock_type guard(base_type::m_constTable);
-        const table_type* ptr = base_type::m_constTable.m_ptr.load(barriers::relaxed);
+        const table_type* ptr;
+        const_guard_type guard(base_type::getBase(), ptr);
 
         return base_type::m_hashTable.find_impl(*ptr, key);
     }
@@ -54,13 +57,20 @@ public:
         // the reserver prevents overwhelming by big number of concurrent insertions
         scoped_reserver_type reserve(base_type::m_concurrentInsertions);
 
-        base_type::check_watermark();
+        base_type::checkWatermark();
 
-        table_type* ptr = base_type::acquire_table(base_type::m_mutableTable);
-        scoped_lock_type guard(base_type::m_mutableTable, false);
+        table_type* ptr;
+        mutable_guard_type guard(base_type::getBase(), ptr);
 
         return base_type::m_hashTable.insert_impl(*ptr, key);
     }
+};
+
+template<typename HashTable, bool greedy>
+struct get_hash_set_table_base_type
+{
+    typedef typename get_hash_table_base_type<HashTable, greedy>::type base_type;
+    typedef hash_set_table_base<base_type> type;
 };
 }
 

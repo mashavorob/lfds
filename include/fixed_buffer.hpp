@@ -14,7 +14,7 @@
 namespace lfds
 {
 
-template<class T, class Allocator>
+template<typename T, typename Allocator>
 class fixed_buffer
 {
 public:
@@ -29,7 +29,8 @@ public:
 
 public:
     fixed_buffer(size_type capacity) :
-            m_capacity(capacity), m_reserved(nullptr)
+            m_capacity(capacity),
+            m_reserved(nullptr)
     {
         m_reserved = m_base.allocate_nodes(m_capacity);
         for (size_type i = 0; i < m_capacity; ++i)
@@ -43,7 +44,7 @@ public:
         m_base.deallocate_nodes(m_reserved, m_capacity);
     }
 #if LFDS_USE_CPP11
-    template<class ... Args>
+    template<typename ... Args>
     node_type* newNode(Args&&... data)
 #else
     node_type* newNode(const value_type& data)

@@ -36,23 +36,24 @@ typedef lfds::perftest::sync::guard guard_type;
 
 namespace
 {
-template<class Key, class Value, class Allocator, bool Unordered>
+template<typename Key, typename Value, typename Allocator, bool Unordered>
 struct get_map_type;
 
-template<class Key, class Value, class Allocator>
+template<typename Key, typename Value, typename Allocator>
 struct get_map_type<Key, Value, Allocator, false>
 {
     typedef std::map<Key, Value, std::less<Key>, Allocator> type;
 };
 
-template<class Key, class Value, class Allocator>
+template<typename Key, typename Value, typename Allocator>
 struct get_map_type<Key, Value, Allocator, true>
 {
-    typedef typename getHash<Key>::type hash_type;
+    typedef typename make_hash<Key>::type hash_type;
 #if LFDS_USE_CPP11
     typedef std::unordered_map<Key, Value, hash_type, std::equal_to<Key>, Allocator> type;
 #else
-    typedef std::tr1::unordered_map<Key, Value, hash_type, std::equal_to<Key>, Allocator> type;
+    typedef std::tr1::unordered_map<Key, Value, hash_type, std::equal_to<Key>,
+            Allocator> type;
 #endif
 };
 
@@ -76,7 +77,8 @@ struct get_reserve_implemented<true>
 };
 #endif
 
-template<class Map, bool Unordered, bool = get_reserve_implemented<Unordered>::value >
+template<typename Map, bool Unordered, bool =
+        get_reserve_implemented<Unordered>::value>
 struct reserver
 {
     typedef Map map_type;
@@ -87,7 +89,7 @@ struct reserver
     }
 };
 
-template<class Map, bool Unordered>
+template<typename Map, bool Unordered>
 struct reserver<Map, Unordered, true>
 {
     typedef Map map_type;
@@ -100,7 +102,8 @@ struct reserver<Map, Unordered, true>
 
 }
 
-template<class Key, class Value, bool Unordered, class Allocator = std::allocator<std::pair<const Key, Value> > >
+template<typename Key, typename Value, bool Unordered,
+        typename Allocator = std::allocator<std::pair<const Key, Value> > >
 class stdmap
 {
 public:
@@ -110,7 +113,8 @@ public:
     typedef typename collection_type::size_type size_type;
 
     static constexpr bool RESERVE_IMPLEMENTED = Unordered;
-    static constexpr bool ALLOCATOR_IMPLEMENTED = get_reserve_implemented<Unordered>::value;
+    static constexpr bool ALLOCATOR_IMPLEMENTED = get_reserve_implemented<
+            Unordered>::value;
 
     typedef Allocator allocator_type;
     typedef counted_allocator<allocator_type> counted_allocator_type;

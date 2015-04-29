@@ -13,7 +13,6 @@
 
 #include <stdexcept>
 
-
 namespace lfds
 {
 namespace perftest
@@ -47,14 +46,14 @@ void PerfTestLocator::getTest(const id_type id, PerformanceTest & test) const
 
 const PerfTestInfo* PerfTestLocator::at(const id_type id) const
 {
-    if ( id >= getSize() )
+    if (id >= getSize())
     {
         throw std::out_of_range("PerfTestLocator::at()");
     }
     PerfTestInfo* link = m_link;
-    while ( link )
+    while (link)
     {
-        if ( link->m_id == id )
+        if (link->m_id == id)
         {
             break;
         }

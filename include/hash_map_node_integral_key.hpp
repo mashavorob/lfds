@@ -18,7 +18,7 @@ namespace lfds
 // It seems Eclipse's developers do not admit the bug so the only way
 // to avoid annoying error marks these macro are used
 template<typename Key>
-struct __attribute__((aligned(2*sizeof(Key)))) key_item
+struct align_by(2*sizeof(Key)) key_item
 {
     typedef key_item<Key> this_type;
     typedef typename get_int_by_size<sizeof(Key)>::type state_type;
@@ -26,9 +26,9 @@ struct __attribute__((aligned(2*sizeof(Key)))) key_item
     enum
     {
         unused,     // initial state
-        pending,    // key is valid, value is being constructed/deleted
-        touched,    // key is valid
-        allocated,  // key & value are valid
+        pending,// key is valid, value is being constructed/deleted
+        touched,// key is valid
+        allocated,// key & value are valid
     };
 
     // normal life cycle of an item in the hash table is:
@@ -63,22 +63,22 @@ struct __attribute__((aligned(2*sizeof(Key)))) key_item
     // 7. allocated - exactly same as 3.
 
     key_item() :
-            m_key(), m_state()
+    m_key(), m_state()
     {
 
     }
     key_item(const Key key, const state_type state) :
-            m_key(key), m_state(state)
+    m_key(key), m_state(state)
     {
 
     }
     key_item(const this_type & other) :
-            m_key(other.m_key), m_state(other.m_state)
+    m_key(other.m_key), m_state(other.m_state)
     {
 
     }
     key_item(const volatile this_type & other) :
-            m_key(other.m_key), m_state(other.m_state)
+    m_key(other.m_key), m_state(other.m_state)
     {
 
     }
@@ -102,7 +102,8 @@ private:
     this_class& operator=(const this_class&); // = delete;
 public:
     hash_node_integral_key() :
-            m_key(), m_refCount(0)
+            m_key(),
+            m_refCount(0)
     {
 
     }
@@ -132,7 +133,7 @@ public:
         return reinterpret_cast<const mapped_type*>(m_value);
     }
     bool atomic_cas(const key_item_type & expected,
-            const key_item_type & newkey)
+                    const key_item_type & newkey)
     {
         return lfds::atomic_cas(m_key, expected, newkey);
     }
@@ -151,8 +152,7 @@ public:
     }
 
 private:
-    volatile key_item_type m_key;
-    char m_value[sizeof(mapped_type)] __attribute__((aligned(__alignof(mapped_type))));
+    volatile key_item_type m_key;char m_value[sizeof(mapped_type)] align_as(mapped_type);
     mutable xtomic<int> m_refCount;
 };
 

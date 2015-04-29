@@ -30,7 +30,8 @@ class MemConsumptionTest: public IPerformanceTest
 {
 public:
     MemConsumptionTest() :
-            m_tester(nullptr), m_mult(1)
+            m_tester(nullptr),
+            m_mult(1)
     {
 
     }
@@ -52,8 +53,8 @@ private:
     double m_mult;
 };
 
-template<class Tester>
-class IMemTesterImpl : public IMemTester
+template<typename Tester>
+class IMemTesterImpl: public IMemTester
 {
 public:
     // override
@@ -65,8 +66,8 @@ private:
     Tester m_test;
 };
 
-template<class Tester, int Multiplier>
-class MemConsumptionTestImpl : public MemConsumptionTest
+template<typename Tester, int Multiplier>
+class MemConsumptionTestImpl: public MemConsumptionTest
 {
 public:
     MemConsumptionTestImpl()

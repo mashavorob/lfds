@@ -13,7 +13,8 @@ namespace lfds
 {
 namespace perftest
 {
-namespace {
+namespace
+{
 
 class ClockTester
 {
@@ -24,7 +25,7 @@ public:
     {
         timespec dummy;
 
-        for ( unsigned int i = 0; i < count; ++i )
+        for (unsigned int i = 0; i < count; ++i)
         {
             clock_gettime(CLOCK_MONOTONIC, &dummy);
         }
@@ -37,8 +38,6 @@ typedef AverageOpTimeTest<ClockTester, 1> clock_pref_count;
 
 const double get_timer_perf::value = clock_pref_count().doTest();
 
-
 }
 }
-
 

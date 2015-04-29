@@ -13,11 +13,8 @@
 namespace lfds
 {
 
-// Eclipse Luna does not recognize alignas keyword regardless of any settings
-// It seems Eclipse's developers do not admit the bug so the only way
-// to avoid annoying error marks these macro are used
-template<class Key>
-struct __attribute__((aligned(2*sizeof(Key)))) hash_set_integral_key
+template<typename Key>
+struct align_by(2*sizeof(Key)) hash_set_integral_key
 {
     typedef hash_set_integral_key<Key> this_type;
     typedef typename get_int_by_size<sizeof(Key)>::type state_type;
@@ -25,8 +22,8 @@ struct __attribute__((aligned(2*sizeof(Key)))) hash_set_integral_key
     enum
     {
         unused,     // initial state
-        touched,    // key is valid
-        allocated,  // key is valid
+        touched,// key is valid
+        allocated,// key is valid
     };
 
     // normal life cycle of an item in the hash table is:
@@ -46,22 +43,22 @@ struct __attribute__((aligned(2*sizeof(Key)))) hash_set_integral_key
     // 4. allocated - exactly same as 2.
 
     hash_set_integral_key() :
-            m_key(), m_state()
+    m_key(), m_state()
     {
 
     }
     hash_set_integral_key(const Key key, const state_type state) :
-            m_key(key), m_state(state)
+    m_key(key), m_state(state)
     {
 
     }
     hash_set_integral_key(const this_type & other) :
-            m_key(other.m_key), m_state(other.m_state)
+    m_key(other.m_key), m_state(other.m_state)
     {
 
     }
     hash_set_integral_key(const volatile this_type & other) :
-            m_key(other.m_key), m_state(other.m_state)
+    m_key(other.m_key), m_state(other.m_state)
     {
 
     }

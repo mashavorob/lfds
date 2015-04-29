@@ -12,14 +12,13 @@
 
 #include <cppbasics.hpp>
 
-
 #include <cassert>
 #include <iostream>
 #include <cmath>
 
 using namespace lfds::perftest;
 
-template<class Pred>
+template<typename Pred>
 void forEachItem(const ids_type & ids, Pred pred)
 {
     ids_type::const_iterator beg = ids.begin();
@@ -33,7 +32,7 @@ void forEachItem(const ids_type & ids, Pred pred)
     }
 }
 
-template<class Pred>
+template<typename Pred>
 void forEachName(const group_type & group, Pred pred)
 {
     group_type::const_iterator beg = group.begin();
@@ -47,7 +46,7 @@ void forEachName(const group_type & group, Pred pred)
     }
 }
 
-template<class Pred>
+template<typename Pred>
 void forEachGroup(const groups_type & groups, Pred pred)
 {
     groups_type::const_iterator beg = groups.begin();
@@ -84,7 +83,6 @@ struct Generic
         std::cout << "group: " << name << std::endl;
     }
 };
-
 
 struct RunTest: public Generic
 {

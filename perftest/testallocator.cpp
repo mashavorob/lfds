@@ -12,7 +12,7 @@ namespace lfds
 namespace perftest
 {
 
- std::size_t allocator_base::m_cbAllocated = 0;
+std::size_t allocator_base::m_cbAllocated = 0;
 
 }
 }

@@ -17,7 +17,7 @@
 // the only purpose of the class is prevent lfds::hash_map<>
 // from using optimized model for integral types and strings
 //
-template<class T>
+template<typename T>
 struct data_adapter
 {
     typedef data_adapter<T> this_class;

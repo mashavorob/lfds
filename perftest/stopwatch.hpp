@@ -15,7 +15,7 @@ namespace lfds
 namespace perftest
 {
 
-template<class Operation>
+template<typename Operation>
 struct Stopwatch
 {
     double operator()(Operation & op) const

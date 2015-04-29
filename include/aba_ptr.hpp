@@ -37,18 +37,27 @@ namespace lfds
 //
 //     x86 cmxchgNb requires N bytes alignment for its operand
 
-template<class T>
-class __attribute__((aligned(sizeof(void*)*2))) aba_ptr
+template<typename T>
+class align_4_cas16 aba_ptr
 {
 public:
     typedef std::size_t counter_type;
 
-    aba_ptr() : m_ptr(nullptr), m_counter(0)
-    {}
-    aba_ptr(T* ptr) : m_ptr(ptr), m_counter(0)
-    {}
-    aba_ptr(T* ptr, counter_type counter) : m_ptr(ptr), m_counter(counter)
-    {}
+    aba_ptr() :
+            m_ptr(nullptr),
+            m_counter(0)
+    {
+    }
+    aba_ptr(T* ptr) :
+            m_ptr(ptr),
+            m_counter(0)
+    {
+    }
+    aba_ptr(T* ptr, counter_type counter) :
+            m_ptr(ptr),
+            m_counter(counter)
+    {
+    }
     aba_ptr(const aba_ptr<T>& other)
     {
         *this = other;

@@ -21,7 +21,7 @@ namespace perftest
 namespace
 {
 
-template<class Accessor, bool byWildCard>
+template<typename Accessor, bool byWildCard>
 struct remove_items
 {
     typedef Filter::strs_type strs_type;
@@ -29,7 +29,8 @@ struct remove_items
 
     typedef typename ids_type::iterator iterator;
 
-    remove_items(bool invertFilter) : m_negFilter(invertFilter)
+    remove_items(bool invertFilter) :
+            m_negFilter(invertFilter)
     {
 
     }
@@ -52,9 +53,10 @@ struct remove_items
         {
             const id_type id = *i;
             const std::string val = get(id);
-            typename strs_type::const_iterator fpos = std::find_if(fbeg, fend, match_type(val));
+            typename strs_type::const_iterator fpos = std::find_if(fbeg, fend,
+                    match_type(val));
             bool res = (fpos != fend);
-            if ( m_negFilter )
+            if (m_negFilter)
             {
                 res = !res;
             }
@@ -94,7 +96,9 @@ void Filter::byName(ids_type & ids, const strs_type & names, bool invertFilter)
     remove(ids, names);
 }
 
-void Filter::byGroup(ids_type & ids, const strs_type & groups, bool invertFilter)
+void Filter::byGroup(ids_type & ids,
+                     const strs_type & groups,
+                     bool invertFilter)
 {
     remove_items<PerfTestLocator::get_test_group, true> remove(invertFilter);
 

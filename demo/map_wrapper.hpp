@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include <mutex>
 
-template<class Map>
+template<typename Map>
 class map_wrapper
 {
 public:
@@ -46,7 +46,7 @@ public:
         }
         return false;
     }
-    template<class ... Args>
+    template<typename ... Args>
     bool insert(const key_type & key, Args&&... val)
     {
         lock_type lock(m_mutex);
@@ -69,8 +69,8 @@ private:
     mutable std::mutex m_mutex;
 };
 
-template<class Key, class T, class Less = std::less<Key>,
-        class Allocator = std::allocator<std::pair<const Key, T> > >
+template<typename Key, typename T, typename Less = std::less<Key>,
+        typename Allocator = std::allocator<std::pair<const Key, T> > >
 class std_map_wrapper
 {
 public:
@@ -88,7 +88,7 @@ public:
     {
         return m_map.find(key, value);
     }
-    template<class ... Args>
+    template<typename ... Args>
     bool insert(const key_type & key, Args&&... val)
     {
         return m_map.insert(key, std::forward<Args>(val)...);
@@ -106,9 +106,9 @@ private:
     wrapped_map_type m_map;
 };
 
-template<class Key, class T, class Hash = std::hash<Key>,
-        class Pred = std::equal_to<Key>, class Allocator = std::allocator<
-                std::pair<const Key, T> > >
+template<typename Key, typename T, typename Hash = std::hash<Key>,
+        typename Pred = std::equal_to<Key>, typename Allocator = std::allocator<
+                std::pair<Key, T> > >
 class std_unordered_map_wrapper
 {
 public:
@@ -126,7 +126,7 @@ public:
     {
         return m_map.find(key, value);
     }
-    template<class ... Args>
+    template<typename ... Args>
     bool insert(const key_type & key, Args&&... val)
     {
         return m_map.insert(key, std::forward<Args>(val)...);

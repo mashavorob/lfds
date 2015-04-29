@@ -25,7 +25,7 @@ inline void atomic_prologue()
 {
 }
 
-template<class T>
+template<typename T>
 class xtomic
 {
 public:
@@ -111,11 +111,11 @@ public:
         return __atomic_fetch_sub(&m_val, val, __ATOMIC_RELEASE);
     }
 
-    bool cas(const T e, const T n)
+    bool atomic_cas(const T e, const T n)
     {
         return __sync_bool_compare_and_swap(&m_val, e, n);
     }
-    bool cas(const this_type & e, const this_type & n)
+    bool atomic_cas(const this_type & e, const this_type & n)
     {
         return cas(e.m_val, n.m_val);
     }

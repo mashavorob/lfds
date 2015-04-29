@@ -66,7 +66,7 @@ public:
     {
         std::string operator()(const id_type id)
         {
-            const PerfTestLocator & locator =  PerfTestLocator::getInstance();
+            const PerfTestLocator & locator = PerfTestLocator::getInstance();
 
             return std::string(locator.getTestGroup(id)) + "."
                     + locator.getTestName(id) + "." + locator.getTestParam(id);
@@ -108,6 +108,5 @@ private:
 
 }
 }
-
 
 #endif /* PERFTEST_TESTLOCATOR_HPP_ */

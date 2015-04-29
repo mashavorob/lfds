@@ -19,7 +19,8 @@
 namespace lfds
 {
 
-template<class T, bool FixedSize = true, class Allocator = std::allocator<T> >
+template<typename T, bool FixedSize = true, typename Allocator = std::allocator<
+        T> >
 class stack
 {
 public:
@@ -44,7 +45,8 @@ private:
 public:
 
     stack(size_type capacity) :
-            m_buff(capacity), m_size(0)
+            m_buff(capacity),
+            m_size(0)
     {
     }
 
@@ -59,7 +61,7 @@ public:
     }
 
 #if LFDS_USE_CPP11
-    template<class ... Args>
+    template<typename ... Args>
     bool push(Args&&... val)
 #else
     bool push(const value_type& val)

@@ -29,7 +29,7 @@
 namespace lfds
 {
 
-template<class Key, class Hash, class Pred, class Allocator>
+template<typename Key, typename Hash, typename Pred, typename Allocator>
 class hash_set_table
 {
 public:
@@ -49,7 +49,7 @@ public:
     static constexpr bool INTEGRAL = false;
 
 //
-// template<class CompatibleKey, Key>
+// template<typename CompatibleKey, Key>
 // struct CompatiblePredicate : public binary_function<CompatibleKey, Key, bool>
 // {
 //      bool operator()(const CompatibleKey & key, const Key & value) const;
@@ -64,7 +64,8 @@ public:
     {
     }
 
-    void getSnapshot_imp(const table_type& raw_table, snapshot_type & snapshot) const
+    void getSnapshot_imp(const table_type& raw_table,
+                         snapshot_type & snapshot) const
     {
         const node_type* table = raw_table.m_table;
         const size_type capacity = raw_table.m_capacity;
@@ -91,7 +92,7 @@ public:
 
         for (size_type i = hash % capacity;; ++i)
         {
-            if ( i == capacity )
+            if (i == capacity)
             {
                 i = 0;
             }
@@ -143,7 +144,7 @@ public:
 
         for (size_type i = hash % capacity;; ++i)
         {
-            if ( i == capacity )
+            if (i == capacity)
             {
                 i = 0;
             }
@@ -187,8 +188,10 @@ public:
             case hash_item_type::touched:
                 if (eq_func(key, *node.getKey()))
                 {
-                    static constexpr std::size_t touched = hash_item_type::touched;
-                    static constexpr std::size_t allocated = hash_item_type::allocated;
+                    static constexpr std::size_t touched =
+                            hash_item_type::touched;
+                    static constexpr std::size_t allocated =
+                            hash_item_type::allocated;
 
                     if (atomic_cas(node.m_hash.m_state, touched, allocated))
                     {
@@ -218,7 +221,7 @@ public:
 
         for (size_type i = hash % capacity;; ++i)
         {
-            if ( i == capacity )
+            if (i == capacity)
             {
                 i = 0;
             }
@@ -249,8 +252,10 @@ public:
             case hash_item_type::allocated:
                 if (eq_func(key, *node.getKey()))
                 {
-                    static constexpr std::size_t touched = hash_item_type::touched;
-                    static constexpr std::size_t allocated = hash_item_type::allocated;
+                    static constexpr std::size_t touched =
+                            hash_item_type::touched;
+                    static constexpr std::size_t allocated =
+                            hash_item_type::allocated;
 
                     // reset readiness
                     if (atomic_cas(node.m_hash.m_state, allocated, touched))
@@ -276,7 +281,8 @@ public:
                 item.m_state == hash_item_type::allocated
                         || item.m_state == hash_item_type::touched
                         || item.m_state == hash_item_type::unused);
-        if (item.m_state == hash_item_type::allocated || item.m_state == hash_item_type::touched)
+        if (item.m_state == hash_item_type::allocated
+                || item.m_state == hash_item_type::touched)
         {
             m_key_allocator.destroy(node.getKey());
         }
@@ -302,13 +308,15 @@ public:
     //    * exclusive access to the container
     //    * new key is unique
     //    * table has enough capacity to insert specified element
-    void insertUniqueKey(table_type& dst, const size_type hash, const key_type & key)
+    void insertUniqueKey(table_type& dst,
+                         const size_type hash,
+                         const key_type & key)
     {
         const size_type capacity = dst.m_capacity;
 
         for (size_type i = hash % capacity;; ++i)
         {
-            if ( i == capacity )
+            if (i == capacity)
             {
                 i = 0;
             }

@@ -11,27 +11,24 @@
 #include "cas.hpp"
 #include "xtomic.hpp"
 #include "inttypes.hpp"
+#include "cppbasics.hpp"
 
 #include <cstddef>
 
 namespace lfds
 {
 
-// Eclipse Luna does not recognize alignas keyword regardless of any settings
-// It seems Eclipse's developers do not admit the bug so the only way
-// to avoid annoying error marks these macro are used
-
-struct __attribute__((aligned(sizeof(void*)*2))) hash_item
+struct align_4_cas16 hash_item
 {
     // states of the item (m_state field)
-    enum {
+    enum
+    {
         unused,     // initial state
         pending,    // hash is valid, key & value are being constructed
         touched,    // hash & key are valid
         pending2,   // hash & key are valid, value is being constructed/deleted
         allocated,  // hash & key & value are valid
     };
-
 
     std::size_t m_hash;
 
@@ -69,19 +66,23 @@ struct __attribute__((aligned(sizeof(void*)*2))) hash_item
     std::size_t m_state;
 
     hash_item() :
-            m_hash(0), m_state(unused)
+            m_hash(0),
+            m_state(unused)
     {
     }
     hash_item(const std::size_t code, const std::size_t flags) :
-            m_hash(code), m_state(flags)
+            m_hash(code),
+            m_state(flags)
     {
     }
     hash_item(const hash_item & other) :
-            m_hash(other.m_hash), m_state(other.m_state)
+            m_hash(other.m_hash),
+            m_state(other.m_state)
     {
     }
     hash_item(const volatile hash_item & other) :
-            m_hash(other.m_hash), m_state(other.m_state)
+            m_hash(other.m_hash),
+            m_state(other.m_state)
     {
     }
     hash_item & operator=(const hash_item & other)
@@ -102,8 +103,7 @@ struct __attribute__((aligned(sizeof(void*)*2))) hash_item
     }
 };
 
-
-template<class Key, class Value>
+template<typename Key, typename Value>
 class hash_node
 {
 public:
@@ -116,7 +116,9 @@ private:
     hash_node(const this_class&); // = delete;
     this_class& operator=(const this_class&); // = delete;
 public:
-    hash_node() : m_hash(), m_refCount(0)
+    hash_node() :
+            m_hash(),
+            m_refCount(0)
     {
 
     }
@@ -167,12 +169,13 @@ public:
     }
     void waitForRelease() const
     {
-        while ( m_refCount.load(barriers::relaxed) ) ;
+        while (m_refCount.load(barriers::relaxed))
+            ;
     }
 
 private:
-    char m_key[sizeof(key_type)] __attribute__((aligned(__alignof(key_type))));
-    char m_value[sizeof(mapped_type)] __attribute__((aligned(__alignof(mapped_type))));
+    char m_key[sizeof(key_type)] align_as(key_type);
+    char m_value[sizeof(mapped_type)] align_as(mapped_type);
     volatile hash_item_type m_hash;
     mutable xtomic<int> m_refCount;
 };

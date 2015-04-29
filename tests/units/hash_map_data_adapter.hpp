@@ -16,7 +16,7 @@ namespace lfds
 namespace testing
 {
 
-template<class T>
+template<typename T>
 class adapter
 {
 public:
@@ -41,18 +41,18 @@ public:
     }
     std::size_t hash() const
     {
-        typename getHash<T>::type hasher;
+        typename make_hash<T>::type hasher;
         return hasher(m_t);
     }
 public:
     T m_t;
 };
 }
-template<class T>
+template<typename T>
 struct adapted_hash
 {
 public:
-    typedef typename getHash<T>::type hash_type;
+    typedef typename make_hash<T>::type hash_type;
 
     size_t operator()(const lfds::testing::adapter<T>& val) const
     {
@@ -64,14 +64,14 @@ private:
 };
 
 template<typename T>
-struct getHash<lfds::testing::adapter<T> >
+struct make_hash<lfds::testing::adapter<T> >
 {
     typedef adapted_hash<T> type;
 };
 
 }
 
-template<class T>
+template<typename T>
 struct bad_hash: public std::unary_function<T, std::size_t>
 {
     std::size_t operator()(const T&) const
@@ -80,13 +80,13 @@ struct bad_hash: public std::unary_function<T, std::size_t>
     }
 };
 
-template<class T>
+template<typename T>
 inline bool operator==(const lfds::testing::adapter<T> & a, T b)
 {
     return a.m_t == b;
 }
 
-template<class T>
+template<typename T>
 inline bool operator==(T a, const lfds::testing::adapter<T> & b)
 {
     return a == b.m_t;

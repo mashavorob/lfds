@@ -10,7 +10,7 @@
 
 #include <atomic>
 
-template<class Collection>
+template<typename Collection>
 class test_consumer
 {
 public:

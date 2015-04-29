@@ -19,7 +19,7 @@ namespace lfds
 
 namespace
 {
-template<class T>
+template<typename T>
 class BufferNode
 {
 public:
@@ -40,7 +40,7 @@ private:
 };
 }
 
-template<class T, class Allocator = std::allocator<T> >
+template<typename T, typename Allocator = std::allocator<T> >
 class queue_spscfs
 {
 public:
@@ -65,7 +65,10 @@ private:
 
 public:
     queue_spscfs(std::size_t capacity) :
-            m_capacity(capacity), m_size(0), m_head(0), m_tail(0)
+            m_capacity(capacity),
+            m_size(0),
+            m_head(0),
+            m_tail(0)
     {
         m_buffer = m_nodeAllocator.allocate(capacity);
     }
@@ -83,7 +86,7 @@ public:
     }
 
 #if LFDS_USE_CPP11
-    template<class ... Args>
+    template<typename ... Args>
     bool push(Args&&... data)
 #else
     bool push(const value_type& data)

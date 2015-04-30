@@ -68,7 +68,7 @@ struct CAS<T, 16>
 };
 
 // built in atomics are preferable
-#if 1
+#if 0
 
 template<typename T>
 struct CAS<T, 8>

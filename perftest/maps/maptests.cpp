@@ -199,32 +199,38 @@ typedef adapter::hash_trie<int, int, 16> hash_trie_type;
 typedef adapter::stdmap<int, int, false> map_type;
 typedef adapter::stdmap<int, int, true> unorderd_map_type;
 
-static registrar<hash_trie_type> r0_16("lock-free", "hash_trie");
+namespace experimental
+{
+static registrar<hash_trie_type> r1("experimental", "hash_trie");
+}
 
 namespace wise
 {
-static registrar<generic_hash_map_type> r1("lock-free", "hash_map<generic, generic, memory_model::wise>");
-static registrar<ikey_hash_map_type> r2_1("lock-free",
-        "hash_map<int64_t, generic, memory_model::wise>");
-static registrar<ival_hash_map_type> r2_2("lock-free",
-        "hash_map<int64_t, int64_t, memory_model::wise>");
-static registrar<ipair_hash_map_type> r2_3("lock-free",
-        "hash_map<int64_t, int, memory_model::wise>");
+static registrar<generic_hash_map_type> r1("memory_model::wise", "hash_map<generic, generic>");
+static registrar<ikey_hash_map_type> r2("memory_model::wise",
+        "hash_map<int64_t, generic>");
+static registrar<ival_hash_map_type> r3("memory_model::wise",
+        "hash_map<int64_t, int64_t>");
+static registrar<ipair_hash_map_type> r4("memory_model::wise",
+        "hash_map<int64_t, int>");
 }
 
 namespace greedy
 {
-static registrar<generic_hash_map_type> r1("lock-free", "hash_map<generic, generic, memory_model::greedy>");
-static registrar<ikey_hash_map_type> r2_1("lock-free",
-        "hash_map<int64_t, generic, memory_model::greedy>");
-static registrar<ival_hash_map_type> r2_2("lock-free",
-        "hash_map<int64_t, int64_t, memory_model::greedy>");
-static registrar<ipair_hash_map_type> r2_3("lock-free",
-        "hash_map<int64_t, int, memory_model::greedy>");
+static registrar<generic_hash_map_type> r1("memory_model::greedy", "hash_map<generic, generic>");
+static registrar<ikey_hash_map_type> r2("memory_model::greedy",
+        "hash_map<int64_t, generic>");
+static registrar<ival_hash_map_type> r3("memory_model::greedy",
+        "hash_map<int64_t, int64_t>");
+static registrar<ipair_hash_map_type> r4("memory_model::greedy",
+        "hash_map<int64_t, int>");
 }
 
-static registrar<map_type> r3("std", "map");
-static registrar<unorderd_map_type> r4("std", "unordered_map");
+namespace reference
+{
+static registrar<map_type> r1("std", "map");
+static registrar<unorderd_map_type> r2("std", "unordered_map");
+}
 
 }
 }

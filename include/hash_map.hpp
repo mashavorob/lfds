@@ -140,6 +140,12 @@ public:
     {
         return m_hash_table_base.find(key, value);
     }
+    const mapped_type find(const key_type & key) const
+    {
+        mapped_type value = mapped_type();
+        m_hash_table_base.find(key, value);
+        return value;
+    }
 #if LFDS_USE_CPP11
     template<typename ... Args>
     bool insert(const key_type & key, Args&&... val)
@@ -147,7 +153,16 @@ public:
     bool insert(const key_type & key, const mapped_type& val)
 #endif
     {
-        return m_hash_table_base.insert(key, std_forward(Args, val));
+        return m_hash_table_base.insert(key, false, std_forward(Args, val));
+    }
+#if LFDS_USE_CPP11
+    template<typename ... Args>
+    bool insertOrUpdate(const key_type & key, Args&&... val)
+#else
+    bool insertOrUpdate(const key_type & key, const mapped_type& val)
+#endif
+    {
+        return m_hash_table_base.insert(key, true, std_forward(Args, val));
     }
     bool erase(const key_type & key)
     {

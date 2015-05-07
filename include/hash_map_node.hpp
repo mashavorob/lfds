@@ -148,6 +148,7 @@ public:
     }
     void setState(std::size_t state)
     {
+        thread_fence(barriers::release);
         m_hash.m_state = state;
     }
     void setItem(std::size_t hash, std::size_t state)

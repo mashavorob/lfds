@@ -57,9 +57,9 @@ public:
     }
 #if LFDS_USE_CPP11
     template<typename ... Args>
-    bool insert(const key_type & key, Args&&... val)
+    bool insert(const key_type & key, const bool updateIfExists, Args&&... val)
 #else // LFDS_USE_CPP11
-    bool insert(const key_type & key, const mapped_type& val)
+    bool insert(const key_type & key, const bool updateIfExists, const mapped_type& val)
 #endif // LFDS_USE_CPP11
     {
         // the lock prevents overwhelming by big number of concurrent insertions
@@ -70,7 +70,7 @@ public:
         table_type* ptr;
         mutable_guard_type guard(base_type::getBase(), ptr);
 
-        return base_type::m_hashTable.insert_impl(*ptr, key,
+        return base_type::m_hashTable.insert_impl(*ptr, key, updateIfExists,
                 std_forward(Args, val));
     }
 };

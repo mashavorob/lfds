@@ -159,10 +159,14 @@ public:
 
 #if LFDS_USE_CPP11
     template<typename ... Args>
-    bool insert_impl(table_type& raw_table, const key_type & key, Args&&... val)
+    bool insert_impl(table_type& raw_table,
+                     const key_type & key,
+                     const bool updateIfExists,
+                     Args&&... val)
 #else
     bool insert_impl(table_type& raw_table,
                      const key_type & key,
+                     const bool updateIfExists,
                      const mapped_type &val)
 #endif
     {
@@ -215,8 +219,23 @@ public:
             case hash_item_type::allocated:
                 if (m_eq_func(key, *node.getKey()))
                 {
-                    // the item is allocated or concurrent insert/delete operation is in progress
-                    return false;
+                    if ( !updateIfExists )
+                    {
+                        // the item is allocated or concurrent insert/delete operation is in progress
+                        return false;
+                    }
+                    hash_item_type new_item(hash, hash_item_type::pending);
+
+                    if (node.atomic_cas(item, new_item))
+                    {
+                        m_value_allocator.destroy(node.getValue());
+                        m_value_allocator.construct(node.getValue(),
+                                std_forward(Args, val));
+                        node.setState(hash_item_type::allocated);
+                        return true;
+                    }
+                    // the slot has been updated by other thread so we have to start all over again
+                    continue;
                 }
                 break;
             case hash_item_type::touched:

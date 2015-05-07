@@ -113,6 +113,7 @@ public:
     }
     bool insert_impl(table_type& raw_table,
                      const key_type key,
+                     const bool updateIfExists,
                      const mapped_type val)
     {
         hash_func_type hash_func;
@@ -150,8 +151,20 @@ public:
             case node_type::allocated:
                 if (eq_func(key, node.m_data.m_key))
                 {
-                    // the item is allocated or concurrent insert/delete operation is in progress
-                    return false;
+                    if (!updateIfExists)
+                    {
+                        // the item is allocated or concurrent insert/delete operation is in progress
+                        return false;
+                    }
+
+                    const node_type new_node(node_type::allocated, key, val);
+
+                    if (table[i].atomic_cas(node, new_node))
+                    {
+                        return true;
+                    }
+                    // the slot has been updated by other thread so we have to start all over again
+                    continue;
                 }
                 break;
             case node_type::touched:

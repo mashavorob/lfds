@@ -145,13 +145,16 @@ public:
     }
 #if LFDS_USE_CPP11
     template<typename ... Args>
-    bool insert_impl(table_type& raw_table, const key_type key, Args&&... val)
+    bool insert_impl(table_type& raw_table,
+                     const key_type key,
+                     const bool updateIfExists,
+                     Args&&... val)
 #else // LFDS_USE_CPP11
     bool insert_impl(table_type& raw_table,
                      const key_type key,
+                     const bool updateIfExists,
                      const mapped_type &val)
 #endif // LFDS_USE_CPP11
-
     {
         const std::size_t hash = m_hash_func(key);
 
@@ -199,8 +202,22 @@ public:
             case key_item_type::allocated:
                 if (m_eq_func(key, item.m_key))
                 {
-                    // the item is allocated or concurrent insert/delete operation is in progress
-                    return false;
+                    if (!updateIfExists)
+                    {
+                        // the item is allocated or concurrent insert/delete operation is in progress
+                        return false;
+                    }
+                    key_item_type new_item(key, key_item_type::pending);
+
+                    if (node.atomic_cas(item, new_item))
+                    {
+                        m_value_allocator.destroy(node.getValue());
+                        m_value_allocator.construct(node.getValue(),
+                                std_forward(Args, val));
+                        node.setState(key_item_type::allocated);
+                        return true;
+                    }
+                    continue;
                 }
                 break;
             case key_item_type::touched:

@@ -148,7 +148,33 @@ struct unform_hash_map_tester
         EXPECT_TRUE(res);
 
         size = hm.size();
-        EXPECT_EQ(size, static_cast<size_type>(1));
+        EXPECT_EQ(static_cast<size_type>(1), size);
+
+        res = hm.insert(0, -2);
+        EXPECT_FALSE(res);
+
+        size = hm.size();
+        EXPECT_EQ(static_cast<size_type>(1), size);
+    }
+
+    static void testInsertOrUpdate()
+    {
+        map_type hm;
+
+        bool res = false;
+        size_type size = 0;
+
+        res = hm.insertOrUpdate(0, -1);
+        EXPECT_TRUE(res);
+
+        size = hm.size();
+        EXPECT_EQ(static_cast<size_type>(1), size);
+
+        res = hm.insertOrUpdate(0, -2);
+        EXPECT_TRUE(res);
+
+        size = hm.size();
+        EXPECT_EQ(static_cast<size_type>(1), size);
     }
 
     static void testFind()
@@ -165,7 +191,17 @@ struct unform_hash_map_tester
         hm.insert(1, -1);
         res = hm.find(1, val);
         EXPECT_TRUE(res);
-        EXPECT_EQ(val, mapped_type(-1));
+        EXPECT_EQ(mapped_type(-1), val);
+
+        hm.insert(1, -2);
+        res = hm.find(1, val);
+        EXPECT_TRUE(res);
+        EXPECT_EQ(mapped_type(-1), val);
+
+        hm.insertOrUpdate(1, -2);
+        res = hm.find(1, val);
+        EXPECT_TRUE(res);
+        EXPECT_EQ(mapped_type(-2), val);
 
         res = hm.find(123, val);
         EXPECT_FALSE(res);
@@ -562,6 +598,7 @@ struct make_map_uniform_tests
         MAKE_MAP_UNIT_TEST(test_maker, suite, TypeTraits) \
         MAKE_MAP_UNIT_TEST(test_maker, suite, Empty) \
         MAKE_MAP_UNIT_TEST(test_maker, suite, Insert) \
+        MAKE_MAP_UNIT_TEST(test_maker, suite, InsertOrUpdate) \
         MAKE_MAP_UNIT_TEST(test_maker, suite, Find) \
         MAKE_MAP_UNIT_TEST(test_maker, suite, Erase) \
         MAKE_MAP_UNIT_TEST(test_maker, suite, Collision) \

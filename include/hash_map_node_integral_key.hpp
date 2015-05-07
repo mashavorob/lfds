@@ -122,6 +122,7 @@ public:
     }
     void setState(const state_type val)
     {
+        thread_fence(barriers::release);
         m_key.m_state = val;
     }
     mapped_type* getValue()

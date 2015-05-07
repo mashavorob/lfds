@@ -23,9 +23,9 @@ namespace maps
 {
 
 static const unsigned int TYPICAL_SIZE = static_cast<unsigned int>(5e5);
-static const unsigned int NUMBER_OF_REPETITIONS = static_cast<unsigned int>(1e6);
+static const unsigned int NUMBER_OF_REPETITIONS = static_cast<unsigned int>(30e6);
 
-template<typename Map, unsigned int Repetitions = TYPICAL_SIZE>
+template<typename Map, bool InitialReserve, unsigned int Repetitions = TYPICAL_SIZE>
 class AvgInsertTester
 {
 public:
@@ -34,12 +34,13 @@ public:
     typedef Map collection_type;
     typedef typename collection_type::key_type key_type;
     typedef typename collection_type::mapped_type mapped_type;
+    typedef typename collection_type::size_type size_type;
     typedef random_generator<key_type> random_generator_type;
     typedef std::vector<key_type> vector_type;
 
 public:
     AvgInsertTester() :
-            m_coll()
+            m_coll(InitialReserve ? Repetitions + 32 : 0)
     {
         random_generator_type gen;
         gen(count, m_data);
@@ -98,7 +99,7 @@ private:
     typename vector_type::const_iterator m_pos;
 };
 
-template<typename Map, unsigned int Repetitions = NUMBER_OF_REPETITIONS>
+template<typename Map, unsigned int Repetitions = TYPICAL_SIZE>
 class AvgEraseTester
 {
 public:
@@ -142,11 +143,12 @@ private:
     collection_type m_coll;
 };
 
-template<typename Map, unsigned int Repetitions = NUMBER_OF_REPETITIONS>
+template<typename Map, unsigned int Repetitions = NUMBER_OF_REPETITIONS, unsigned int Size = TYPICAL_SIZE>
 class AvgFindTester
 {
 public:
     static const unsigned int count = Repetitions;
+    static const unsigned int size = Size;
 
     typedef Map collection_type;
     typedef typename collection_type::key_type key_type;
@@ -159,7 +161,7 @@ public:
             m_coll(count)
     {
         random_generator_type gen;
-        gen(count, m_data);
+        gen(size, m_data);
 
         typename vector_type::const_iterator i = m_data.begin();
         typename vector_type::const_iterator end = m_data.end();
@@ -173,12 +175,19 @@ public:
 
     void operator()() const
     {
-        typename vector_type::const_iterator i = m_data.begin();
+        typename vector_type::const_iterator beg = m_data.begin();
         typename vector_type::const_iterator end = m_data.end();
+        typename vector_type::const_iterator i = beg;
         mapped_type val;
-        for (; i != end; ++i)
+        unsigned int c = count;
+        while ( --c )
         {
-            bool res = m_coll.find(*i, val);
+            if (++i == end)
+            {
+                i = beg;
+            }
+            const key_type key = *i;
+            bool res = m_coll.find(key, val);
             if (!res)
             {
                 std::cerr << "This code is normally unreachable, "

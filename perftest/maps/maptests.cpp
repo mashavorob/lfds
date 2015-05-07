@@ -72,7 +72,7 @@ class mem_registrar
 {
 public:
     typedef typename Map::counted_map_type map_type;
-    typedef AvgInsertTester<map_type> tester_type;
+    typedef AvgInsertTester<map_type, false> tester_type;
     typedef MemConsumptionTestImpl<tester_type, 1> mem_test_type;
     typedef PerfTestFactoryImpl<mem_test_type> factory_type;
 
@@ -122,7 +122,7 @@ class registrar
 public:
 
     typedef Map map_type;
-    typedef AvgInsertTester<map_type> avg_insert_tester_type;
+    typedef AvgInsertTester<map_type, true> avg_insert_tester_type;
     typedef MaxInsertTester<map_type, false> max_insert_tester_type;
     typedef AvgEraseTester<map_type> avg_erase_tester_type;
     typedef AvgFindTester<map_type> avg_find_tester_type;

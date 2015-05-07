@@ -131,6 +131,7 @@ public:
 
     bool insert_impl(table_type& raw_table,
                      const key_type & key,
+                     const bool updateIfExists,
                      const mapped_type &val)
     {
         const size_type hash = m_hash_func(key);
@@ -159,6 +160,7 @@ public:
                     value_item_type & ritem = node.getValue();
                     ritem.m_value = val;
                     m_key_allocator.construct(node.getKey(), key);
+                    thread_fence(barriers::release);
                     ritem.m_state = value_item_type::allocated;
                     ++raw_table.m_used;
                     ++raw_table.m_size;
@@ -175,8 +177,21 @@ public:
             case value_item_type::allocated:
                 if (m_eq_func(key, *node.getKey()))
                 {
-                    // the item is allocated or concurrent insert/delete operation is in progress
-                    return false;
+                    if ( !updateIfExists )
+                    {
+                        // the item is allocated or concurrent insert/delete operation is in progress
+                        return false;
+                    }
+                    if (node.getValue().atomic_cas(value_item_type::allocated,
+                            value_item_type::pending))
+                    {
+                        value_item_type & ritem = node.getValue();
+                        ritem.m_value = val;
+                        thread_fence(barriers::release);
+                        ritem.m_state = value_item_type::allocated;
+                        return true;
+                    }
+                    continue;
                 }
                 break;
             case value_item_type::touched:
@@ -187,6 +202,7 @@ public:
                     {
                         value_item_type & ritem = node.getValue();
                         ritem.m_value = val;
+                        thread_fence(barriers::release);
                         ritem.m_state = value_item_type::allocated;
                         ++raw_table.m_size;
                         return true;
@@ -310,6 +326,7 @@ public:
             {
                 m_key_allocator.construct(node.getKey(), key);
                 item.m_value = val;
+                thread_fence(barriers::release);
                 item.m_state = value_item_type::allocated;
                 ++dst.m_size;
                 ++dst.m_used;

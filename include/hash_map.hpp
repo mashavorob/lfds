@@ -13,6 +13,7 @@
 #include "hash_map_table_integral_pair.hpp"
 #include "hash_map_table_integral_value.hpp"
 #include "hash_map_table_integral_key.hpp"
+#include "hash_map_table_simplified.hpp"
 #include "hash_map_table_base.hpp"
 #include "xtraits.hpp"
 #include "xfunctional.hpp"
@@ -46,7 +47,7 @@ struct dummy_hash_tuple<Key, Value, true>
 };
 
 template<typename Key, typename Value>
-struct is_interal_pair
+struct is_integral_pair
 {
     enum
     {
@@ -60,7 +61,7 @@ template<typename Key, typename Value,
         typename Pred = std::equal_to<Key>, typename Allocator = std::allocator<
                 Value>, bool IntegralKey = is_integral<Key>::value,
         bool IntegralValue = is_integral<Value>::value, bool IntegralKeyValue =
-                is_interal_pair<Key, Value>::value>
+                is_integral_pair<Key, Value>::value>
 struct hash_table_traits
 {
     typedef lfds::hash_map_table<Key, Value, Hash, Pred, Allocator> type;
@@ -88,6 +89,23 @@ template<typename Key, typename Value, typename Hash, typename Pred,
 struct hash_table_traits<Key, Value, Hash, Pred, Allocator, true, false, false>
 {
     typedef lfds::hash_map_table_integral_key<Key, Value, Hash, Pred, Allocator> type;
+};
+
+template<typename Key, typename Value,
+        typename Hash = typename make_hash<Key>::type,
+        typename Pred = std::equal_to<Key>, typename Allocator = std::allocator<
+                Value>, bool IntegralKey = is_integral<Key>::value,
+        bool IntegralValue = is_integral<Value>::value,
+        bool TooBig = is_greater<sizeof(std::pair<Key, Value>),
+                2 * sizeof(void*)>::value>
+struct simple_hash_table_traits;
+
+template<typename Key, typename Value, typename Hash, typename Pred,
+        typename Allocator>
+struct simple_hash_table_traits<Key, Value, Hash, Pred, Allocator, true, true,
+        false>
+{
+    typedef hash_map_table_simplified<Key, Value, Hash, Pred, Allocator> type;
 };
 
 }
@@ -186,6 +204,94 @@ private:
     hash_table_base_type m_hash_table_base;
 };
 
+template<typename Key, typename Value, typename Hash, typename Pred,
+        typename Allocator>
+class hash_map<Key, Value, Hash, Pred, Allocator, memory_model::simplified>
+{
+public:
+
+    typedef hash_map<Key, Value, Hash, Pred, Allocator, memory_model::simplified> this_type;
+    typedef simple_hash_table_traits<Key, Value, Hash, Pred, Allocator> hash_table_traits_type;
+
+    typedef typename hash_table_traits_type::type hash_table_type;
+    typedef typename hash_table_type::key_type key_type;
+    typedef typename hash_table_type::mapped_type mapped_type;
+    typedef typename hash_table_type::hash_func_type hash_func_type;
+    typedef typename hash_table_type::equal_predicate_type equal_predicate_type;
+    typedef typename hash_table_type::allocator_type allocator_type;
+    typedef typename hash_table_type::size_type size_type;
+    typedef typename hash_table_type::value_type value_type;
+    typedef typename hash_table_type::snapshot_type snapshot_type;
+
+    static constexpr bool INTEGRAL_KEY = hash_table_type::INTEGRAL_KEY;
+    static constexpr bool INTEGRAL_VALUE = hash_table_type::INTEGRAL_VALUE;
+    static constexpr bool INTEGRAL_KEYVALUE = hash_table_type::INTEGRAL_KEYVALUE;
+    static constexpr memory_model::type MEMORY_MODEL = memory_model::simplified;
+private:
+    hash_map(const this_type&); // = delete;
+    this_type& operator=(const this_type&); // = delete;
+
+public:
+    hash_map(const size_type initialCapacity = 0) :
+            m_hash_table(),
+            m_hash_table_base(m_hash_table, initialCapacity)
+    {
+
+    }
+    void getSnapshot(snapshot_type & snapshot) const
+    {
+        m_hash_table_base.getSnapshot(snapshot);
+    }
+    bool find(const key_type & key, mapped_type & value) const
+    {
+        return m_hash_table_base.find(key, value);
+    }
+    const mapped_type find(const key_type & key) const
+    {
+        mapped_type value = mapped_type();
+        m_hash_table_base.find(key, value);
+        return value;
+    }
+#if LFDS_USE_CPP11
+    template<typename ... Args>
+    bool insert(const key_type & key, Args&&... val)
+#else
+    bool insert(const key_type & key, const mapped_type& val)
+#endif
+    {
+        return m_hash_table_base.insert(key, false, std_forward(Args, val));
+    }
+#if LFDS_USE_CPP11
+    template<typename ... Args>
+    bool insertOrUpdate(const key_type & key, Args&&... val)
+#else
+    bool insertOrUpdate(const key_type & key, const mapped_type& val)
+#endif
+    {
+        return m_hash_table_base.insert(key, true, std_forward(Args, val));
+    }
+    bool erase(const key_type & key)
+    {
+        return m_hash_table_base.erase(key);
+    }
+    size_type size() const
+    {
+        return m_hash_table_base.size();
+    }
+    size_type getCapacity() const
+    {
+        return m_hash_table_base.getCapacity();
+    }
+
+private:
+    //typedef hash_map_table_base<hash_table_type> hash_table_base_type;
+    typedef hash_map_table_base_traits<hash_table_type, memory_model::greedy> hash_map_table_base_traits_type;
+    typedef typename hash_map_table_base_traits_type::type hash_table_base_type;
+
+    hash_table_type m_hash_table;
+    hash_table_base_type m_hash_table_base;
+};
+
 template<typename Key, typename Value,
         typename Hash = typename make_hash<Key>::type,
         typename Pred = std::equal_to<Key>, typename Allocator = std::allocator<
@@ -202,6 +308,15 @@ template<typename Key, typename Value,
 struct make_greedy_hash_map
 {
     typedef hash_map<Key, Value, Hash, Pred, Allocator, memory_model::greedy> type;
+};
+
+template<typename Key, typename Value,
+        typename Hash = typename make_hash<Key>::type,
+        typename Pred = std::equal_to<Key>, typename Allocator = std::allocator<
+                Value> >
+struct make_simplified_hash_map
+{
+    typedef hash_map<Key, Value, Hash, Pred, Allocator, memory_model::simplified> type;
 };
 
 }

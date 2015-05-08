@@ -195,6 +195,11 @@ typedef adapter::make_greedy_hash_map<long long, slow_int_type>::type ikey_hash_
 typedef adapter::make_greedy_hash_map<long long, long long>::type ival_hash_map_type;
 typedef adapter::make_greedy_hash_map<long long, int>::type ipair_hash_map_type;
 }
+namespace simplified
+{
+typedef adapter::make_greedy_hash_map<long long, long long>::type hash_map_type;
+}
+
 typedef adapter::hash_trie<int, int, 16> hash_trie_type;
 typedef adapter::stdmap<int, int, false> map_type;
 typedef adapter::stdmap<int, int, true> unorderd_map_type;
@@ -225,7 +230,10 @@ static registrar<ival_hash_map_type> r3("memory_model::greedy",
 static registrar<ipair_hash_map_type> r4("memory_model::greedy",
         "hash_map<int64_t, int>");
 }
-
+namespace simplified
+{
+static registrar<hash_map_type> r1("memory_model::simplified", "hash_map<int64_t, int64_t>");
+}
 namespace reference
 {
 static registrar<map_type> r1("std", "map");

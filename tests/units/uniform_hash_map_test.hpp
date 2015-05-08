@@ -23,6 +23,12 @@ template<typename Key, typename Value, typename Hash,
 struct make_hash_table;
 
 template<typename Key, typename Value, typename Hash>
+struct make_hash_table<Key, Value, Hash, lfds::memory_model::simplified>
+{
+    typedef typename lfds::make_simplified_hash_map<Key, Value, Hash>::type type;
+};
+
+template<typename Key, typename Value, typename Hash>
 struct make_hash_table<Key, Value, Hash, lfds::memory_model::wise>
 {
     typedef typename lfds::make_wise_hash_map<Key, Value, Hash>::type type;
@@ -144,13 +150,13 @@ struct unform_hash_map_tester
         bool res = false;
         size_type size = 0;
 
-        res = hm.insert(0, -1);
+        res = hm.insert(1, -1);
         EXPECT_TRUE(res);
 
         size = hm.size();
         EXPECT_EQ(static_cast<size_type>(1), size);
 
-        res = hm.insert(0, -2);
+        res = hm.insert(1, -2);
         EXPECT_FALSE(res);
 
         size = hm.size();
@@ -164,13 +170,13 @@ struct unform_hash_map_tester
         bool res = false;
         size_type size = 0;
 
-        res = hm.insertOrUpdate(0, -1);
+        res = hm.insertOrUpdate(1, -1);
         EXPECT_TRUE(res);
 
         size = hm.size();
         EXPECT_EQ(static_cast<size_type>(1), size);
 
-        res = hm.insertOrUpdate(0, -2);
+        res = hm.insertOrUpdate(1, -2);
         EXPECT_TRUE(res);
 
         size = hm.size();
@@ -209,7 +215,7 @@ struct unform_hash_map_tester
         res = hm.find(-1, val);
         EXPECT_FALSE(res);
 
-        res = hm.find(0, val);
+        res = hm.find(321, val);
         EXPECT_FALSE(res);
     }
 
@@ -232,7 +238,7 @@ struct unform_hash_map_tester
         res = hm.erase(-1);
         EXPECT_FALSE(res);
 
-        res = hm.erase(0);
+        res = hm.erase(123);
         EXPECT_FALSE(res);
 
         res = hm.find(1, val);
@@ -579,10 +585,10 @@ struct unform_hash_map_tester
 template<typename Key, typename Value, map_type::type MapType>
 struct make_map_uniform_tests
 {
-    typedef unform_hash_map_tester<Key, Value, lfds::memory_model::wise,
-            MapType> wise_test_type;
     typedef unform_hash_map_tester<Key, Value, lfds::memory_model::greedy,
             MapType> greedy_test_type;
+    typedef unform_hash_map_tester<Key, Value, lfds::memory_model::wise,
+            MapType> wise_test_type;
 };
 
 #define MAKE_MAP_UNIT_TEST(test_maker, suite, testFunc) \
@@ -609,6 +615,5 @@ struct make_map_uniform_tests
         MAKE_MAP_UNIT_TEST(test_maker, suite, SnapshotEmpty) \
         MAKE_MAP_UNIT_TEST(test_maker, suite, Snapshot) \
         MAKE_MAP_UNIT_TEST(test_maker, suite, Multithread)
-
 
 #endif /* TESTS_UNITS_UNIFORM_HASH_MAP_TEST_HPP_ */

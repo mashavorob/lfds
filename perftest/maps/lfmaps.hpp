@@ -86,6 +86,15 @@ struct make_greedy_hash_map
     typedef hash_map<Key, Value, Hash, Allocator, lfds::memory_model::greedy> type;
 };
 
+template<typename Key, typename Value,
+        typename Hash = typename make_hash<Key>::type,
+        typename Allocator = std::allocator<Value>
+        >
+struct make_simplified_hash_map
+{
+    typedef hash_map<Key, Value, Hash, Allocator, lfds::memory_model::simplified> type;
+};
+
 template<typename Key, typename Value, int BFactor,
         typename Allocator = std::allocator<Value> >
 class hash_trie

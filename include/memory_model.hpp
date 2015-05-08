@@ -19,7 +19,7 @@ struct memory_model
 {
     enum type
     {
-        greedy, wise,
+        simplified, greedy, wise,
     };
 };
 

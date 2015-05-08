@@ -106,8 +106,8 @@ struct integral_item_data_fields<Key, Value, State, true, 0>
 #if _DETAILED_CONSTRUCTOR_
     integral_item_data_fields(const State state) :
             m_key(),
-            m_value(state),
-            m_state()
+            m_value(),
+            m_state(state)
     {
 
     }

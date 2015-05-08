@@ -20,6 +20,7 @@ add_executable( unit-tests
     hash_map_integral_value.cpp
     hash_map_integral_pair.cpp
     hash_set_integral_key.cpp
+    hash_map_simplified.cpp
     hash_trie.cpp
     stack_node.cpp
     queue_one2one.cpp

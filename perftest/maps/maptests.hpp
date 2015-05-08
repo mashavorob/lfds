@@ -158,7 +158,7 @@ public:
 
 public:
     AvgFindTester() :
-            m_coll(count)
+            m_coll(size)
     {
         random_generator_type gen;
         gen(size, m_data);

@@ -23,12 +23,6 @@ template<typename Key, typename Value, typename Hash,
 struct make_hash_table;
 
 template<typename Key, typename Value, typename Hash>
-struct make_hash_table<Key, Value, Hash, lfds::memory_model::simplified>
-{
-    typedef typename lfds::make_simplified_hash_map<Key, Value, Hash>::type type;
-};
-
-template<typename Key, typename Value, typename Hash>
 struct make_hash_table<Key, Value, Hash, lfds::memory_model::wise>
 {
     typedef typename lfds::make_wise_hash_map<Key, Value, Hash>::type type;

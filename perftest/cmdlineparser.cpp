@@ -228,7 +228,7 @@ void CommandLineParser::showHelp(const char* arg0)
 {
     std::cout << "Usage:" << std::endl << arg0
             << " [--duration=<duration>] run "
-            << "[--objects=[-]<objects>] [--groups=[-]<groups>] [--filters=[-]<filters>]"
+            << "[--objects=[-]<objects>] [--groups=[-]<groups>] [--filter=[-]<filters>]"
             << std::endl << "or" << std::endl << arg0 << " list-tests"
             << std::endl << "or" << std::endl << arg0 << " --help" << std::endl
             << "where:" << std::endl << "    run - executes tests" << std::endl
@@ -284,7 +284,7 @@ CommandLineParser::Command CommandLineParser::onRunTests(const int argc,
             processList(validateGroups, filter_by_group(), argv[i], pair.second,
                     tests);
         }
-        else if (pair.first == "--filters")
+        else if (pair.first == "--filter")
         {
             processList(validateFilters, filter_by_full(), argv[i], pair.second,
                     tests);

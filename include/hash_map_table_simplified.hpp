@@ -71,12 +71,8 @@ public:
         const node_type* table = raw_table.m_table;
         const size_type capacity = raw_table.m_capacity;
 
-        for (size_type i = hash % capacity;; ++i)
+        for (size_type i = hash % capacity;;)
         {
-            if (i == capacity)
-            {
-                i = 0;
-            }
             const node_type node = table[i];
             if (m_eq_func(node.m_data.m_key, s_defaultKey))
             {
@@ -86,6 +82,10 @@ public:
             {
                 value = node.m_data.m_value;
                 return value != s_defaultValue;
+            }
+            if (++i == capacity)
+            {
+                i = 0;
             }
         }
 
@@ -112,10 +112,6 @@ public:
 
         for (size_type i = hash % capacity;;)
         {
-            if (i == capacity)
-            {
-                i = 0;
-            }
             const node_type node = table[i];
 
             if (m_eq_func(node.m_data.m_key, s_defaultKey))
@@ -149,7 +145,10 @@ public:
                 }
                 continue;
             }
-            ++i;
+            if (++i == capacity)
+            {
+                i = 0;
+            }
         }
         throw std::bad_alloc();
         return false;
@@ -161,12 +160,8 @@ public:
         node_type* table = raw_table.m_table;
         const size_type capacity = raw_table.m_capacity;
 
-        for (size_type i = hash % capacity;; ++i)
+        for (size_type i = hash % capacity;;)
         {
-            if (i == capacity)
-            {
-                i = 0;
-            }
             const node_type node = table[i];
             if (m_eq_func(node.m_data.m_key, s_defaultKey))
             {
@@ -186,6 +181,10 @@ public:
                     return true;
                 }
                 return false;
+            }
+            if (++i == capacity)
+            {
+                i = 0;
             }
         }
         return false;

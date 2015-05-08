@@ -91,12 +91,8 @@ public:
         const node_type* table = raw_table.m_table;
         const size_type capacity = raw_table.m_capacity;
 
-        for (size_type i = hash % capacity;; ++i)
+        for (size_type i = hash % capacity;;)
         {
-            if (i == capacity)
-            {
-                i = 0;
-            }
             const node_type& node = table[i];
             const key_item_type item = node.getKey();
 
@@ -139,6 +135,10 @@ public:
             default:
                 assert(false);
             }
+            if (++i == capacity)
+            {
+                i = 0;
+            }
         }
 
         return false;
@@ -161,13 +161,8 @@ public:
         node_type* table = raw_table.m_table;
         const size_type capacity = raw_table.m_capacity;
 
-        for (size_type i = hash % capacity;; ++i)
+        for (size_type i = hash % capacity;;)
         {
-            if (i == capacity)
-            {
-                i = 0;
-            }
-
             node_type& node = table[i];
             const key_item_type item = node.getKey();
 
@@ -241,6 +236,10 @@ public:
             default:
                 assert(false);
             }
+            if (++i == capacity)
+            {
+                i = 0;
+            }
         }
         throw std::bad_alloc();
         return false;
@@ -253,12 +252,8 @@ public:
         node_type* table = raw_table.m_table;
         const size_type capacity = raw_table.m_capacity;
 
-        for (size_type i = hash % capacity;; ++i)
+        for (size_type i = hash % capacity;;)
         {
-            if (i == capacity)
-            {
-                i = 0;
-            }
             node_type& node = table[i];
             const key_item_type item = node.getKey();
 
@@ -303,6 +298,10 @@ public:
                 break;
             default:
                 assert(false);
+            }
+            if (++i == capacity)
+            {
+                i = 0;
             }
         }
         return false;

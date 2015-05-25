@@ -5,7 +5,7 @@
  *      Author: masha
  */
 
-#include <xtraits.hpp>
+#include <xtomic/impl/xtraits.hpp>
 
 #include <gtest/gtest.h>
 

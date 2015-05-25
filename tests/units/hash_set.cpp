@@ -5,10 +5,9 @@
  *      Author: masha
  */
 
-#include <gtest/gtest.h>
+#include <xtomic/hash_set.hpp>
 
-#include <hash_set.hpp>
-
+#include "gtest/gtest.h"
 #include "uniform_hash_set_test.hpp"
 
 typedef lfds::my::int_wrapper<int> key_type;

@@ -6,15 +6,15 @@
  */
 
 #include "maptests.hpp"
-#include <hash_map.hpp>
-#include <hash_trie.hpp>
-#include <maps/stdmaps.hpp>
+#include <xtomic/hash_map.hpp>
+#include <xtomic/hash_trie.hpp>
+#include "maps/stdmaps.hpp"
 #include "lfmaps.hpp"
 
-#include <testaveragetime.hpp>
-#include <testmaxtime.hpp>
-#include <performancetest.hpp>
-#include <testfactory.hpp>
+#include "testaveragetime.hpp"
+#include "testmaxtime.hpp"
+#include "performancetest.hpp"
+#include "testfactory.hpp"
 
 namespace lfds
 {

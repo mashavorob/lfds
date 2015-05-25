@@ -8,7 +8,7 @@
 #ifndef UTILS_UTILS_MY_NONCOPYABLE_HPP_
 #define UTILS_UTILS_MY_NONCOPYABLE_HPP_
 
-#include <cppbasics.hpp>
+#include <xtomic/aux/cppbasics.hpp>
 
 namespace lfds
 {

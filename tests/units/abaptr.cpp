@@ -5,7 +5,7 @@
  *      Author: masha
  */
 
-#include <aba_ptr.hpp>
+#include <xtomic/impl/aba_ptr.hpp>
 #include "gtest/gtest.h"
 
 

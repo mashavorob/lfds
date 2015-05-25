@@ -8,7 +8,7 @@
 #ifndef PERFTEST_TESTALLOCATOR_HPP_
 #define PERFTEST_TESTALLOCATOR_HPP_
 
-#include <cppbasics.hpp>
+#include <xtomic/aux/cppbasics.hpp>
 
 #include <memory>
 

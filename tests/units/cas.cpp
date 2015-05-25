@@ -2,7 +2,7 @@
 
 #include <utility>
 
-#include "cas.hpp"
+#include <xtomic/impl/cas.hpp>
 
 TEST(CAS1b, Negative)
 {

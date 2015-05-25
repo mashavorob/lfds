@@ -7,8 +7,8 @@
 
 #include "gtest/gtest.h"
 
-#include "fixed_buffer.hpp"
-#include "dynamic_buffer.hpp"
+#include <xtomic/impl/fixed_buffer.hpp>
+#include <xtomic/impl/dynamic_buffer.hpp>
 
 TEST(fixed_buffer, allocfree)
 {

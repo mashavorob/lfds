@@ -9,7 +9,7 @@
 #include "performancetest.hpp"
 #include "testfactory.hpp"
 
-#include <cppbasics.hpp>
+#include <xtomic/aux/cppbasics.hpp>
 
 #include <stdexcept>
 

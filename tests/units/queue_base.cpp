@@ -7,7 +7,7 @@
 
 #include "gtest/gtest.h"
 
-#include "queue_base.hpp"
+#include <xtomic/impl/queue_base.hpp>
 
 TEST(queue_base, pop)
 {

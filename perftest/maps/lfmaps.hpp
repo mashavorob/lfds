@@ -8,9 +8,9 @@
 #ifndef PERFTEST_MAPS_LFMAPS_HPP_
 #define PERFTEST_MAPS_LFMAPS_HPP_
 
-#include <hash_map.hpp>
-#include <hash_trie.hpp>
-#include <xfunctional.hpp>
+#include <xtomic/hash_map.hpp>
+#include <xtomic/hash_trie.hpp>
+#include <xtomic/aux/xfunctional.hpp>
 
 namespace lfds
 {

@@ -7,7 +7,7 @@
 
 #include "gtest/gtest.h"
 
-#include "stack.hpp"
+#include <xtomic/stack.hpp>
 
 TEST(FixedSizeStack, pop)
 {

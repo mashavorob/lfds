@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-#include <hash_set.hpp>
+#include <xtomic/hash_set.hpp>
 
 #include "uniform_hash_set_test.hpp"
 

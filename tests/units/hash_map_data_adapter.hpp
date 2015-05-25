@@ -8,8 +8,8 @@
 #ifndef TESTS_HASH_MAP_DATA_ADAPTER_HPP_
 #define TESTS_HASH_MAP_DATA_ADAPTER_HPP_
 
-#include <cppbasics.hpp>
-#include <xfunctional.hpp>
+#include <xtomic/aux/cppbasics.hpp>
+#include <xtomic/xfunctional.hpp>
 
 namespace lfds
 {

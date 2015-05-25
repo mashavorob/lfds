@@ -8,9 +8,9 @@
 #include "data_adapter.hpp"
 #include "map_wrapper.hpp"
 
-#include <queue.hpp>
-#include <hash_map.hpp>
-#include <hash_trie.hpp>
+#include <xtomic/queue.hpp>
+#include <xtomic/hash_map.hpp>
+#include <xtomic/hash_trie.hpp>
 
 #include <atomic>
 #include <cstdlib>

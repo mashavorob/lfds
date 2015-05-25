@@ -7,7 +7,7 @@
 
 #include "gtest/gtest.h"
 
-#include <queue.hpp>
+#include <xtomic/queue.hpp>
 
 TEST(FixedSizeQueue, pop)
 {

@@ -8,9 +8,9 @@
 #ifndef PERFTEST_NUMBERS_HPP_
 #define PERFTEST_NUMBERS_HPP_
 
-#include <inttypes.hpp>
-#include <xfunctional.hpp>
-#include <cppbasics.hpp>
+#include <xtomic/aux/inttypes.hpp>
+#include <xtomic/aux/xfunctional.hpp>
+#include <xtomic/aux/cppbasics.hpp>
 
 #include <cstdlib>
 #include <ctime>

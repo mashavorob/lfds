@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(LockFreeDataStructures)
+project(xtomic)
 
 set(LFDS_VERSION_MAJOR 1)
 set(LFDS_VERSION_MINOR 0)
@@ -22,8 +22,8 @@ endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-configure_file("${PROJECT_SOURCE_DIR}/include/config.hpp.in" 
-    "${PROJECT_SOURCE_DIR}/include/config.hpp")
+configure_file("${PROJECT_SOURCE_DIR}/include/xtomic/config.hpp.in" 
+    "${PROJECT_SOURCE_DIR}/include/xtomic/config.hpp")
 
 include_directories(
     include
@@ -41,6 +41,6 @@ install(DIRECTORY "${PROJECT_SOURCE_DIR}/include" DESTINATION "lfds")
 
 set(CMAKE_CTEST_COMMAND ctest) 
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
-add_test( LockFreeUnitTests bin/unit-tests )
+add_test( xtomic-unit-tests bin/unit-tests )
 add_dependencies(check tests)
 

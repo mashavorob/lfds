@@ -9,7 +9,7 @@
 #include "testlocator.hpp"
 #include "wildcard.hpp"
 
-#include <cppbasics.hpp>
+#include <xtomic/aux/cppbasics.hpp>
 
 #include <algorithm>
 

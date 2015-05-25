@@ -5,7 +5,7 @@
  *      Author: masha
  */
 
-#include <stack_node.hpp>
+#include <xtomic/impl/stack_node.hpp>
 
 #include <gtest/gtest.h>
 

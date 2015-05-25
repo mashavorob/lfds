@@ -5,7 +5,7 @@
  *      Author: masha
  */
 
-#include <cppbasics.hpp>
+#include <xtomic/aux/cppbasics.hpp>
 
 #include "cmdlineparser.hpp"
 #include "testfilter.hpp"

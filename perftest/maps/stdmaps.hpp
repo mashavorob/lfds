@@ -8,10 +8,10 @@
 #ifndef PERFTEST_STDMAP_HPP_
 #define PERFTEST_STDMAP_HPP_
 
-#include <testsync.hpp>
-#include <testallocator.hpp>
-#include <xfunctional.hpp>
-#include <cppbasics.hpp>
+#include "testsync.hpp"
+#include "testallocator.hpp"
+#include <xtomic/aux/xfunctional.hpp>
+#include <xtomic/aux/cppbasics.hpp>
 
 #include <pthread.h>
 #include <map>

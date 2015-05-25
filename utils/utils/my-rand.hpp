@@ -8,8 +8,8 @@
 #ifndef UTILS_UTILS_MY_RAND_HPP_
 #define UTILS_UTILS_MY_RAND_HPP_
 
-#include <xtraits.hpp>
-#include <cppbasics.hpp>
+#include <xtomic/impl/xtraits.hpp>
+#include <xtomic/aux/cppbasics.hpp>
 
 #include <set>
 #include <vector>

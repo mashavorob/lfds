@@ -13,7 +13,7 @@
 #include "set_insert_erase.hpp"
 
 #include <utils/my-int-wrapper.hpp>
-#include <hash_set.hpp>
+#include <xtomic/hash_set.hpp>
 
 #include <ctime>
 #include <cstdlib>

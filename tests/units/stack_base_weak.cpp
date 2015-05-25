@@ -5,7 +5,7 @@
  *      Author: masha
  */
 
-#include "stack_base_weak.hpp"
+#include <xtomic/impl/stack_base_weak.hpp>
 #include "gtest/gtest.h"
 
 TEST(stack_base_weak, pop)

@@ -6,7 +6,7 @@
  */
 #include <gtest/gtest.h>
 
-#include <hash_map.hpp>
+#include <xtomic/hash_map.hpp>
 #include <utils/my-int-wrapper.hpp>
 #include "uniform_hash_map_test.hpp"
 

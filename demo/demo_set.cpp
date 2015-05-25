@@ -8,8 +8,8 @@
 #include "data_adapter.hpp"
 #include "set_wrapper.hpp"
 
-#include <queue.hpp>
-#include <hash_set.hpp>
+#include <xtomic/queue.hpp>
+#include <xtomic/hash_set.hpp>
 
 #include <atomic>
 #include <cstdlib>

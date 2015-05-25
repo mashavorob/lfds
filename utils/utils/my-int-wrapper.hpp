@@ -8,8 +8,8 @@
 #ifndef UTILS_UTILS_MY_INT_WRAPPER_HPP_
 #define UTILS_UTILS_MY_INT_WRAPPER_HPP_
 
-#include <xfunctional.hpp>
-#include <cppbasics.hpp>
+#include <xtomic/aux/xfunctional.hpp>
+#include <xtomic/aux/cppbasics.hpp>
 
 namespace lfds
 {

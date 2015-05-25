@@ -10,7 +10,7 @@
 #include "testfilter.hpp"
 #include "cmdlineparser.hpp"
 
-#include <cppbasics.hpp>
+#include <xtomic/aux/cppbasics.hpp>
 
 #include <cassert>
 #include <iostream>

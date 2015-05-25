@@ -10,8 +10,8 @@
 #include "std_queue_wrapper.hpp"
 #include "benchmark.hpp"
 
-#include <queue.hpp>
-#include <xtraits.hpp>
+#include <xtomic/queue.hpp>
+#include <xtomic/xtraits.hpp>
 
 #include <iostream>
 #include <queue>

@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-#include <hash_trie.hpp>
+#include <xtomic/hash_trie.hpp>
 
 struct BadHashFunc
 {

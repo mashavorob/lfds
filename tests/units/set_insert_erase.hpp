@@ -8,7 +8,7 @@
 #ifndef TESTS_UNITS_SET_INSERT_ERASE_HPP_
 #define TESTS_UNITS_SET_INSERT_ERASE_HPP_
 
-#include <queue.hpp>
+#include <xtomic/queue.hpp>
 #include <utils/my-rand.hpp>
 
 #include <vector>

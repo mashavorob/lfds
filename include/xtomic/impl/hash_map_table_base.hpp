@@ -14,7 +14,7 @@
 #include <vector>
 #include <utility>
 
-namespace lfds
+namespace xtomic
 {
 
 template<typename HashTableBase>

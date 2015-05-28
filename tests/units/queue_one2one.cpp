@@ -18,8 +18,8 @@ TEST(MT_WaitFreeQueue, multithread)
         QueueSize = 100,
     };
 
-    typedef lfds::queue<int, lfds::Queue::FixedSize, lfds::Queue::OneProducer, lfds::Queue::OneConsumer> queue_type;
-    typedef lfds::testing::queue_one2one<queue_type, Size> test_type;
+    typedef xtomic::queue<int, xtomic::Queue::FixedSize, xtomic::Queue::OneProducer, xtomic::Queue::OneConsumer> queue_type;
+    typedef xtomic::testing::queue_one2one<queue_type, Size> test_type;
 
 
     queue_type q(QueueSize);
@@ -39,8 +39,8 @@ TEST(MT_LockFreeQueue, fixedSize_oneProducer_OneConsumer)
         QueueSize = 100,
     };
 
-    typedef lfds::queue<int, lfds::Queue::DynamicSize, lfds::Queue::OneProducer, lfds::Queue::OneConsumer> queue_type;
-    typedef lfds::testing::queue_one2one<queue_type, Size> test_type;
+    typedef xtomic::queue<int, xtomic::Queue::DynamicSize, xtomic::Queue::OneProducer, xtomic::Queue::OneConsumer> queue_type;
+    typedef xtomic::testing::queue_one2one<queue_type, Size> test_type;
 
 
     queue_type q(QueueSize);

@@ -12,7 +12,7 @@
 #include "hash_set_table_base.hpp"
 #include "xtraits.hpp"
 
-namespace lfds
+namespace xtomic
 {
 
 struct memory_model

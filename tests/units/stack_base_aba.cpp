@@ -10,7 +10,7 @@
 
 TEST(stack_base_aba, pop)
 {
-    typedef lfds::stack_base_aba<int> stack_type;
+    typedef xtomic::stack_base_aba<int> stack_type;
     typedef stack_type::node_type node_type;
 
     stack_type stack;
@@ -19,7 +19,7 @@ TEST(stack_base_aba, pop)
 
 TEST(stack_base_aba, push)
 {
-    typedef lfds::stack_base_aba<int> stack_type;
+    typedef xtomic::stack_base_aba<int> stack_type;
     typedef stack_type::node_type node_type;
 
     stack_type stack;
@@ -31,7 +31,7 @@ TEST(stack_base_aba, push)
 
 TEST(stack_base_aba, push3)
 {
-    typedef lfds::stack_base_aba<int> stack_type;
+    typedef xtomic::stack_base_aba<int> stack_type;
     typedef stack_type::node_type node_type;
 
     stack_type stack;
@@ -47,7 +47,7 @@ TEST(stack_base_aba, push3)
 
 TEST(stack_base_aba, atomic_pop)
 {
-    typedef lfds::stack_base_aba<int> stack_type;
+    typedef xtomic::stack_base_aba<int> stack_type;
     typedef stack_type::node_type node_type;
 
     stack_type stack;
@@ -56,7 +56,7 @@ TEST(stack_base_aba, atomic_pop)
 
 TEST(stack_base_aba, atomic_push)
 {
-    typedef lfds::stack_base_aba<int> stack_type;
+    typedef xtomic::stack_base_aba<int> stack_type;
     typedef stack_type::node_type node_type;
 
     stack_type stack;
@@ -68,7 +68,7 @@ TEST(stack_base_aba, atomic_push)
 
 TEST(stack_base_aba, atomic_push3)
 {
-    typedef lfds::stack_base_aba<int> stack_type;
+    typedef xtomic::stack_base_aba<int> stack_type;
     typedef stack_type::node_type node_type;
 
     stack_type stack;
@@ -84,7 +84,7 @@ TEST(stack_base_aba, atomic_push3)
 
 TEST(stack_base_aba, copy_upsidedown)
 {
-    typedef lfds::stack_base_aba<int> stack_type;
+    typedef xtomic::stack_base_aba<int> stack_type;
     typedef stack_type::node_type node_type;
 
     stack_type stack1;

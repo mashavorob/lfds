@@ -16,7 +16,7 @@
 #include <vector>
 #include <iostream>
 
-namespace lfds
+namespace xtomic
 {
 namespace perftest
 {

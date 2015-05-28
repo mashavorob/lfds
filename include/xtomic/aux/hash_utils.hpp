@@ -10,10 +10,10 @@
 
 #include <xtomic/aux/xfunctional.hpp>
 
-namespace lfds
+namespace xtomic
 {
 
-// Code from boost
+/// @brief Helper function to combine hash codes (taken from from boost).
 template<typename T>
 inline void hash_combine(std::size_t& seed, T const& v)
 {

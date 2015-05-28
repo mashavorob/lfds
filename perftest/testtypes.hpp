@@ -13,7 +13,7 @@
 #include <cstdlib>
 #include <string>
 
-namespace lfds
+namespace xtomic
 {
 namespace perftest
 {

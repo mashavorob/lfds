@@ -13,7 +13,7 @@
 
 #include <vector>
 
-namespace lfds
+namespace xtomic
 {
 namespace testing
 {
@@ -34,8 +34,8 @@ public:
     static const int UpperWatermark = SetSize + SetSize / 10;
 
 private:
-    typedef lfds::my::random_generator<key_type> rand_type;
-    typedef lfds::queue<key_type, lfds::Queue::FixedSize> queue_type;
+    typedef xtomic::my::random_generator<key_type> rand_type;
+    typedef xtomic::queue<key_type, xtomic::Queue::FixedSize> queue_type;
     typedef std::vector<key_type> vector_type;
 
 public:

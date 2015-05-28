@@ -13,7 +13,7 @@
 
 TEST(Stack_Node, recover)
 {
-    typedef lfds::stack_node<int> node_type;
+    typedef xtomic::stack_node<int> node_type;
 
     node_type node;
     node_type* pnode = &node;

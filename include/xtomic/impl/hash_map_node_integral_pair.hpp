@@ -15,7 +15,7 @@
 #pragma pack(push)
 #pragma pack(1)
 
-namespace lfds
+namespace xtomic
 {
 
 namespace
@@ -342,7 +342,7 @@ public:
     }
     bool atomic_cas(const this_type & expected, const this_type & val) volatile
     {
-        return lfds::atomic_cas(m_data, expected.m_data, val.m_data);
+        return xtomic::atomic_cas(m_data, expected.m_data, val.m_data);
     }
 public:
     data_type m_data;

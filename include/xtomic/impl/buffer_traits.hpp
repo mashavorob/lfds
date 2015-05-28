@@ -11,7 +11,7 @@
 #include "fixed_buffer.hpp"
 #include "dynamic_buffer.hpp"
 
-namespace lfds
+namespace xtomic
 {
 
 template<typename T, typename Allocator, bool FixedSize>

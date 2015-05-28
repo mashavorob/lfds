@@ -18,8 +18,8 @@ TEST(MT_LockFreeQueue, fixedSize_manyProducers_singleConsumer)
         QueueSize = 100,
     };
 
-    typedef lfds::queue<int, lfds::Queue::FixedSize, lfds::Queue::ManyProducers, lfds::Queue::OneConsumer> queue_type;
-    typedef lfds::testing::queue_many2many<queue_type, Size, 3, 1> test_type;
+    typedef xtomic::queue<int, xtomic::Queue::FixedSize, xtomic::Queue::ManyProducers, xtomic::Queue::OneConsumer> queue_type;
+    typedef xtomic::testing::queue_many2many<queue_type, Size, 3, 1> test_type;
 
     queue_type q(QueueSize);
     test_type test(q);
@@ -38,8 +38,8 @@ TEST(MT_LockFreeQueue, dynamicSize_manyProducers_singleConsumer)
         QueueSize = 100,
     };
 
-    typedef lfds::queue<int, lfds::Queue::DynamicSize, lfds::Queue::ManyProducers, lfds::Queue::OneConsumer> queue_type;
-    typedef lfds::testing::queue_many2many<queue_type, Size, 3, 1> test_type;
+    typedef xtomic::queue<int, xtomic::Queue::DynamicSize, xtomic::Queue::ManyProducers, xtomic::Queue::OneConsumer> queue_type;
+    typedef xtomic::testing::queue_many2many<queue_type, Size, 3, 1> test_type;
 
     queue_type q(QueueSize);
     test_type test(q);
@@ -59,8 +59,8 @@ TEST(MT_LockFreeQueue, fixedSize_manyProducers_manyConsumers)
         QueueSize = 100,
     };
 
-    typedef lfds::queue<int, lfds::Queue::FixedSize, lfds::Queue::ManyProducers, lfds::Queue::ManyConsumers> queue_type;
-    typedef lfds::testing::queue_many2many<queue_type, Size, 2, 2> test_type;
+    typedef xtomic::queue<int, xtomic::Queue::FixedSize, xtomic::Queue::ManyProducers, xtomic::Queue::ManyConsumers> queue_type;
+    typedef xtomic::testing::queue_many2many<queue_type, Size, 2, 2> test_type;
 
     queue_type q(QueueSize);
     test_type test(q);
@@ -79,8 +79,8 @@ TEST(MT_LockFreeQueue, dynamicSize_manyProducers_manyConsumers)
         QueueSize = 100,
     };
 
-    typedef lfds::queue<int, lfds::Queue::DynamicSize, lfds::Queue::ManyProducers, lfds::Queue::ManyConsumers> queue_type;
-    typedef lfds::testing::queue_many2many<queue_type, Size, 2, 2> test_type;
+    typedef xtomic::queue<int, xtomic::Queue::DynamicSize, xtomic::Queue::ManyProducers, xtomic::Queue::ManyConsumers> queue_type;
+    typedef xtomic::testing::queue_many2many<queue_type, Size, 2, 2> test_type;
 
     queue_type q(QueueSize);
     test_type test(q);

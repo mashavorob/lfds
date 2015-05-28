@@ -8,159 +8,174 @@
 #ifndef INCLUDE_XTOMIC_MODERN_HPP_
 #define INCLUDE_XTOMIC_MODERN_HPP_
 
-namespace lfds
+namespace xtomic
 {
 
-inline void thread_fence(barriers::erelease)
+inline void thread_fence(const barriers::erelease)
 {
     __atomic_thread_fence(__ATOMIC_RELEASE);
 }
 
-inline void thread_fence(barriers::eacquire)
+inline void thread_fence(const barriers::eacquire)
 {
     __atomic_thread_fence(__ATOMIC_ACQUIRE);
 }
 
-inline void atomic_prologue()
+template<typename T>
+inline void quantum<T>::store(const T val, barriers::erelaxed)
 {
+    __atomic_store_n(&m_val, val, __ATOMIC_RELAXED);
 }
 
 template<typename T>
-class xtomic
+inline void quantum<T>::store(const T val, barriers::erelaxed) volatile
 {
-public:
-    typedef xtomic<T> this_type;
+    __atomic_store_n(&m_val, val, __ATOMIC_RELAXED);
+}
 
-public:
-    xtomic() :
-            m_val()
-    {
+template<typename T>
+inline void quantum<T>::store(const T val, barriers::erelease)
+{
+    __atomic_store_n(&m_val, val, __ATOMIC_RELEASE);
+}
 
-    }
-    xtomic(T val) :
-            m_val(val)
-    {
+template<typename T>
+inline void quantum<T>::store(const T val, barriers::erelease) volatile
+{
+    __atomic_store_n(&m_val, val, __ATOMIC_RELEASE);
+}
 
-    }
+template<typename T>
+inline T quantum<T>::load(const barriers::erelaxed) const
+{
+    return __atomic_load_n(&m_val, __ATOMIC_RELAXED);
+}
 
-    void store(T val, barriers::erelaxed)
-    {
-        __atomic_store_n(&m_val, val, __ATOMIC_RELAXED);
-    }
-    void store(T val, barriers::erelaxed) volatile
-    {
-        __atomic_store_n(&m_val, val, __ATOMIC_RELAXED);
-    }
-    void store(T val, barriers::erelease)
-    {
-        __atomic_store_n(&m_val, val, __ATOMIC_RELEASE);
-    }
-    void store(T val, barriers::erelease) volatile
-    {
-        __atomic_store_n(&m_val, val, __ATOMIC_RELEASE);
-    }
+template<typename T>
+inline T quantum<T>::load(const barriers::erelaxed) const volatile
+{
+    return __atomic_load_n(&m_val, __ATOMIC_RELAXED);
+}
 
-    T load(barriers::erelaxed) const
-    {
-        return __atomic_load_n(&m_val, __ATOMIC_RELAXED);
-    }
-    T load(barriers::erelaxed) const volatile
-    {
-        return __atomic_load_n(&m_val, __ATOMIC_RELAXED);
-    }
-    T load(barriers::eacquire) const
-    {
-        return __atomic_load_n(&m_val, __ATOMIC_ACQUIRE);
-    }
-    T load(barriers::eacquire) const volatile
-    {
-        return __atomic_load_n(&m_val, __ATOMIC_ACQUIRE);
-    }
+template<typename T>
+inline T quantum<T>::load(const barriers::eacquire) const
+{
+    return __atomic_load_n(&m_val, __ATOMIC_ACQUIRE);
+}
 
-    T fetch_add(T val, barriers::erelaxed)
-    {
-        return __atomic_fetch_add(&m_val, val, __ATOMIC_RELAXED);
-    }
-    T fetch_add(T val, barriers::erelaxed) volatile
-    {
-        return __atomic_fetch_add(&m_val, val, __ATOMIC_RELAXED);
-    }
-    T fetch_add(T val, barriers::erelease)
-    {
-        return __atomic_fetch_add(&m_val, val, __ATOMIC_RELEASE);
-    }
-    T fetch_add(T val, barriers::erelease) volatile
-    {
-        return __atomic_fetch_add(&m_val, val, __ATOMIC_RELEASE);
-    }
+template<typename T>
+inline T quantum<T>::load(const barriers::eacquire) const volatile
+{
+    return __atomic_load_n(&m_val, __ATOMIC_ACQUIRE);
+}
 
-    T fetch_sub(T val, barriers::erelaxed)
-    {
-        return __atomic_fetch_sub(&m_val, val, __ATOMIC_RELAXED);
-    }
-    T fetch_sub(T val, barriers::erelaxed) volatile
-    {
-        return __atomic_fetch_sub(&m_val, val, __ATOMIC_RELAXED);
-    }
-    T fetch_sub(T val, barriers::erelease)
-    {
-        return __atomic_fetch_sub(&m_val, val, __ATOMIC_RELEASE);
-    }
-    T fetch_sub(T val, barriers::erelease) volatile
-    {
-        return __atomic_fetch_sub(&m_val, val, __ATOMIC_RELEASE);
-    }
+template<typename T>
+inline T quantum<T>::fetch_add(const T val, barriers::erelaxed)
+{
+    return __atomic_fetch_add(&m_val, val, __ATOMIC_RELAXED);
+}
 
-    bool atomic_cas(const T e, const T n)
-    {
-        return __sync_bool_compare_and_swap(&m_val, e, n);
-    }
-    bool atomic_cas(const this_type & e, const this_type & n)
-    {
-        return cas(e.m_val, n.m_val);
-    }
+template<typename T>
+inline T quantum<T>::fetch_add(const T val, barriers::erelaxed) volatile
+{
+    return __atomic_fetch_add(&m_val, val, __ATOMIC_RELAXED);
+}
 
-    // pre
-    T operator++()
-    {
-        return __atomic_add_fetch(&m_val, static_cast<T>(1), __ATOMIC_SEQ_CST);
-    }
-    T operator++() volatile
-    {
-        return __atomic_add_fetch(&m_val, static_cast<T>(1), __ATOMIC_SEQ_CST);
-    }
+template<typename T>
+inline T quantum<T>::fetch_add(const T val, barriers::erelease)
+{
+    return __atomic_fetch_add(&m_val, val, __ATOMIC_RELEASE);
+}
 
-    T operator--()
-    {
-        return __atomic_sub_fetch(&m_val, static_cast<T>(1), __ATOMIC_SEQ_CST);
-    }
-    T operator--() volatile
-    {
-        return __atomic_sub_fetch(&m_val, static_cast<T>(1), __ATOMIC_SEQ_CST);
-    }
-    // post
-    T operator++(int)
-    {
-        return __atomic_fetch_add(&m_val, static_cast<T>(1), __ATOMIC_SEQ_CST);
-    }
-    T operator++(int) volatile
-    {
-        return __atomic_fetch_add(&m_val, static_cast<T>(1), __ATOMIC_SEQ_CST);
-    }
+template<typename T>
+inline T quantum<T>::fetch_add(const T val, barriers::erelease) volatile
+{
+    return __atomic_fetch_add(&m_val, val, __ATOMIC_RELEASE);
+}
 
-    T operator--(int)
-    {
-        return __atomic_fetch_sub(&m_val, static_cast<T>(1), __ATOMIC_SEQ_CST);
-    }
-    T operator--(int) volatile
-    {
-        return __atomic_fetch_sub(&m_val, static_cast<T>(1), __ATOMIC_SEQ_CST);
-    }
-private:
-    xtomic(const this_type&) = delete;
-    this_type& operator=(const this_type&) = delete;
-private:
-    volatile T m_val;
+template<typename T>
+inline T quantum<T>::fetch_sub(const T val, barriers::erelaxed)
+{
+    return __atomic_fetch_sub(&m_val, val, __ATOMIC_RELAXED);
+}
+
+template<typename T>
+inline T quantum<T>::fetch_sub(const T val, barriers::erelaxed) volatile
+{
+    return __atomic_fetch_sub(&m_val, val, __ATOMIC_RELAXED);
+}
+
+template<typename T>
+inline T quantum<T>::fetch_sub(const T val, barriers::erelease)
+{
+    return __atomic_fetch_sub(&m_val, val, __ATOMIC_RELEASE);
+}
+
+template<typename T>
+inline T quantum<T>::fetch_sub(const T val, barriers::erelease) volatile
+{
+    return __atomic_fetch_sub(&m_val, val, __ATOMIC_RELEASE);
+}
+
+template<typename T>
+inline bool quantum<T>::atomic_cas(const T e, const T n)
+{
+    return __sync_bool_compare_and_swap(&m_val, e, n);
+}
+
+template<typename T>
+inline bool quantum<T>::atomic_cas(const this_type & e, const this_type & n)
+{
+    return cas(e.m_val, n.m_val);
+}
+
+template<typename T>
+inline T quantum<T>::operator++()
+{
+    return __atomic_add_fetch(&m_val, static_cast<T>(1), __ATOMIC_SEQ_CST);
+}
+
+template<typename T>
+inline T quantum<T>::operator++() volatile
+{
+    return __atomic_add_fetch(&m_val, static_cast<T>(1), __ATOMIC_SEQ_CST);
+}
+
+template<typename T>
+inline T quantum<T>::operator--()
+{
+    return __atomic_sub_fetch(&m_val, static_cast<T>(1), __ATOMIC_SEQ_CST);
+}
+
+template<typename T>
+inline T quantum<T>::operator--() volatile
+{
+    return __atomic_sub_fetch(&m_val, static_cast<T>(1), __ATOMIC_SEQ_CST);
+}
+
+template<typename T>
+inline T quantum<T>::operator++(int)
+{
+    return __atomic_fetch_add(&m_val, static_cast<T>(1), __ATOMIC_SEQ_CST);
+}
+
+template<typename T>
+inline T quantum<T>::operator++(int) volatile
+{
+    return __atomic_fetch_add(&m_val, static_cast<T>(1), __ATOMIC_SEQ_CST);
+}
+
+template<typename T>
+inline T quantum<T>::operator--(int)
+{
+    return __atomic_fetch_sub(&m_val, static_cast<T>(1), __ATOMIC_SEQ_CST);
+}
+
+template<typename T>
+inline T quantum<T>::operator--(int) volatile
+{
+    return __atomic_fetch_sub(&m_val, static_cast<T>(1), __ATOMIC_SEQ_CST);
+}
 };
 
 }

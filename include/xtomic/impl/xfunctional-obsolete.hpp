@@ -10,7 +10,7 @@
 
 #include <tr1/functional>
 
-namespace lfds
+namespace xtomic
 {
 
 template<typename T>

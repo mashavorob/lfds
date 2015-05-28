@@ -81,7 +81,7 @@ class BenchmarkBase
 {
 public:
     // wait free data queue to pass inserted data to deleter thread
-    typedef lfds::queue<Data, lfds::Queue::FixedSize> queue_type;
+    typedef xtomic::queue<Data, xtomic::Queue::FixedSize> queue_type;
     typedef Map map_type;
     typedef typename map_type::key_type key_type;
     typedef typename map_type::mapped_type mapped_type;
@@ -355,10 +355,10 @@ void DemoMap()
     typedef data_adapter<int> key_type;
     typedef data_adapter<int> mapped_type;
 
-    typedef lfds::hash_map<int, int> lf_map_type_integral_pair;
-    typedef lfds::hash_map<int, mapped_type> lf_map_type_integral_key;
-    typedef lfds::hash_map<key_type, mapped_type> lf_map_type;
-    typedef lfds::hash_trie<int, int> lf_trie_type;
+    typedef xtomic::hash_map<int, int> lf_map_type_integral_pair;
+    typedef xtomic::hash_map<int, mapped_type> lf_map_type_integral_key;
+    typedef xtomic::hash_map<key_type, mapped_type> lf_map_type;
+    typedef xtomic::hash_trie<int, int> lf_trie_type;
     typedef std_map_wrapper<key_type, mapped_type> std_map_type;
     typedef std_unordered_map_wrapper<key_type, mapped_type> std_unordered_map_type;
 

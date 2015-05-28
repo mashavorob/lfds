@@ -17,7 +17,7 @@
 #include <cstddef>
 #include <algorithm>
 
-namespace lfds
+namespace xtomic
 {
 
 namespace
@@ -30,7 +30,7 @@ struct LinkedEnvelop: public Value
     typedef Value value_type;
     typedef std::size_t count_type;
 
-    mutable xtomic<count_type> m_writeCount;
+    mutable xtomic::quantum<count_type> m_writeCount;
 
     this_type* m_link;
 
@@ -50,8 +50,8 @@ struct align_4_cas16 CountedEnvelop: public Value
     typedef Value value_type;
     typedef std::size_t count_type;
 
-    mutable xtomic<count_type> m_readCount;
-    mutable xtomic<count_type> m_writeCount;
+    mutable xtomic::quantum<count_type> m_readCount;
+    mutable xtomic::quantum<count_type> m_writeCount;
 
     CountedEnvelop() :
             Value(),
@@ -71,8 +71,8 @@ struct align_4_cas16 CountedPtr
     typedef value_type* ptr_type;
     typedef const value_type* const_ptr_type;
 
-    xtomic<ptr_type> m_ptr;
-    mutable xtomic<count_type> m_count;
+    xtomic::quantum<ptr_type> m_ptr;
+    mutable xtomic::quantum<count_type> m_count;
 
     CountedPtr(ptr_type ptr = nullptr, count_type count = 0) :
             m_ptr(ptr),
@@ -96,7 +96,7 @@ struct align_4_cas16 CountedPtr
 
             this_type expected(ptr, count);
             this_type next(ptr, ++count);
-            res = lfds::atomic_cas(*this, expected, next);
+            res = xtomic::atomic_cas(*this, expected, next);
         }
         while (!res);
         return ptr;
@@ -110,7 +110,7 @@ struct align_4_cas16 CountedPtr
         prev.m_ptr.store(expected, barriers::release);
         prev.m_count.store(m_count.load(barriers::acquire), barriers::release);
         this_type next(ptr, 0);
-        bool res = lfds::atomic_cas(*this, prev, next);
+        bool res = xtomic::atomic_cas(*this, prev, next);
         return res;
     }
     void reset(ptr_type expected, ptr_type ptr, this_type& prev)
@@ -126,7 +126,7 @@ struct align_4_cas16 CountedPtr
     {
         reset(expected.m_ptr.load(barriers::relaxed), ptr, prev);
     }
-    void waitFor(xtomic<count_type>& count)
+    void waitFor(xtomic::quantum<count_type>& count)
     {
         count_type expected = m_count.load(barriers::acquire);
         count_type actual = count.load(barriers::acquire);
@@ -217,7 +217,7 @@ public:
         return m_count.load(barriers::relaxed);
     }
 private:
-    mutable xtomic<count_type> m_count;
+    mutable xtomic::quantum<count_type> m_count;
 };
 }
 
@@ -305,8 +305,8 @@ public:
     typedef table_type* cookie_type;
 
 private:
-    typedef xtomic<linked_table_type*> linked_table_ptr_type;
-    typedef xtomic<table_type*> table_ptr_type;
+    typedef xtomic::quantum<linked_table_type*> linked_table_ptr_type;
+    typedef xtomic::quantum<table_type*> table_ptr_type;
     typedef CountedPtr<linked_table_type> table_cptr_type;
 public:
 
@@ -597,7 +597,7 @@ public:
     {
         const table_type* ptr;
         const_guard_type guard(getBase(), ptr);
-        return ptr->m_capacity;
+        return ptr->m_highWatermark;
     }
     size_type size() const
     {

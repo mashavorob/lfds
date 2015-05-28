@@ -11,7 +11,7 @@
 #include "aba_ptr.hpp"
 #include "stack_node.hpp"
 
-namespace lfds
+namespace xtomic
 {
 
 // base implementation for stack

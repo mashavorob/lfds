@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <utility>
 
-namespace lfds
+namespace xtomic
 {
 namespace perftest
 {

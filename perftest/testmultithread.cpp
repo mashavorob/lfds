@@ -11,7 +11,7 @@
 #include <ctime>
 #include "testmultithread.hpp"
 
-namespace lfds
+namespace xtomic
 {
 namespace perftest
 {

@@ -10,7 +10,7 @@
 
 #include "dynamic_buffer.hpp"
 
-namespace lfds
+namespace xtomic
 {
 
 template<typename T, typename Allocator>

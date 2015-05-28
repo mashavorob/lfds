@@ -10,7 +10,7 @@
 #include "gtest/gtest.h"
 #include "uniform_hash_set_test.hpp"
 
-typedef lfds::my::int_wrapper<int> key_type;
+typedef xtomic::my::int_wrapper<int> key_type;
 
 MAKE_ALL_TESTS_FOR_SET(key_type, Generic)
 

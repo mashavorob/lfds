@@ -10,7 +10,7 @@
 
 TEST(stack_base_weak, pop)
 {
-    typedef lfds::stack_base_weak<int> stack_type;
+    typedef xtomic::stack_base_weak<int> stack_type;
     typedef stack_type::node_type node_type;
 
     stack_type stack;
@@ -19,7 +19,7 @@ TEST(stack_base_weak, pop)
 
 TEST(stack_base_weak, push)
 {
-    typedef lfds::stack_base_weak<int> stack_type;
+    typedef xtomic::stack_base_weak<int> stack_type;
     typedef stack_type::node_type node_type;
 
     stack_type stack;
@@ -31,7 +31,7 @@ TEST(stack_base_weak, push)
 
 TEST(stack_base_weak, push3)
 {
-    typedef lfds::stack_base_weak<int> stack_type;
+    typedef xtomic::stack_base_weak<int> stack_type;
     typedef stack_type::node_type node_type;
 
     stack_type stack;
@@ -47,7 +47,7 @@ TEST(stack_base_weak, push3)
 
 TEST(stack_base_weak, atomic_pop)
 {
-    typedef lfds::stack_base_weak<int> stack_type;
+    typedef xtomic::stack_base_weak<int> stack_type;
     typedef stack_type::node_type node_type;
 
     stack_type stack;
@@ -56,7 +56,7 @@ TEST(stack_base_weak, atomic_pop)
 
 TEST(stack_base_weak, atomic_push)
 {
-    typedef lfds::stack_base_weak<int> stack_type;
+    typedef xtomic::stack_base_weak<int> stack_type;
     typedef stack_type::node_type node_type;
 
     stack_type stack;
@@ -68,7 +68,7 @@ TEST(stack_base_weak, atomic_push)
 
 TEST(stack_base_weak, atomic_push3)
 {
-    typedef lfds::stack_base_weak<int> stack_type;
+    typedef xtomic::stack_base_weak<int> stack_type;
     typedef stack_type::node_type node_type;
 
     stack_type stack;

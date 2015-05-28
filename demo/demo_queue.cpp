@@ -27,37 +27,37 @@ template<bool ManyConsumers>
 struct get_num_consumers;
 
 template<>
-struct get_size_type<false> : public lfds::integral_const<lfds::Queue::ESize, lfds::Queue::DynamicSize>
+struct get_size_type<false> : public xtomic::integral_const<xtomic::Queue::ESize, xtomic::Queue::DynamicSize>
 {
 
 };
 
 template<>
-struct get_size_type<true> : public lfds::integral_const<lfds::Queue::ESize, lfds::Queue::FixedSize>
+struct get_size_type<true> : public xtomic::integral_const<xtomic::Queue::ESize, xtomic::Queue::FixedSize>
 {
 
 };
 
 template<>
-struct get_num_producers<true> : public lfds::integral_const<lfds::Queue::EMultiplicity, lfds::Queue::ManyProducers>
+struct get_num_producers<true> : public xtomic::integral_const<xtomic::Queue::EMultiplicity, xtomic::Queue::ManyProducers>
 {
 
 };
 
 template<>
-struct get_num_producers<false> : public lfds::integral_const<lfds::Queue::EMultiplicity, lfds::Queue::OneProducer>
+struct get_num_producers<false> : public xtomic::integral_const<xtomic::Queue::EMultiplicity, xtomic::Queue::OneProducer>
 {
 
 };
 
 template<>
-struct get_num_consumers<true> : public lfds::integral_const<lfds::Queue::EMultiplicity, lfds::Queue::ManyConsumers>
+struct get_num_consumers<true> : public xtomic::integral_const<xtomic::Queue::EMultiplicity, xtomic::Queue::ManyConsumers>
 {
 
 };
 
 template<>
-struct get_num_consumers<false> : public lfds::integral_const<lfds::Queue::EMultiplicity, lfds::Queue::OneConsumer>
+struct get_num_consumers<false> : public xtomic::integral_const<xtomic::Queue::EMultiplicity, xtomic::Queue::OneConsumer>
 {
 
 };
@@ -89,7 +89,7 @@ struct QueueCaptionImpl<false>
 template<bool fixedSize>
 struct QueueRunnerImpl
 {
-    typedef lfds::queue<int, get_size_type<fixedSize>::value> collection_type;
+    typedef xtomic::queue<int, get_size_type<fixedSize>::value> collection_type;
     typedef counted_collection_wrapper<collection_type> counted_collection_type;
 
     std::size_t operator()()
@@ -134,8 +134,8 @@ class QueueDemonstrator
 {
 public:
     typedef std_queue_wrapper<std::queue<int> > ref_collection_type;
-    typedef lfds::queue<int, lfds::Queue::FixedSize, get_num_producers<ManyProducers>::value, get_num_consumers<ManyConsumers>::value> fixed_collection_type;
-    typedef lfds::queue<int, lfds::Queue::DynamicSize, get_num_producers<ManyProducers>::value, get_num_consumers<ManyConsumers>::value> dynamic_collection_type;
+    typedef xtomic::queue<int, xtomic::Queue::FixedSize, get_num_producers<ManyProducers>::value, get_num_consumers<ManyConsumers>::value> fixed_collection_type;
+    typedef xtomic::queue<int, xtomic::Queue::DynamicSize, get_num_producers<ManyProducers>::value, get_num_consumers<ManyConsumers>::value> dynamic_collection_type;
 
 public:
     static const unsigned duration_seconds = 10;

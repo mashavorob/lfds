@@ -12,7 +12,7 @@
 #include "stack_base_aba.hpp"
 #include <xtomic/xtomic.hpp>
 
-namespace lfds
+namespace xtomic
 {
 
 namespace
@@ -79,7 +79,7 @@ public:
         return p;
     }
 private:
-    xtomic<counter_type> m_lock;
+    xtomic::quantum<counter_type> m_lock;
 public:
     producer_stack_type m_producerEnd;
     consumer_stack_type m_consumerEnd;

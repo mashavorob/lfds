@@ -12,7 +12,7 @@
 #include <xtomic/aux/cppbasics.hpp>
 #include "cas.hpp"
 
-namespace lfds
+namespace xtomic
 {
 
 // pointer that protects CAS operations with pointers from
@@ -74,7 +74,7 @@ public:
     }
     bool atomic_cas(const aba_ptr<T>& expected, const aba_ptr<T>& val) volatile
     {
-        return lfds::atomic_cas(*this, expected, val);
+        return xtomic::atomic_cas(*this, expected, val);
     }
 public:
     T* m_ptr;

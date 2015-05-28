@@ -11,7 +11,7 @@
 #include "performancetest.hpp"
 #include "testtypes.hpp"
 
-namespace lfds
+namespace xtomic
 {
 namespace perftest
 {

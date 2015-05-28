@@ -5,7 +5,7 @@
  *      Author: masha
  */
 
-namespace lfds
+namespace xtomic
 {
 namespace perftest
 {

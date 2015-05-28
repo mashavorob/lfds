@@ -11,7 +11,7 @@
 
 TEST(queue_base, pop)
 {
-    typedef lfds::queue_base<int, false, false> queue_type;
+    typedef xtomic::queue_base<int, false, false> queue_type;
     typedef queue_type::node_type node_type;
 
     queue_type queue;
@@ -20,7 +20,7 @@ TEST(queue_base, pop)
 
 TEST(queue_base, push)
 {
-    typedef lfds::queue_base<int, false, false> queue_type;
+    typedef xtomic::queue_base<int, false, false> queue_type;
     typedef queue_type::node_type node_type;
 
     queue_type queue;
@@ -32,7 +32,7 @@ TEST(queue_base, push)
 
 TEST(queue_base, push3)
 {
-    typedef lfds::queue_base<int, false, false> queue_type;
+    typedef xtomic::queue_base<int, false, false> queue_type;
     typedef queue_type::node_type node_type;
 
     queue_type queue;
@@ -48,7 +48,7 @@ TEST(queue_base, push3)
 
 TEST(queue_base, atomic_pop)
 {
-    typedef lfds::queue_base<int, false, false> queue_type;
+    typedef xtomic::queue_base<int, false, false> queue_type;
     typedef queue_type::node_type node_type;
 
     queue_type queue;
@@ -57,7 +57,7 @@ TEST(queue_base, atomic_pop)
 
 TEST(queue_base, atomic_push)
 {
-    typedef lfds::queue_base<int, false, false> queue_type;
+    typedef xtomic::queue_base<int, false, false> queue_type;
     typedef queue_type::node_type node_type;
 
     queue_type queue;
@@ -70,7 +70,7 @@ TEST(queue_base, atomic_push)
 
 TEST(queue_base, atomic_push3)
 {
-    typedef lfds::queue_base<int, false, false> queue_type;
+    typedef xtomic::queue_base<int, false, false> queue_type;
     typedef queue_type::node_type node_type;
 
     queue_type queue;

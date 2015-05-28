@@ -15,7 +15,7 @@
 
 #include <cstddef>
 
-namespace lfds
+namespace xtomic
 {
 
 struct align_4_cas16 hash_item
@@ -158,7 +158,7 @@ public:
     }
     bool atomic_cas(const hash_item & expected, const hash_item & hash)
     {
-        return lfds::atomic_cas(m_hash, expected, hash);
+        return xtomic::atomic_cas(m_hash, expected, hash);
     }
     void addRef() const
     {
@@ -178,7 +178,7 @@ private:
     char m_key[sizeof(key_type)] align_as(key_type);
     char m_value[sizeof(mapped_type)] align_as(mapped_type);
     volatile hash_item_type m_hash;
-    mutable xtomic<int> m_refCount;
+    mutable xtomic::quantum<int> m_refCount;
 };
 
 }

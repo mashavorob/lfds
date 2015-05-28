@@ -11,7 +11,7 @@
 #include <xtomic/aux/xfunctional.hpp>
 #include <xtomic/aux/cppbasics.hpp>
 
-namespace lfds
+namespace xtomic
 {
 namespace my
 {
@@ -119,13 +119,13 @@ struct int_wrapper_hash
         return m_hasher(val);
     }
 private:
-    typename lfds::make_hash<T>::type m_hasher;
+    typename xtomic::make_hash<T>::type m_hasher;
 };
 
 template<typename T>
 struct make_hash
 {
-    typedef typename lfds::make_hash<T>::type type;
+    typedef typename xtomic::make_hash<T>::type type;
 };
 
 template<typename T>
@@ -142,7 +142,7 @@ struct remove_wrapper
 };
 
 template<typename T>
-struct remove_wrapper<lfds::my::int_wrapper<T> >
+struct remove_wrapper<xtomic::my::int_wrapper<T> >
 {
     typedef T type;
 };
@@ -154,9 +154,9 @@ struct make_value_type
 };
 
 template<typename T, typename Int>
-struct make_value_type<lfds::my::int_wrapper<T>, Int>
+struct make_value_type<xtomic::my::int_wrapper<T>, Int>
 {
-    typedef lfds::my::int_wrapper<Int> type;
+    typedef xtomic::my::int_wrapper<Int> type;
 };
 
 }

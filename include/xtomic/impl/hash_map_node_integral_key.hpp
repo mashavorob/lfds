@@ -11,7 +11,7 @@
 #include "meta_utils.hpp"
 #include <xtomic/xtomic.hpp>
 
-namespace lfds
+namespace xtomic
 {
 
 // Eclipse Luna does not recognize alignas keyword regardless of any settings
@@ -136,7 +136,7 @@ public:
     bool atomic_cas(const key_item_type & expected,
                     const key_item_type & newkey)
     {
-        return lfds::atomic_cas(m_key, expected, newkey);
+        return xtomic::atomic_cas(m_key, expected, newkey);
     }
     void addRef() const
     {
@@ -154,7 +154,7 @@ public:
 
 private:
     volatile key_item_type m_key;char m_value[sizeof(mapped_type)] align_as(mapped_type);
-    mutable xtomic<int> m_refCount;
+    mutable xtomic::quantum<int> m_refCount;
 };
 
 }

@@ -10,7 +10,7 @@
 
 #include <cassert>
 
-namespace lfds
+namespace xtomic
 {
 
 template<typename T>

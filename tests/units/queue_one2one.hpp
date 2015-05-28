@@ -11,7 +11,7 @@
 #include <vector>
 #include <pthread.h>
 
-namespace lfds
+namespace xtomic
 {
 namespace testing
 {

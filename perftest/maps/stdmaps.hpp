@@ -21,7 +21,7 @@
 #include <tr1/unordered_map>
 #endif
 
-namespace lfds
+namespace xtomic
 {
 namespace perftest
 {
@@ -31,8 +31,8 @@ namespace maps
 namespace adapter
 {
 
-typedef lfds::perftest::sync::mutex mutex_type;
-typedef lfds::perftest::sync::guard guard_type;
+typedef xtomic::perftest::sync::mutex mutex_type;
+typedef xtomic::perftest::sync::guard guard_type;
 
 namespace
 {

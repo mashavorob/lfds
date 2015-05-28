@@ -7,7 +7,7 @@
 
 #include "timeutils.hpp"
 
-namespace lfds
+namespace xtomic
 {
 namespace perftest
 {

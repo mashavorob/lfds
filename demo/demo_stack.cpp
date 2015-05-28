@@ -23,8 +23,8 @@ void DemoStack() {
 
 
 	typedef std_stack_wrapper< std::stack<int> > ref_collection_type;
-	typedef lfds::stack<int, true>				 fixed_collection_type;
-	typedef lfds::stack<int, false>				 dynamic_collection_type;
+	typedef xtomic::stack<int, true>				 fixed_collection_type;
+	typedef xtomic::stack<int, false>				 dynamic_collection_type;
 
 	ref_collection_type ref_coll(capacity);
 	fixed_collection_type fixed_coll(capacity);

@@ -10,7 +10,7 @@
 
 #include "testlocator.hpp"
 
-namespace lfds
+namespace xtomic
 {
 namespace perftest
 {

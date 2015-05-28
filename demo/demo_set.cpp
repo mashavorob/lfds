@@ -80,7 +80,7 @@ class BenchmarkBase
 {
 public:
     // wait free data queue to pass inserted data to deleter thread
-    typedef lfds::queue<Data, lfds::Queue::FixedSize> queue_type;
+    typedef xtomic::queue<Data, xtomic::Queue::FixedSize> queue_type;
     typedef Set set_type;
     typedef typename set_type::key_type key_type;
     typedef get_random_data<Data> randomizer_type;
@@ -350,8 +350,8 @@ void DemoSet()
     typedef int data_type;
     typedef data_adapter<data_type> key_type;
 
-    typedef lfds::hash_set<int> lf_set_type_integral_key;
-    typedef lfds::hash_set<key_type> lf_set_type;
+    typedef xtomic::hash_set<int> lf_set_type_integral_key;
+    typedef xtomic::hash_set<key_type> lf_set_type;
     typedef std_set_wrapper<key_type> std_set_type;
     typedef std_unordered_set_wrapper<key_type> std_unordered_set_type;
 

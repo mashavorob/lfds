@@ -10,7 +10,7 @@
 
 #include <pthread.h>
 
-namespace lfds
+namespace xtomic
 {
 namespace perftest
 {

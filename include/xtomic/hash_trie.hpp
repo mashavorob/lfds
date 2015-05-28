@@ -5,8 +5,12 @@
  *      Author: masha
  */
 
+/// \file hash_trie.hpp
+
 #ifndef INCLUDE_HASH_TRIE_HPP_
 #define INCLUDE_HASH_TRIE_HPP_
+
+/// \cond HIDDEN_SYMBOLS
 
 #include "impl/cas.hpp"
 #include "impl/pool_buffer.hpp"
@@ -19,9 +23,12 @@
 
 #include <cassert>
 
-namespace lfds
+/// \endcond
+
+namespace xtomic
 {
 
+/// \cond HIDDEN_SYMBOLS
 namespace htrie
 {
 
@@ -143,7 +150,7 @@ struct get_max_level<HashType, 256>
 };
 
 typedef std::size_t counter_type;
-typedef xtomic<counter_type> atomic_counter_type;
+typedef xtomic::quantum<counter_type> atomic_counter_type;
 
 enum NodeType
 {
@@ -224,7 +231,7 @@ public:
     }
     bool atomic_cas(const NodePtr & expected, const NodePtr & replacement)
     {
-        return lfds::atomic_cas(*this, expected, replacement);
+        return xtomic::atomic_cas(*this, expected, replacement);
     }
     bool atomic_cas_strong(const NodePtr & expected,
                            const NodePtr & replacement)
@@ -259,9 +266,9 @@ public:
         return !isEqual(other);
     }
 private:
-    xtomic<Node*> m_node;                      // generic node
-    xtomic<counter_type> m_abaCount;           // aba protection
-    mutable xtomic<counter_type> m_refCount;   // reference count
+    xtomic::quantum<Node*> m_node;                      // generic node
+    xtomic::quantum<counter_type> m_abaCount;           // aba protection
+    mutable xtomic::quantum<counter_type> m_refCount;   // reference count
 };
 
 // chain node
@@ -285,7 +292,7 @@ struct CNode: public Node
     l_type* m_next;
     hash_type m_hash;
 
-    xtomic<bool> m_allocated;
+    xtomic::quantum<bool> m_allocated;
 
     key_type* getKey()
     {
@@ -318,7 +325,7 @@ struct BNode: public Node
     typedef Key key_type;
     typedef Value value_type;
     typedef HashType hash_type;
-    typedef xtomic<hash_type> atomic_hash_type;
+    typedef xtomic::quantum<hash_type> atomic_hash_type;
     typedef NodePtr ptr_type;
     typedef BNode<key_type, value_type, hash_type, BFactor> b_type;
     typedef CNode<key_type, value_type, hash_type> c_type;
@@ -327,7 +334,7 @@ struct BNode: public Node
     static constexpr int SIZE = BFactor;
 
     b_type* m_parent;
-    mutable xtomic<counter_type> m_refCount;
+    mutable xtomic::quantum<counter_type> m_refCount;
     ptr_type m_array[SIZE];
 
 private:
@@ -401,7 +408,38 @@ private:
 };
 
 }
+/// \endcond
 
+///
+/// \class hash_trie
+///
+/// \brief *Experimental*. The class is associative container with constant complexity of insert, find and
+/// erase operations. The container is thread-safe and it does not require additional
+/// synchronization in multi-thread environment.
+///
+/// Hash trie behaves like hash map with collision resolution by means of chaining. The main
+/// difference comparing with hash_map is in representing of hash table. The trie stores it as
+/// a tree. As result rehashing never happens and usually tries consume less memory. The
+/// tradeoff is performance in all others cases.
+///
+/// The main parameter that affect performance of the container is branching factor.
+/// Branching factor controls how many children has each node of the hash tree. So when
+/// the branching factor is 16 then each branch has 16 children. When it is 256 then
+/// each branch has 256 children. Other side effect is a depth of the tree:
+/// - branch with 16 children (branching factor=16) represents 4 bits of hash code,
+///   so maximum depth of the hash tree is 64 bits / 4 bit per layer = 16
+/// - branch with 256 children (branching factor=256) represents 8 bits of hash code,
+///   so maximum depth of the hash tree is 64 bits / 8 bit per layer = 8
+/// So in general bigger branching factor should improve perfomance at cost of memory
+/// consumption.
+///
+/// @param Key type of keys.
+/// @param Value type of mapped values.
+/// @param BFactor branching factor. Allowed values are 16, 256. Default is 16.
+/// @param Hash hash function. Default is std::hash<Key>.
+/// @param Pred equal predicate. Default is std::equal_to<Key>.
+/// @param Allocator allocator type. Default is std::allocator<Value>.
+///
 template<typename Key, typename Value, int BFactor = 16,
         typename Hash = typename make_hash<Key>::type,
         typename Pred = std::equal_to<Key>, typename Allocator = std::allocator<
@@ -409,24 +447,29 @@ template<typename Key, typename Value, int BFactor = 16,
 class hash_trie
 {
 public:
-    typedef Key key_type;
-    typedef Value mapped_type;
-    typedef std::pair<key_type, mapped_type> value_type;
+    typedef Key key_type;                                   ///< key type.
+    typedef Value mapped_type;                              ///< mapped value type.
+    typedef std::pair<key_type, mapped_type> value_type;    ///< key-value pair.
+    typedef Pred predicate_type;                            ///< equal to predicate.
+    typedef Allocator allocator_type;                       ///< allocator type.
+    typedef std::size_t size_type;                          ///< size type
+
+
+    static constexpr int BFACTOR = BFactor;                                 ///< branching factor
+
+    /// \cond HIDDEN_SYMBOLS
     typedef Hash hash_base_type;
-    typedef Pred predicate_type;
-    typedef Allocator allocator_type;
-
-    static constexpr int BFACTOR = BFactor; // branching factor
-
     typedef hash_trie<key_type, mapped_type, BFACTOR, hash_base_type,
             predicate_type, allocator_type> this_type;
+    /// \endcond
 
-    typedef htrie::hash_adapter<key_type, hash_base_type> hash_func_type;
-    typedef typename hash_func_type::hash_type hash_type;
+    typedef htrie::hash_adapter<key_type, hash_base_type> hash_func_type;   ///< adapted hash function type.
+    typedef typename hash_func_type::hash_type hash_type;                   ///< hash type
 
     static constexpr int NFACTOR =
-            htrie::get_max_level<hash_type, BFACTOR>::value;
+            htrie::get_max_level<hash_type, BFACTOR>::value;                ///< nesting factor, max depth of the trie
 
+    /// \cond HIDDEN_SYMBOLS
     typedef htrie::Node n_type;
     typedef htrie::NodePtr ptr_type;
     typedef htrie::BNode<key_type, mapped_type, hash_type, BFACTOR> b_type;
@@ -437,8 +480,7 @@ public:
 
     typedef typename Allocator::template rebind<key_type>::other key_allocator_type;
     typedef typename Allocator::template rebind<mapped_type>::other mapped_allocator_type;
-
-    typedef std::size_t size_type;
+    /// \endcond
 
 private:
     hash_trie(const this_type &); // = delete;
@@ -458,6 +500,12 @@ private:
     typedef ref_lock<const ptr_type> cptr_lock;
 
 public:
+
+    ///
+    /// \brief Constructor.
+    ///
+    /// Default constructor.
+    ///
     hash_trie() :
             m_size(0),
             m_bsize(0),
@@ -472,6 +520,16 @@ public:
     {
         assert(!dbgCheckRefrences());
     }
+
+    ///
+    /// \brief The method finds value associated with specified key.
+    ///
+    /// @param key key to find.
+    /// @param val receives a value associated with the specified key.
+    /// @return
+    /// - `true` if the association was found.
+    /// - `false` if the container had value associated with the key.
+    ///
     bool find(const key_type & key, mapped_type & val) const
     {
         const hash_type hash = m_hashFunc(key);
@@ -502,6 +560,18 @@ public:
         assert(false); // shit happens
         return false;
     }
+
+    ///
+    /// The method inserts a new key-value pair. The method does nothing if
+    /// the key already has associated value.
+    ///
+    /// @param key specifies a key
+    /// @param val specifies a mapped-value
+    /// @return
+    /// - `true` if a new association was inserted.
+    /// - `false` if the container already had a value associated with the specified key.
+    ///    The old value remains unchanged.
+    ///
 #if LFDS_USE_CPP11
     template<typename ... Args>
     bool insert(const key_type & key, Args&&... val)
@@ -561,6 +631,15 @@ public:
         assert(false); // shit happens
         return false;
     }
+
+    ///
+    /// The method erases an existing association for specified key.
+    ///
+    /// @param key specifies a key.
+    /// @return
+    /// - `true` if an association for specified key was found. The operation always erases the association.
+    /// - `false` if the container did not have value associated with specified key.
+    ///
     bool erase(const key_type & key)
     {
         constexpr hash_type mask = htrie::get_mask<BFACTOR>::value;
@@ -614,10 +693,17 @@ public:
         assert(false); // shit happens
         return false;
     }
+
+    ///
+    /// The method returns actual number of elements.
+    ///
+    /// @return size of the container.
+    ///
     size_type size() const
     {
         return m_size.load(barriers::relaxed);
     }
+    /// \cond HIDDEN_SYMBOLS
     // diagnosis
 public:
     bool dbgCheckRefrences() const
@@ -628,7 +714,7 @@ public:
     {
         return dbgCountBranchesImpl(&m_root);
     }
-
+    /// \endcond
 private:
     bool findInChain(cb_lock& bn,
                      cptr_lock& ptr,
@@ -942,8 +1028,8 @@ private:
 
 private:
     b_type m_root;
-    xtomic<size_type> m_size;
-    xtomic<size_type> m_bsize;
+    xtomic::quantum<size_type> m_size;
+    xtomic::quantum<size_type> m_bsize;
 
     key_allocator_type m_keyAllocator;
     mapped_allocator_type m_mappedAllocator;

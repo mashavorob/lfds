@@ -29,7 +29,7 @@ TEST(HashTrie, empty)
 {
     typedef int key_type;
     typedef int value_type;
-    typedef lfds::hash_trie<key_type, value_type> hash_trie;
+    typedef xtomic::hash_trie<key_type, value_type> hash_trie;
     typedef hash_trie::size_type size_type;
 
     hash_trie ht;
@@ -56,7 +56,7 @@ TEST(HashTrie, insert)
 {
     typedef int key_type;
     typedef int value_type;
-    typedef lfds::hash_trie<key_type, value_type> hash_trie;
+    typedef xtomic::hash_trie<key_type, value_type> hash_trie;
     typedef hash_trie::size_type size_type;
 
     hash_trie ht;
@@ -82,7 +82,7 @@ TEST(HashTrie, insertBranch)
     typedef int key_type;
     typedef int value_type;
 
-    typedef lfds::hash_trie<key_type, value_type, 16, BadHashFunc> hash_trie;
+    typedef xtomic::hash_trie<key_type, value_type, 16, BadHashFunc> hash_trie;
     typedef hash_trie::size_type size_type;
 
     hash_trie ht;
@@ -109,7 +109,7 @@ TEST(HashTrie, insertChain)
     typedef int key_type;
     typedef int value_type;
 
-    typedef lfds::hash_trie<key_type, value_type, 16, TheWorstHashFunc> hash_trie;
+    typedef xtomic::hash_trie<key_type, value_type, 16, TheWorstHashFunc> hash_trie;
     typedef hash_trie::size_type size_type;
 
     hash_trie ht;
@@ -134,7 +134,7 @@ TEST(HashTrie, find)
 {
     typedef int key_type;
     typedef int value_type;
-    typedef lfds::hash_trie<key_type, value_type> hash_trie;
+    typedef xtomic::hash_trie<key_type, value_type> hash_trie;
     typedef hash_trie::size_type size_type;
 
     hash_trie ht;
@@ -173,7 +173,7 @@ TEST(HashTrie, findBranch)
     typedef int key_type;
     typedef int value_type;
 
-    typedef lfds::hash_trie<key_type, value_type, 16, BadHashFunc> hash_trie;
+    typedef xtomic::hash_trie<key_type, value_type, 16, BadHashFunc> hash_trie;
     typedef hash_trie::size_type size_type;
 
     hash_trie ht;
@@ -212,7 +212,7 @@ TEST(HashTrie, findChain)
     typedef int key_type;
     typedef int value_type;
 
-    typedef lfds::hash_trie<key_type, value_type, 16, TheWorstHashFunc> hash_trie;
+    typedef xtomic::hash_trie<key_type, value_type, 16, TheWorstHashFunc> hash_trie;
     typedef hash_trie::size_type size_type;
 
     hash_trie ht;
@@ -250,7 +250,7 @@ TEST(HashTrie, erase)
 {
     typedef int key_type;
     typedef int value_type;
-    typedef lfds::hash_trie<key_type, value_type> hash_trie;
+    typedef xtomic::hash_trie<key_type, value_type> hash_trie;
     typedef hash_trie::size_type size_type;
 
     hash_trie ht;
@@ -294,7 +294,7 @@ TEST(HashTrie, eraseBranch)
 {
     typedef int key_type;
     typedef int value_type;
-    typedef lfds::hash_trie<key_type, value_type, 16, BadHashFunc> hash_trie;
+    typedef xtomic::hash_trie<key_type, value_type, 16, BadHashFunc> hash_trie;
     typedef hash_trie::size_type size_type;
 
     hash_trie ht;
@@ -339,7 +339,7 @@ TEST(HashTrie, eraseChain)
 {
     typedef int key_type;
     typedef int value_type;
-    typedef lfds::hash_trie<key_type, value_type, 16, TheWorstHashFunc> hash_trie;
+    typedef xtomic::hash_trie<key_type, value_type, 16, TheWorstHashFunc> hash_trie;
     typedef hash_trie::size_type size_type;
 
     hash_trie ht;

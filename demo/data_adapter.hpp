@@ -14,7 +14,7 @@
 #include <cstdint>
 
 //
-// the only purpose of the class is prevent lfds::hash_map<>
+// the only purpose of the class is prevent xtomic::hash_map<>
 // from using optimized model for integral types and strings
 //
 template<typename T>

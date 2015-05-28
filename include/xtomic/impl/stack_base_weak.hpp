@@ -12,7 +12,7 @@
 #include "cas.hpp"
 #include "stack_node.hpp"
 
-namespace lfds
+namespace xtomic
 {
 
 // base implementation for stack
@@ -114,7 +114,7 @@ public:
         m_head.store(p, barriers::relaxed);
     }
 private:
-    xtomic<node_type*> m_head;
+    xtomic::quantum<node_type*> m_head;
 };
 
 }

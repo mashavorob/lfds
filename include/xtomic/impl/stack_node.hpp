@@ -11,7 +11,7 @@
 #include <xtomic/aux/cppbasics.hpp>
 #include <cstddef>
 
-namespace lfds
+namespace xtomic
 {
 
 template<typename T>

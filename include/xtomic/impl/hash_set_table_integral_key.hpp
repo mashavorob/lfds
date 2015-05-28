@@ -14,7 +14,7 @@
 #include <functional>
 #include <vector>
 
-namespace lfds
+namespace xtomic
 {
 template<typename Key, typename Hash, typename Pred, typename Allocator>
 class hash_set_table_integral_key

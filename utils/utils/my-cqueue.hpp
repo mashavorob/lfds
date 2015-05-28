@@ -13,7 +13,7 @@
 
 #include <queue>
 
-namespace lfds
+namespace xtomic
 {
 namespace my
 {

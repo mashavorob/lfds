@@ -14,7 +14,7 @@
 
 #include <cstddef>
 
-namespace lfds
+namespace xtomic
 {
 
 template<typename Value>
@@ -63,11 +63,11 @@ struct align_4_cas16 mapped_value
     }
     bool atomic_cas(const this_type & expected, const this_type & val)
     {
-        return lfds::atomic_cas(*this, expected, val);
+        return xtomic::atomic_cas(*this, expected, val);
     }
     bool atomic_cas(const state_type expected, const state_type val)
     {
-        return lfds::atomic_cas(m_state, expected, val);
+        return xtomic::atomic_cas(m_state, expected, val);
     }
 
 public:

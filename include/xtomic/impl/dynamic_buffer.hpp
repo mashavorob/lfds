@@ -11,7 +11,7 @@
 #include "buffer_base.hpp"
 #include <xtomic/aux/cppbasics.hpp>
 
-namespace lfds
+namespace xtomic
 {
 
 template<typename T, typename Allocator>

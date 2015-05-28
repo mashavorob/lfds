@@ -13,7 +13,7 @@
 
 #include <vector>
 
-namespace lfds
+namespace xtomic
 {
 
 template<typename BaseHashTable>

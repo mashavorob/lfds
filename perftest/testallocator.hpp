@@ -12,7 +12,7 @@
 
 #include <memory>
 
-namespace lfds
+namespace xtomic
 {
 namespace perftest
 {

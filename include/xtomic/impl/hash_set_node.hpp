@@ -12,7 +12,7 @@
 #include <xtomic/aux/inttypes.hpp>
 #include <xtomic/aux/cppbasics.hpp>
 
-namespace lfds
+namespace xtomic
 {
 
 struct align_4_cas16 hash_set_item

@@ -18,36 +18,36 @@
 #include <ctime>
 #include <cstdlib>
 
-template<typename Key, typename Hash, lfds::memory_model::type model>
+template<typename Key, typename Hash, xtomic::memory_model::type model>
 struct make_hash_set_table;
 
 template<typename Key, typename Hash>
-struct make_hash_set_table<Key, Hash, lfds::memory_model::wise>
+struct make_hash_set_table<Key, Hash, xtomic::memory_model::wise>
 {
-    typedef typename lfds::make_wise_hash_set<Key, Hash>::type type;
+    typedef typename xtomic::make_wise_hash_set<Key, Hash>::type type;
 };
 
 template<typename Key, typename Hash>
-struct make_hash_set_table<Key, Hash, lfds::memory_model::greedy>
+struct make_hash_set_table<Key, Hash, xtomic::memory_model::greedy>
 {
-    typedef typename lfds::make_greedy_hash_set<Key, Hash>::type type;
+    typedef typename xtomic::make_greedy_hash_set<Key, Hash>::type type;
 };
 
-template<typename Key, lfds::memory_model::type model, bool IsIntegral>
+template<typename Key, xtomic::memory_model::type model, bool IsIntegral>
 struct unform_hash_set_tester
 {
     static constexpr int MapSize = static_cast<int>(1e5);
     static constexpr int NumRepetitions = MapSize * 10;
 
     typedef Key key_type;
-    typedef typename lfds::my::make_hash<Key>::type hash_type;
+    typedef typename xtomic::my::make_hash<Key>::type hash_type;
     typedef typename make_hash_set_table<key_type, hash_type, model>::type set_type;
     typedef typename set_type::size_type size_type;
     typedef typename set_type::snapshot_type snapshot_type;
-    typedef lfds::testing::set_insert_erase<set_type, MapSize, NumRepetitions> mt_test_type;
+    typedef xtomic::testing::set_insert_erase<set_type, MapSize, NumRepetitions> mt_test_type;
 
     static constexpr bool INTEGRAL = set_type::INTEGRAL;
-    static constexpr lfds::memory_model::type MEMORY_MODEL =
+    static constexpr xtomic::memory_model::type MEMORY_MODEL =
             set_type::MEMORY_MODEL;
 
     static void testTypeTraits()
@@ -63,7 +63,7 @@ struct unform_hash_set_tester
 
 #undef check_flag
 
-        const lfds::memory_model::type memoryModel = MEMORY_MODEL;
+        const xtomic::memory_model::type memoryModel = MEMORY_MODEL;
         EXPECT_EQ(model, memoryModel);
     }
 
@@ -338,13 +338,13 @@ struct unform_hash_set_tester
     template<typename InnerKey>
     struct compile_tester
     {
-        typedef typename lfds::my::make_value_type<key_type, InnerKey>::type sized_key_type;
-        typedef typename lfds::my::make_hash<sized_key_type>::type inner_hash_type;
+        typedef typename xtomic::my::make_value_type<key_type, InnerKey>::type sized_key_type;
+        typedef typename xtomic::my::make_hash<sized_key_type>::type inner_hash_type;
 
         typedef std::equal_to<sized_key_type> equal_func_type;
         typedef std::allocator<key_type> allocator_type;
 
-        typedef lfds::hash_set<sized_key_type, inner_hash_type, equal_func_type,
+        typedef xtomic::hash_set<sized_key_type, inner_hash_type, equal_func_type,
                 allocator_type, set_type::MEMORY_MODEL> inner_hash_set_type;
         typedef typename inner_hash_set_type::size_type size_type;
 
@@ -352,7 +352,7 @@ struct unform_hash_set_tester
         {
             // components
             bool expected = IsIntegral;
-            bool res = lfds::is_integral<sized_key_type>::value;
+            bool res = xtomic::is_integral<sized_key_type>::value;
             EXPECT_EQ(expected, res);
 
             inner_hash_set_type hm;
@@ -365,9 +365,9 @@ struct unform_hash_set_tester
             hm.size();
 
             const bool isIntegral = inner_hash_set_type::INTEGRAL;
-            const lfds::memory_model::type memModel =
+            const xtomic::memory_model::type memModel =
                     inner_hash_set_type::MEMORY_MODEL;
-            const lfds::memory_model::type expectedModel = MEMORY_MODEL;
+            const xtomic::memory_model::type expectedModel = MEMORY_MODEL;
 
             EXPECT_EQ(expected, isIntegral);
             //EXPECT_EQ(model, memModel);
@@ -425,11 +425,11 @@ struct unform_hash_set_tester
     }
 };
 
-template<typename Key, bool integralKey = lfds::is_integral<Key>::value >
+template<typename Key, bool integralKey = xtomic::is_integral<Key>::value >
 struct make_set_uniform_tests
 {
-    typedef unform_hash_set_tester<Key, lfds::memory_model::wise, integralKey> wise_test_type;
-    typedef unform_hash_set_tester<Key, lfds::memory_model::greedy, integralKey> greedy_test_type;
+    typedef unform_hash_set_tester<Key, xtomic::memory_model::wise, integralKey> wise_test_type;
+    typedef unform_hash_set_tester<Key, xtomic::memory_model::greedy, integralKey> greedy_test_type;
 };
 
 #define MAKE_SET_UNIT_TEST(test_maker, suite, testFunc) \

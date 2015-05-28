@@ -19,19 +19,19 @@
 #include <cstdlib>
 
 template<typename Key, typename Value, typename Hash,
-        lfds::memory_model::type model>
+        xtomic::memory_model::type model>
 struct make_hash_table;
 
 template<typename Key, typename Value, typename Hash>
-struct make_hash_table<Key, Value, Hash, lfds::memory_model::wise>
+struct make_hash_table<Key, Value, Hash, xtomic::memory_model::wise>
 {
-    typedef typename lfds::make_wise_hash_map<Key, Value, Hash>::type type;
+    typedef typename xtomic::make_wise_hash_map<Key, Value, Hash>::type type;
 };
 
 template<typename Key, typename Value, typename Hash>
-struct make_hash_table<Key, Value, Hash, lfds::memory_model::greedy>
+struct make_hash_table<Key, Value, Hash, xtomic::memory_model::greedy>
 {
-    typedef typename lfds::make_greedy_hash_map<Key, Value, Hash>::type type;
+    typedef typename xtomic::make_greedy_hash_map<Key, Value, Hash>::type type;
 };
 
 struct map_type
@@ -76,7 +76,7 @@ struct map_traits<map_type::IntegralPair>
     static constexpr bool INTEGRAL_KEYVALUE = true;
 };
 
-template<typename Key, typename Value, lfds::memory_model::type MemoryModel,
+template<typename Key, typename Value, xtomic::memory_model::type MemoryModel,
         map_type::type MapType>
 struct unform_hash_map_tester
 {
@@ -85,19 +85,19 @@ struct unform_hash_map_tester
 
     typedef Key key_type;
     typedef Value mapped_type;
-    typedef typename lfds::my::make_hash<Key>::type hash_type;
+    typedef typename xtomic::my::make_hash<Key>::type hash_type;
     typedef typename make_hash_table<key_type, mapped_type, hash_type,
             MemoryModel>::type map_type;
     typedef typename map_type::size_type size_type;
     typedef typename map_type::snapshot_type snapshot_type;
-    typedef lfds::testing::map_insert_erase<map_type, MapSize, NumRepetitions> mt_test_type;
+    typedef xtomic::testing::map_insert_erase<map_type, MapSize, NumRepetitions> mt_test_type;
 
     typedef map_traits<MapType> expected_map_traits_type;
 
     static constexpr bool INTEGRAL_KEY = map_type::INTEGRAL_KEY;
     static constexpr bool INTEGRAL_VALUE = map_type::INTEGRAL_VALUE;
     static constexpr bool INTEGRAL_KEYVALUE = map_type::INTEGRAL_KEYVALUE;
-    static constexpr lfds::memory_model::type MEMORY_MODEL =
+    static constexpr xtomic::memory_model::type MEMORY_MODEL =
             map_type::MEMORY_MODEL;
 
     static void testTypeTraits()
@@ -115,7 +115,7 @@ struct unform_hash_map_tester
 
 #undef check_traits_flag
 
-        const lfds::memory_model::type memoryModel = MEMORY_MODEL;
+        const xtomic::memory_model::type memoryModel = MEMORY_MODEL;
         EXPECT_EQ(memoryModel, MemoryModel);
     }
 
@@ -164,14 +164,12 @@ struct unform_hash_map_tester
         bool res = false;
         size_type size = 0;
 
-        res = hm.insertOrUpdate(1, -1);
-        EXPECT_TRUE(res);
+        hm.insertOrUpdate(1, -1);
 
         size = hm.size();
         EXPECT_EQ(static_cast<size_type>(1), size);
 
-        res = hm.insertOrUpdate(1, -2);
-        EXPECT_TRUE(res);
+        hm.insertOrUpdate(1, -2);
 
         size = hm.size();
         EXPECT_EQ(static_cast<size_type>(1), size);
@@ -449,8 +447,8 @@ struct unform_hash_map_tester
             {
                 ++count_found;
 
-                typedef typename lfds::my::remove_wrapper<key_type>::type key_int_type;
-                typedef typename lfds::my::remove_wrapper<mapped_type>::type mapped_int_type;
+                typedef typename xtomic::my::remove_wrapper<key_type>::type key_int_type;
+                typedef typename xtomic::my::remove_wrapper<mapped_type>::type mapped_int_type;
 
                 EXPECT_EQ(static_cast<mapped_int_type>(v),
                         -static_cast<key_int_type>(k));
@@ -463,14 +461,14 @@ struct unform_hash_map_tester
     template<typename InnerKey, typename InnerValue>
     struct compile_tester
     {
-        typedef typename lfds::my::make_value_type<key_type, InnerKey>::type sized_key_type;
-        typedef typename lfds::my::make_value_type<mapped_type, InnerValue>::type sized_mapped_type;
-        typedef typename lfds::my::make_hash<sized_key_type>::type inner_hash_type;
+        typedef typename xtomic::my::make_value_type<key_type, InnerKey>::type sized_key_type;
+        typedef typename xtomic::my::make_value_type<mapped_type, InnerValue>::type sized_mapped_type;
+        typedef typename xtomic::my::make_hash<sized_key_type>::type inner_hash_type;
 
         typedef std::equal_to<sized_key_type> equal_func_type;
         typedef std::allocator<mapped_type> allocator_type;
 
-        typedef lfds::hash_map<sized_key_type, sized_mapped_type,
+        typedef xtomic::hash_map<sized_key_type, sized_mapped_type,
                 inner_hash_type, equal_func_type, allocator_type,
                 map_type::MEMORY_MODEL> inner_hash_map_type;
         typedef typename inner_hash_map_type::size_type size_type;
@@ -480,7 +478,7 @@ struct unform_hash_map_tester
                 inner_hash_map_type::INTEGRAL_VALUE;
         static constexpr bool INTEGRAL_KEYVALUE =
                 inner_hash_map_type::INTEGRAL_KEYVALUE;
-        static constexpr lfds::memory_model::type MEMORY_MODEL =
+        static constexpr xtomic::memory_model::type MEMORY_MODEL =
                 inner_hash_map_type::MEMORY_MODEL;
 
         void operator()() const
@@ -507,7 +505,7 @@ struct unform_hash_map_tester
 
 #undef check_traits_flag
 
-            const lfds::memory_model::type memModel = MEMORY_MODEL;
+            const xtomic::memory_model::type memModel = MEMORY_MODEL;
             EXPECT_EQ(MemoryModel, memModel);
         }
     };
@@ -579,9 +577,9 @@ struct unform_hash_map_tester
 template<typename Key, typename Value, map_type::type MapType>
 struct make_map_uniform_tests
 {
-    typedef unform_hash_map_tester<Key, Value, lfds::memory_model::greedy,
+    typedef unform_hash_map_tester<Key, Value, xtomic::memory_model::greedy,
             MapType> greedy_test_type;
-    typedef unform_hash_map_tester<Key, Value, lfds::memory_model::wise,
+    typedef unform_hash_map_tester<Key, Value, xtomic::memory_model::wise,
             MapType> wise_test_type;
 };
 

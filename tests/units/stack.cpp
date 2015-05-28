@@ -12,7 +12,7 @@
 TEST(FixedSizeStack, pop)
 {
     int val;
-    typedef lfds::stack<int, true> stack_type;
+    typedef xtomic::stack<int, true> stack_type;
 
     stack_type s(1);
 
@@ -22,7 +22,7 @@ TEST(FixedSizeStack, pop)
 TEST(FixedSizeStack, pushpoppop)
 {
     int val = 0;
-    typedef lfds::stack<int, true> stack_type;
+    typedef xtomic::stack<int, true> stack_type;
 
     stack_type s(1);
 
@@ -36,7 +36,7 @@ TEST(FixedSizeStack, pushpoppop)
 TEST(FixedSizeStack, sequence)
 {
     int val = 0;
-    typedef lfds::stack<int, true> stack_type;
+    typedef xtomic::stack<int, true> stack_type;
 
     stack_type s(3);
 
@@ -58,7 +58,7 @@ TEST(FixedSizeStack, sequence)
 TEST(DynamicSizeStack, pop)
 {
     int val;
-    typedef lfds::stack<int, false> stack_type;
+    typedef xtomic::stack<int, false> stack_type;
 
     stack_type s(1);
 
@@ -68,7 +68,7 @@ TEST(DynamicSizeStack, pop)
 TEST(DynamicSizeStack, pushpoppop)
 {
     int val = 0;
-    typedef lfds::stack<int, false> stack_type;
+    typedef xtomic::stack<int, false> stack_type;
 
     stack_type s(1);
 
@@ -81,7 +81,7 @@ TEST(DynamicSizeStack, pushpoppop)
 TEST(DynamicSizeStack, sequence)
 {
     int val = 0;
-    typedef lfds::stack<int, false> stack_type;
+    typedef xtomic::stack<int, false> stack_type;
 
     stack_type s(3);
 

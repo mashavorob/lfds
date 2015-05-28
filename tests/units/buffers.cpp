@@ -12,7 +12,7 @@
 
 TEST(fixed_buffer, allocfree)
 {
-    typedef lfds::fixed_buffer<int, std::allocator<int> > buffer_type;
+    typedef xtomic::fixed_buffer<int, std::allocator<int> > buffer_type;
     typedef buffer_type::node_type node_type;
 
     enum
@@ -31,7 +31,7 @@ TEST(fixed_buffer, allocfree)
 
 TEST(fixed_buffer, allocfree3)
 {
-    typedef lfds::fixed_buffer<int, std::allocator<int> > buffer_type;
+    typedef xtomic::fixed_buffer<int, std::allocator<int> > buffer_type;
     typedef buffer_type::node_type node_type;
 
     enum
@@ -71,7 +71,7 @@ TEST(fixed_buffer, allocfree3)
 
 TEST(dynamic_buffer, allocfree)
 {
-    typedef lfds::dynamic_buffer<int, std::allocator<int> > buffer_type;
+    typedef xtomic::dynamic_buffer<int, std::allocator<int> > buffer_type;
     typedef buffer_type::node_type node_type;
 
     enum
@@ -90,7 +90,7 @@ TEST(dynamic_buffer, allocfree)
 
 TEST(dynamic_buffer, reuse_node)
 {
-    typedef lfds::dynamic_buffer<int, std::allocator<int> > buffer_type;
+    typedef xtomic::dynamic_buffer<int, std::allocator<int> > buffer_type;
     typedef buffer_type::node_type node_type;
 
     enum

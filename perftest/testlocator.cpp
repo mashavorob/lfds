@@ -13,7 +13,7 @@
 
 #include <stdexcept>
 
-namespace lfds
+namespace xtomic
 {
 namespace perftest
 {

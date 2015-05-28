@@ -10,7 +10,7 @@
 
 #include "meta_utils.hpp"
 
-namespace lfds
+namespace xtomic
 {
 
 template<typename Key>

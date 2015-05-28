@@ -36,6 +36,7 @@ if ( LFDS_USE_CPP11 )
     add_subdirectory(demo)
 endif()
 add_subdirectory(perftest)
+add_subdirectory(doxy)
 
 install(DIRECTORY "${PROJECT_SOURCE_DIR}/include" DESTINATION "lfds")
 

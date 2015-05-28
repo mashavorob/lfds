@@ -11,7 +11,7 @@
 #include "stack_base_aba.hpp"
 #include <xtomic/aux/cppbasics.hpp>
 
-namespace lfds
+namespace xtomic
 {
 
 template<typename Buffer>

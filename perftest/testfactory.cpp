@@ -7,7 +7,7 @@
 
 #include "testfactory.hpp"
 
-namespace lfds
+namespace xtomic
 {
 namespace perftest
 {

@@ -26,7 +26,7 @@
 //        * lock free insert when resizing is not required
 //        * resize with exclusive access
 //        * lock free delete
-namespace lfds
+namespace xtomic
 {
 
 template<typename Key, typename Hash, typename Pred, typename Allocator>

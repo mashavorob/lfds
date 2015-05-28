@@ -9,7 +9,7 @@
 
 #include <xtomic/aux/cppbasics.hpp>
 
-namespace lfds
+namespace xtomic
 {
 namespace perftest
 {

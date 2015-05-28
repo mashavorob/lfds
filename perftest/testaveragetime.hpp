@@ -11,7 +11,7 @@
 #include "stopwatch.hpp"
 #include "performancetest.hpp"
 
-namespace lfds
+namespace xtomic
 {
 namespace perftest
 {

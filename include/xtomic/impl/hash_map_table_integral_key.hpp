@@ -20,7 +20,7 @@
 #include <functional>
 #include <vector>
 
-namespace lfds
+namespace xtomic
 {
 
 template<typename Key, typename Value, typename Hash, typename Pred,

@@ -12,7 +12,7 @@
 
 #include <cstddef>
 
-namespace lfds
+namespace xtomic
 {
 
 template<typename Node>
@@ -24,8 +24,8 @@ struct hash_data_table
     node_type* m_table;
     size_type m_capacity;
     size_type m_highWatermark;
-    xtomic<size_type> m_size;
-    xtomic<size_type> m_used;
+    xtomic::quantum<size_type> m_size;
+    xtomic::quantum<size_type> m_used;
 };
 
 }

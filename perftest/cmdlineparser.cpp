@@ -20,7 +20,7 @@
 #include <cassert>
 #include <cstring>
 
-namespace lfds
+namespace xtomic
 {
 namespace perftest
 {

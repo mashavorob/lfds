@@ -11,7 +11,7 @@
 #include <xtomic/config.hpp>
 #include <xtomic/aux/inttypes.hpp>
 
-namespace lfds
+namespace xtomic
 {
 
 template<typename T, T v>

@@ -23,7 +23,7 @@ struct Runner
         do
         {
             Value tagVal = tag;
-            lfds::atomic_cas(tagVal, expected, newVal);
+            xtomic::atomic_cas(tagVal, expected, newVal);
         } while (--repetitions);
     }
 };
@@ -79,7 +79,7 @@ struct RunnerTraits<Value, false, 8>
 {
     static const char* name()
     {
-        return "lfds::cas 8b";
+        return "xtomic::cas 8b";
     }
     static void run(std::size_t repetitions, const Value tag,
             const Value expected, const Value newVal)
@@ -93,7 +93,7 @@ struct RunnerTraits<Value, false, 16>
 {
     static const char* name()
     {
-        return "lfds::cas 16b";
+        return "xtomic::cas 16b";
     }
     static void run(std::size_t repetitions, const Value tag,
             const Value expected, const Value newVal)

@@ -16,7 +16,7 @@
 #include <iostream>
 #include <cmath>
 
-using namespace lfds::perftest;
+using namespace xtomic::perftest;
 
 template<typename Pred>
 void forEachItem(const ids_type & ids, Pred pred)

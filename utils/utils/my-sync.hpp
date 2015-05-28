@@ -12,10 +12,10 @@
 
 #include <pthread.h>
 
-namespace lfds {
+namespace xtomic {
 //
-// All content of 'my' namespace can be used only inside lfds library
-// do not try to reuse it outside of lfds
+// All content of 'my' namespace can be used only inside xtomic library
+// do not try to reuse it outside of xtomic
 //
 namespace my {
 class mutex

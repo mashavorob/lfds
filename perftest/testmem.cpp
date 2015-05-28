@@ -8,7 +8,7 @@
 #include "testmem.hpp"
 #include "testallocator.hpp"
 
-namespace lfds
+namespace xtomic
 {
 namespace perftest
 {

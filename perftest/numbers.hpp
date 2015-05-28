@@ -17,7 +17,7 @@
 #include <set>
 #include <vector>
 
-namespace lfds
+namespace xtomic
 {
 namespace perftest
 {

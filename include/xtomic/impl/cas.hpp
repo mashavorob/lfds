@@ -10,7 +10,7 @@
 
 #include <xtomic/aux/inttypes.hpp>
 
-namespace lfds
+namespace xtomic
 {
 
 namespace

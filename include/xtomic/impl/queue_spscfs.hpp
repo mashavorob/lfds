@@ -14,7 +14,7 @@
 #include <memory>
 #include <utility>
 
-namespace lfds
+namespace xtomic
 {
 
 namespace
@@ -148,7 +148,7 @@ private:
     }
 private:
     const size_type m_capacity;
-    xtomic<size_type> m_size;
+    xtomic::quantum<size_type> m_size;
     size_type m_head;
     size_type m_tail;
     node_type* m_buffer;

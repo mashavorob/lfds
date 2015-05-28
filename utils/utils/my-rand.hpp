@@ -16,7 +16,7 @@
 #include <cstdlib>
 #include <ctime>
 
-namespace lfds
+namespace xtomic
 {
 namespace my
 {

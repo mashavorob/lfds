@@ -15,7 +15,7 @@
 
 #include <iostream>
 
-namespace lfds
+namespace xtomic
 {
 namespace testing
 {
@@ -32,8 +32,8 @@ public:
 private:
     struct node_type
     {
-        lfds::xtomic<size_type> m_count;
-        lfds::xtomic<size_type> m_index;
+        xtomic::quantum<size_type> m_count;
+        xtomic::quantum<size_type> m_index;
 
         node_type() :
                 m_count(0),
@@ -42,17 +42,17 @@ private:
 
         }
         node_type(const node_type& other) :
-                m_count(other.m_count.load(lfds::barriers::relaxed)),
-                m_index(other.m_index.load(lfds::barriers::relaxed))
+                m_count(other.m_count.load(xtomic::barriers::relaxed)),
+                m_index(other.m_index.load(xtomic::barriers::relaxed))
         {
 
         }
         node_type operator=(const node_type& other)
         {
-            m_count.store(other.m_count.load(lfds::barriers::relaxed),
-                    lfds::barriers::relaxed);
-            m_index.store(other.m_index.load(lfds::barriers::relaxed),
-                    lfds::barriers::relaxed);
+            m_count.store(other.m_count.load(xtomic::barriers::relaxed),
+                    xtomic::barriers::relaxed);
+            m_index.store(other.m_index.load(xtomic::barriers::relaxed),
+                    xtomic::barriers::relaxed);
             return *this;
         }
     };
@@ -79,13 +79,13 @@ public:
         m_table.swap(table);
 
         m_finish = false;
-        m_index.store(-1, lfds::barriers::relaxed);
-        m_failedPushes.store(0, lfds::barriers::relaxed);
-        m_numOfIncorrectValues.store(0, lfds::barriers::relaxed);
+        m_index.store(-1, xtomic::barriers::relaxed);
+        m_failedPushes.store(0, xtomic::barriers::relaxed);
+        m_numOfIncorrectValues.store(0, xtomic::barriers::relaxed);
         void* parg = reinterpret_cast<void*>(this);
 
         // ensure that all data is written at this point
-        lfds::thread_fence(lfds::barriers::release);
+        xtomic::thread_fence(xtomic::barriers::release);
 
         // start threads
         for (int i = 0; i < Consumers; ++i)
@@ -112,11 +112,11 @@ public:
 
     size_type getNumOfFailedPushes() const
     {
-        return m_failedPushes.load(lfds::barriers::relaxed);
+        return m_failedPushes.load(xtomic::barriers::relaxed);
     }
     size_type getNumOfIncorrectValues() const
     {
-        return m_numOfIncorrectValues.load(lfds::barriers::relaxed);
+        return m_numOfIncorrectValues.load(xtomic::barriers::relaxed);
     }
     bool isDataComplete() const
     {
@@ -126,7 +126,7 @@ public:
         for (const_iterator i = m_table.begin(); i != end; ++i, ++index)
         {
             const node_type & node = *i;
-            if (node.m_count.load(lfds::barriers::relaxed) == 0)
+            if (node.m_count.load(xtomic::barriers::relaxed) == 0)
             {
                 res = false;
                 std::cerr << "***item " << index << " was not received" << std::endl;
@@ -144,12 +144,12 @@ public:
         for (const_iterator i = beg; i != end; ++i, ++index)
         {
             const node_type & node = *i;
-            if (node.m_count.load(lfds::barriers::relaxed) != 1)
+            if (node.m_count.load(xtomic::barriers::relaxed) != 1)
             {
                 continue;
             }
             int diff = static_cast<int>(index
-                    - node.m_index.load(lfds::barriers::relaxed));
+                    - node.m_index.load(xtomic::barriers::relaxed));
             if (diff < 0)
             {
                 diff = -diff;
@@ -195,7 +195,7 @@ private:
                 int count = ++node.m_count;
                 if ( count == 1)
                 {
-                    node.m_index.store(order, lfds::barriers::release);
+                    node.m_index.store(order, xtomic::barriers::release);
                 }
 
                 if (count > 1)
@@ -233,10 +233,10 @@ private:
     }
 private:
     queue_type& m_q;
-    lfds::xtomic<int> m_index;
+    xtomic::quantum<int> m_index;
     table_type m_table;
-    lfds::xtomic<size_type> m_failedPushes;
-    lfds::xtomic<size_type> m_numOfIncorrectValues;
+    xtomic::quantum<size_type> m_failedPushes;
+    xtomic::quantum<size_type> m_numOfIncorrectValues;
     volatile bool m_finish;
 };
 

@@ -15,7 +15,7 @@
 
 #include <cstddef>
 
-namespace lfds
+namespace xtomic
 {
 template<typename T>
 struct align_4_cas16 ref_ptr
@@ -23,8 +23,8 @@ struct align_4_cas16 ref_ptr
     typedef ref_ptr<T> this_type;
     typedef std::size_t size_type;
     typedef T value_type;
-    typedef xtomic<value_type*> atomic_ptr_type;
-    typedef xtomic<size_type> atomic_counter;
+    typedef xtomic::quantum<value_type*> atomic_ptr_type;
+    typedef xtomic::quantum<size_type> atomic_counter;
 
     atomic_ptr_type m_ptr;
     mutable atomic_counter m_refCount;
@@ -57,7 +57,7 @@ struct align_4_cas16 ref_ptr
 
     bool atomic_cas(const this_type & expected, const this_type & val)
     {
-        return lfds::atomic_cas(*this, expected, val);
+        return xtomic::atomic_cas(*this, expected, val);
     }
     size_type addRef() const
     {

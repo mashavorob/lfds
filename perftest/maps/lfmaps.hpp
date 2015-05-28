@@ -12,7 +12,7 @@
 #include <xtomic/hash_trie.hpp>
 #include <xtomic/aux/xfunctional.hpp>
 
-namespace lfds
+namespace xtomic
 {
 namespace perftest
 {
@@ -24,13 +24,13 @@ namespace adapter
 template<typename Key, typename Value,
         typename Hash = typename make_hash<Key>::type,
         typename Allocator = std::allocator<Value>,
-        lfds::memory_model::type MemModel = lfds::default_memory_model::value
+        xtomic::memory_model::type MemModel = xtomic::default_memory_model::value
         >
 class hash_map
 {
 public:
     typedef std::equal_to<Key> equal_to_type;
-    typedef lfds::hash_map<Key, Value, Hash, equal_to_type, Allocator, MemModel> collection_type;
+    typedef xtomic::hash_map<Key, Value, Hash, equal_to_type, Allocator, MemModel> collection_type;
     typedef typename collection_type::key_type key_type;
     typedef typename collection_type::mapped_type mapped_type;
     typedef typename collection_type::size_type size_type;
@@ -74,7 +74,7 @@ template<typename Key, typename Value,
         >
 struct make_wise_hash_map
 {
-    typedef hash_map<Key, Value, Hash, Allocator, lfds::memory_model::wise> type;
+    typedef hash_map<Key, Value, Hash, Allocator, xtomic::memory_model::wise> type;
 };
 
 template<typename Key, typename Value,
@@ -83,7 +83,7 @@ template<typename Key, typename Value,
         >
 struct make_greedy_hash_map
 {
-    typedef hash_map<Key, Value, Hash, Allocator, lfds::memory_model::greedy> type;
+    typedef hash_map<Key, Value, Hash, Allocator, xtomic::memory_model::greedy> type;
 };
 
 template<typename Key, typename Value, int BFactor,
@@ -91,7 +91,7 @@ template<typename Key, typename Value, int BFactor,
 class hash_trie
 {
 public:
-    typedef lfds::hash_trie<Key, Value, BFactor, typename make_hash<Key>::type,
+    typedef xtomic::hash_trie<Key, Value, BFactor, typename make_hash<Key>::type,
             std::equal_to<Key>, Allocator> collection_type;
     typedef typename collection_type::key_type key_type;
     typedef typename collection_type::mapped_type mapped_type;

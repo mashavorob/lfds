@@ -13,7 +13,7 @@
 #pragma pack(push)
 #pragma pack(1)
 
-namespace lfds
+namespace xtomic
 {
 namespace
 {

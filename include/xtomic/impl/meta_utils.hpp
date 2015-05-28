@@ -11,7 +11,7 @@
 #include <xtomic/aux/inttypes.hpp>
 #include "xtraits.hpp"
 
-namespace lfds
+namespace xtomic
 {
 
 template<int A, int B>

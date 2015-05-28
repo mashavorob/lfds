@@ -11,7 +11,7 @@
 #include <xtomic/aux/cppbasics.hpp>
 #include <xtomic/xfunctional.hpp>
 
-namespace lfds
+namespace xtomic
 {
 namespace testing
 {
@@ -54,7 +54,7 @@ struct adapted_hash
 public:
     typedef typename make_hash<T>::type hash_type;
 
-    size_t operator()(const lfds::testing::adapter<T>& val) const
+    size_t operator()(const xtomic::testing::adapter<T>& val) const
     {
         return m_hasher(val.m_t);
     }
@@ -64,7 +64,7 @@ private:
 };
 
 template<typename T>
-struct make_hash<lfds::testing::adapter<T> >
+struct make_hash<xtomic::testing::adapter<T> >
 {
     typedef adapted_hash<T> type;
 };
@@ -81,13 +81,13 @@ struct bad_hash: public std::unary_function<T, std::size_t>
 };
 
 template<typename T>
-inline bool operator==(const lfds::testing::adapter<T> & a, T b)
+inline bool operator==(const xtomic::testing::adapter<T> & a, T b)
 {
     return a.m_t == b;
 }
 
 template<typename T>
-inline bool operator==(T a, const lfds::testing::adapter<T> & b)
+inline bool operator==(T a, const xtomic::testing::adapter<T> & b)
 {
     return a == b.m_t;
 }

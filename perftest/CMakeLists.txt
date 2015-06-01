@@ -24,4 +24,9 @@ target_link_libraries (
     ${CMAKE_THREAD_LIBS_INIT}
     rt
     )
+
+install(
+  PROGRAMS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/perftest
+  DESTINATION ${XTOMIC_INSTALL_PREFIX}/bin
+  )
 	

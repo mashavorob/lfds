@@ -19,8 +19,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     add_definitions(-pthread)
 endif()
 
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/xtomic/config.hpp.in" 
     "${CMAKE_CURRENT_BINARY_DIR}/include/xtomic/config.hpp")
@@ -31,12 +30,29 @@ include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}/include
     )
 
+#if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+#    set( CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/install )
+#endif()
+
+set(
+    XTOMIC_INSTALL_PREFIX
+    ${CMAKE_INSTALL_PREFIX}/xtomic-v${XTOMIC_VERSION_MAJOR}.${XTOMIC_VERSION_MINOR}
+    )
+
 enable_testing()
 add_subdirectory(tests)
 add_subdirectory(perftest)
 add_subdirectory(doxy)
 
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/include" DESTINATION "lfds")
+install(DIRECTORY
+  "${CMAKE_CURRENT_SOURCE_DIR}/include/xtomic" 
+  DESTINATION "${XTOMIC_INSTALL_PREFIX}/include"
+  PATTERN "*.in" EXCLUDE
+  )
+install(FILES
+  "${CMAKE_CURRENT_BINARY_DIR}/include/xtomic/config.hpp" 
+  DESTINATION "${XTOMIC_INSTALL_PREFIX}/include/xtomic"
+  )
 
 set(CMAKE_CTEST_COMMAND ctest) 
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})

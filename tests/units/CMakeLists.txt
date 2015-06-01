@@ -28,3 +28,8 @@ add_executable( unit-tests
 
 # Link test executable against gtest & gtest_main
 target_link_libraries(unit-tests gtest gtest_main)
+
+install(
+  PROGRAMS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unit-tests
+  DESTINATION ${XTOMIC_INSTALL_PREFIX}/bin
+  )

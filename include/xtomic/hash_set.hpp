@@ -8,6 +8,8 @@
 ///
 /// \file hash_set.hpp
 ///
+/// @brief `hash_set<>` and related helpers.
+///
 
 #ifndef INCLUDE_HASH_SET_HPP_
 #define INCLUDE_HASH_SET_HPP_

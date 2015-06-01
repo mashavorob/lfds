@@ -5,10 +5,19 @@
  *      Author: masha
  */
 
+/// @file xfunctional.hpp
+///
+/// @brief The file implements bridge for uniform using C++11 functors in C++98.
+///
+/// C++11 makes available some new functors that were defined under tr1 namespace in C++98.
+///
+
 #ifndef INCLUDE_XFUNCTIONAL_HPP_
 #define INCLUDE_XFUNCTIONAL_HPP_
 
+/// @cond HIDDEN_SYMBOLS
 #include <xtomic/config.hpp>
+/// @endcond
 
 ///
 /// @brief Helper meta class for using stl::hash<>
@@ -27,7 +36,7 @@ template<typename T>
 struct make_hash;
 
 
-#if LFDS_USE_CPP11
+#if XTOMIC_USE_CPP11
 
 #include <xtomic/impl/xfunctional-modern.hpp>
 

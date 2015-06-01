@@ -5,7 +5,10 @@
  *      Author: masha
  */
 
-/// \file xtomic.hpp
+/// \file quantum.hpp
+///
+/// @brief Memory barriers and atomics.
+///
 
 #ifndef INCLUDE_XTOMIC_HPP_
 #define INCLUDE_XTOMIC_HPP_
@@ -85,15 +88,10 @@ private:
 
 public:
 
-    ///
-    /// @defgroup quantum_quantum Constructors
-    ///
-    /// @param val specifies initial variable value.
-    ///
-    /// @{
-    ///
-
     /// @brief Default constructor.
+    ///
+    /// Constructs an object initialized by zero.
+    ///
     quantum() :
             m_val()
     {
@@ -101,59 +99,53 @@ public:
     }
 
     /// @brief Constructor with initial value.
+    ///
+    /// @param val specifies initial value.
+    ///
     quantum(const T val) :
             m_val(val)
     {
 
     }
-    /// @}
 
-    ///
-    /// @defgroup quantum_store Atomic store operation.
+    /// @name Atomic store.
+    /// @{
+
     ///
     /// The method atomically stores specified value and implements requested barrier.
     ///
     /// @param val specifies a value to store.
     ///
-    /// @{
-
-    /// @brief Relaxed store.
     void store(const T val, barriers::erelaxed);
 
-    /// @brief Volatile version of relaxed store.
     void store(const T val, barriers::erelaxed) volatile;
 
-    /// @brief Store with `release` barrier.
     void store(const T val, barriers::erelease);
 
-    /// @brief Volatile version of store with `release` barrier.
     void store(const T val, barriers::erelease) volatile;
     /// @}
 
-    ///
-    /// @defgroup quantum_load Atomic load operation.
+
+    /// @name Atomic load.
+    /// @{
+
     ///
     /// The operation implements requested barrier and atomically loads a value from the object.
     ///
     /// @return value that the object holds.
     ///
-    /// @{
-
-    /// @brief Relaxed load.
     T load(const barriers::erelaxed) const;
 
-    /// @brief Volatale version of relaxed load.
     T load(const barriers::erelaxed) const volatile;
 
-    /// @brief Load with `acquire` barrier.
     T load(const barriers::eacquire) const;
 
-    /// @brief Volatile version of load with `acquire` barrier.
     T load(const barriers::eacquire) const volatile;
     /// @}
 
-    ///
-    /// @defgroup quantum_fetch_add Atomic fetch and add operation.
+    /// @name Atomic fetch and add operation.
+    /// @{
+
     ///
     /// The operation atomically adds specified value to current object's value and implements requested
     /// memory barrier. At exit the methods return value, that was in object before the operation.
@@ -166,6 +158,7 @@ public:
     /// {
     ///     T oldVal = m_val;
     ///     m_val += val;
+    ///     thread_fence(barrier);
     ///     return oldVal;
     /// }
     /// \endcode
@@ -173,25 +166,18 @@ public:
     /// @param val specifies a value to add.
     /// @return value that was stored in the object before the operation.
     ///
-    /// @{
-    ///
-
-    /// @brief Relaxed operation.
     T fetch_add(const T val, barriers::erelaxed);
 
-    /// @brief Volatile version of relaxed operation.
     T fetch_add(const T val, barriers::erelaxed) volatile;
 
-    /// @brief Operation with release barrier.
     T fetch_add(const T val, barriers::erelease);
 
-    /// @brief Volatile version of the operation with release barrier.
     T fetch_add(const T val, barriers::erelease) volatile;
     /// @}
 
-    ///
-    /// @defgroup quantum_fetch_sub Atomic fetch and add operation.
-    ///
+    /// @name Atomic fetch and sub operation.
+    /// @{
+
     /// The operation atomically subtracts specified value from current object's value and returns
     /// value that was in the object before the operation. The operation implements requested barrier.
     ///
@@ -203,6 +189,7 @@ public:
     /// {
     ///     T oldVal = m_val;
     ///     m_val -= val;
+    ///     thread_fence(barrier);
     ///     return oldVal;
     /// }
     /// @endcode
@@ -210,24 +197,19 @@ public:
     /// @param val specifies a value to add.
     /// @return value that was in the object before the operation.
     ///
-    /// @{
-    ///
-
-    /// @brief Relaxed operation.
     T fetch_sub(const T val, barriers::erelaxed);
 
-    /// @brief Volatile version of the relaxed operation.
     T fetch_sub(const T val, barriers::erelaxed) volatile;
 
-    /// @brief Operation with release barrier.
     T fetch_sub(const T val, barriers::erelease);
 
-    /// @brief Volatile version of the operation with release barrier.
     T fetch_sub(const T val, barriers::erelease) volatile;
     /// @}
 
-    ///
-    /// @defgroup quantum_atomic_cas Atomic Compare And Swap (CAS) operation.
+
+    /// @name Atomic compare and swap operation.
+    /// @{
+
     ///
     /// The method can be illustrated by pseudo-code:
     ///
@@ -250,57 +232,36 @@ public:
     /// - `false` if expected value did not match with actual value stored in the object. At exit
     ///   the object remains aunchanged.
     ///
-    /// @{
 
-    /// @brief atomic compare and swap.
     bool atomic_cas(const T e, const T n);
 
-    /// @brief atomic compare and swap.
     bool atomic_cas(const this_type & e, const this_type & n);
     /// @}
 
     ///
-    /// @defgroup quantum_increment Atomic increments
+    /// @name Increments and decrements.
     ///
-    /// The operators implement pre and post increments with full memory barriers.
+    /// The operators implement full memory barrier.
     ///
     /// @{
-    ///
 
-    /// @brief conventional pre-increment.
     T operator++();
 
-    /// @brief volatile pre-increment.
     T operator++() volatile;
 
-    /// @brief conventional post-increment.
     T operator++(int);
 
-    /// @brief volatile post-increment.
     T operator++(int) volatile;
-    /// @}
 
-    ///
-    /// @defgroup quantum_decrement Atomic increments
-    ///
-    /// The operators implement pre and post decrements with full memory barriers.
-    ///
-    /// @{
-    ///
-
-    /// @brief conventional pre-decrement.
     T operator--();
 
-    /// @brief volatile pre-decrement.
     T operator--() volatile;
 
 
-    /// @brief conventional post-decrement.
     T operator--(int);
 
-    /// @brief volatile post-decrement.
     T operator--(int) volatile;
-    /// \}
+    /// @}
 
 private:
     volatile T m_val;
@@ -309,7 +270,7 @@ private:
 
 }
 
-#if LFDS_USE_CPP11
+#if XTOMIC_USE_CPP11
 
 #include "impl/xtomic-modern.hpp"
 

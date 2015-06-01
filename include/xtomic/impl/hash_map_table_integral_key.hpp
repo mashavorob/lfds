@@ -143,18 +143,18 @@ public:
 
         return false;
     }
-#if LFDS_USE_CPP11
+#if XTOMIC_USE_CPP11
     template<typename ... Args>
     bool insert_impl(table_type& raw_table,
                      const key_type key,
                      const bool updateIfExists,
                      Args&&... val)
-#else // LFDS_USE_CPP11
+#else // XTOMIC_USE_CPP11
     bool insert_impl(table_type& raw_table,
                      const key_type key,
                      const bool updateIfExists,
                      const mapped_type &val)
-#endif // LFDS_USE_CPP11
+#endif // XTOMIC_USE_CPP11
     {
         const std::size_t hash = m_hash_func(key);
 

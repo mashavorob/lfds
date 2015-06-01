@@ -6,6 +6,9 @@
  */
 
 /// \file queue.hpp
+///
+/// @brief Queues and related helpers.
+///
 
 #ifndef INCLUDE_QUEUE_HPP_
 #define INCLUDE_QUEUE_HPP_
@@ -188,7 +191,7 @@ public:
     ///
     /// *Note:* in case of dynamic sized queue the operation always returns `true`.
     ///
-#if LFDS_USE_CPP11
+#if XTOMIC_USE_CPP11
     template<typename ... Args>
     bool push(Args&&... data)
 #else
@@ -277,7 +280,7 @@ public:
     {
     }
 
-#if LFDS_USE_CPP11
+#if XTOMIC_USE_CPP11
     template<typename ... Args>
     bool push(Args&&... data)
 #else

@@ -50,7 +50,7 @@ public:
         }
     }
 
-#if LFDS_USE_CPP11
+#if XTOMIC_USE_CPP11
     template<typename ... Args>
     node_type* newNode(Args&&... data)
 #else
@@ -65,7 +65,7 @@ public:
         m_base.constructData(node, std_forward(Args, data));
         return node;
     }
-#if !LFDS_USE_CPP11
+#if !XTOMIC_USE_CPP11
     node_type* newNode()
     {
         node_type* node = m_base.popFreeNode();

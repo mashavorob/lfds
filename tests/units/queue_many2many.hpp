@@ -8,10 +8,9 @@
 #ifndef TESTS_SYNC_QUEUE_MANY2MANY_HPP_
 #define TESTS_SYNC_QUEUE_MANY2MANY_HPP_
 
-#include <xtomic/xtomic.hpp>
-
 #include <vector>
 #include <pthread.h>
+#include <xtomic/quantum.hpp>
 
 #include <iostream>
 

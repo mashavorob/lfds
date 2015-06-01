@@ -157,7 +157,7 @@ public:
         return false;
     }
 
-#if LFDS_USE_CPP11
+#if XTOMIC_USE_CPP11
     template<typename ... Args>
     bool insert_impl(table_type& raw_table,
                      const key_type & key,

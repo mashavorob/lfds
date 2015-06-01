@@ -15,7 +15,7 @@
 
 #include <pthread.h>
 #include <map>
-#if LFDS_USE_CPP11
+#if XTOMIC_USE_CPP11
 #include <unordered_map>
 #else
 #include <tr1/unordered_map>
@@ -49,7 +49,7 @@ template<typename Key, typename Value, typename Allocator>
 struct get_map_type<Key, Value, Allocator, true>
 {
     typedef typename make_hash<Key>::type hash_type;
-#if LFDS_USE_CPP11
+#if XTOMIC_USE_CPP11
     typedef std::unordered_map<Key, Value, hash_type, std::equal_to<Key>, Allocator> type;
 #else
     typedef std::tr1::unordered_map<Key, Value, hash_type, std::equal_to<Key>,
@@ -66,7 +66,7 @@ struct get_reserve_implemented
     };
 };
 
-#if LFDS_USE_CPP11
+#if XTOMIC_USE_CPP11
 template<>
 struct get_reserve_implemented<true>
 {

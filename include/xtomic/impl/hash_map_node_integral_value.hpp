@@ -9,8 +9,8 @@
 #define INCLUDE_HASH_MAP_NODE_INTEGRAL_VALUE_HPP_
 
 #include "cas.hpp"
-#include <xtomic/xtomic.hpp>
 #include <xtomic/aux/inttypes.hpp>
+#include <xtomic/quantum.hpp>
 
 #include <cstddef>
 

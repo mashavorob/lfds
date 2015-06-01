@@ -10,8 +10,8 @@
 
 #include "ref_ptr.hpp"
 #include "ref_lock.hpp"
-#include <xtomic/xtomic.hpp>
 #include <xtomic/aux/cppbasics.hpp>
+#include <xtomic/quantum.hpp>
 
 #include <cassert>
 #include <cstddef>

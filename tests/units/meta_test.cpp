@@ -10,7 +10,7 @@
 #include <gtest/gtest.h>
 
 
-#if !LFDS_USE_CPP11
+#if !XTOMIC_USE_CPP11
 template<typename T>
 struct is_int
 {

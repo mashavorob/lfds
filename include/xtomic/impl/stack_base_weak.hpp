@@ -8,7 +8,7 @@
 #ifndef INCLUDE_STACK_BASE_WEAK_HPP_
 #define INCLUDE_STACK_BASE_WEAK_HPP_
 
-#include <xtomic/xtomic.hpp>
+#include <xtomic/quantum.hpp>
 #include "cas.hpp"
 #include "stack_node.hpp"
 

@@ -6,16 +6,18 @@
  */
 
 /// \file stack.hpp
+///
+/// @brief Stack.
+///
 
 #ifndef INCLUDE_STACK_HPP_
 #define INCLUDE_STACK_HPP_
 
 /// \cond HIDDEN_SYMBOLS
+#include <xtomic/quantum.hpp>
 #include "impl/stack_base_aba.hpp"
 #include "impl/buffer_traits.hpp"
 #include "aux/cppbasics.hpp"
-#include "xtomic.hpp"
-
 #include <utility>
 /// \endcond
 
@@ -88,7 +90,7 @@ public:
     ///    - *Dinosourus C*++: specifies a value of a new item.
     /// @return true if new item was inserted successfully.
     ///
-#if LFDS_USE_CPP11
+#if XTOMIC_USE_CPP11
     template<typename ... Args>
     bool push(Args&&... val)
 #else

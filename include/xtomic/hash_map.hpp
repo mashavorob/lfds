@@ -6,8 +6,9 @@
  */
 
 ///
-/// \file hash_map.hpp
-/// \brief \tableofcontents
+/// @file hash_map.hpp
+///
+/// @brief `hash_map<>` and related helpers.
 ///
 
 #ifndef INCLUDE_HASH_MAP_HPP_
@@ -29,6 +30,7 @@
 
 /// \endcond
 
+/// @brief Generic namespace for xtomic library.
 namespace xtomic
 {
 
@@ -204,8 +206,10 @@ public:
         m_hash_table_base.getSnapshot(snapshot);
     }
 
+    /// @name Find
+    /// @{
+
     ///
-    /// @defgroup hash_map_find Find operation.
     /// @brief The operation finds value associated with specified key.
     ///
     /// @param key specifies key to find.
@@ -213,18 +217,20 @@ public:
     ///
     /// @return
     /// - `true` if the association was found otherwise `false`.
-    /// - value associated with the key if found otherwise default value `mapped_type()`.
     ///
-    /// @{
-    ///
-
-    /// @brief find value by key
     bool find(const key_type & key, mapped_type & value) const
     {
         return m_hash_table_base.find(key, value);
     }
 
-    /// @brief find value by key
+    ///
+    /// @brief The operation finds value associated with specified key.
+    ///
+    /// @param key specifies key to find.
+    ///
+    /// @return
+    /// - value associated with the key if found otherwise default value `mapped_type()`.
+    ///
     const mapped_type find(const key_type & key) const
     {
         mapped_type value = mapped_type();
@@ -232,6 +238,9 @@ public:
         return value;
     }
     /// @}
+
+    /// @name Insert
+    /// @{
 
     ///
     /// The method inserts a new key-value pair. The method does nothing if
@@ -244,7 +253,7 @@ public:
     /// - `false` if the container already had a value associated with the specified key.
     ///    The old value remains unchanged.
     ///
-#if LFDS_USE_CPP11
+#if XTOMIC_USE_CPP11
     template<typename ... Args>
     bool insert(const key_type & key, Args&&... val)
 #else
@@ -260,7 +269,7 @@ public:
     /// @param key specifies a key.
     /// @param val specifies a mapped-value.
     ///
-#if LFDS_USE_CPP11
+#if XTOMIC_USE_CPP11
     template<typename ... Args>
     void insertOrUpdate(const key_type & key, Args&&... val)
 #else
@@ -269,6 +278,8 @@ public:
     {
         m_hash_table_base.insert(key, true, std_forward(Args, val));
     }
+
+    /// @}
 
     ///
     /// The method erases an existing association for specified key.

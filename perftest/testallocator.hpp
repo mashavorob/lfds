@@ -109,7 +109,7 @@ public:
     {
         return m_nestedAlloc.max_size();
     }
-#if LFDS_USE_CPP11
+#if XTOMIC_USE_CPP11
     template<typename ... Args>
     void construct(pointer p, Args&&... val)
 #else

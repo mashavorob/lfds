@@ -19,12 +19,12 @@ class noncopyable
 {
 private:
     noncopyable(const noncopyable&)
-#if LFDS_USE_CPP11
+#if XTOMIC_USE_CPP11
     = delete
 #endif
     ;
     noncopyable& operator=(const noncopyable&)
-#if LFDS_USE_CPP11
+#if XTOMIC_USE_CPP11
     = delete
 #endif
     ;

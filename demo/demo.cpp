@@ -46,8 +46,8 @@ const char* usage =
 
 int main(int argc, char** argv)
 {
-    std::cout << "Lock Free Data Structures Demo v" << LFDS_VERSION_MAJOR << "."
-            << LFDS_VERSION_MINOR << std::endl << std::endl;
+    std::cout << "Lock Free Data Structures Demo v" << XTOMIC_VERSION_MAJOR << "."
+            << XTOMIC_VERSION_MINOR << std::endl << std::endl;
 
     static const int FixedSize = 0x1;
     static const int ManyProducers = 0x2;

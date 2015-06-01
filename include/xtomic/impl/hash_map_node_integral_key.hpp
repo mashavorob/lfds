@@ -8,8 +8,8 @@
 #ifndef INCLUDE_HASH_MAP_NODE_INTEGRAL_KEY_HPP_
 #define INCLUDE_HASH_MAP_NODE_INTEGRAL_KEY_HPP_
 
+#include <xtomic/quantum.hpp>
 #include "meta_utils.hpp"
-#include <xtomic/xtomic.hpp>
 
 namespace xtomic
 {

@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 project(xtomic)
 
-set(LFDS_VERSION_MAJOR 1)
-set(LFDS_VERSION_MINOR 0)
+set(XTOMIC_VERSION_MAJOR 1)
+set(XTOMIC_VERSION_MINOR 0)
 
 if(CMAKE_COMPILER_IS_GNUCXX)
     message(status "GNUCXX detected")
@@ -12,9 +12,9 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     if (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
         message(STATUS "Version >= 4.8")
         add_definitions(-std=c++11)
-        set(LFDS_USE_CPP11 1)
+        set(XTOMIC_USE_CPP11 1)
     else()
-        set(LFDS_USE_CPP11 0)
+        set(XTOMIC_USE_CPP11 0)
     endif()    
     add_definitions(-pthread)
 endif()
@@ -22,19 +22,17 @@ endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-configure_file("${PROJECT_SOURCE_DIR}/include/xtomic/config.hpp.in" 
-    "${PROJECT_SOURCE_DIR}/include/xtomic/config.hpp")
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/xtomic/config.hpp.in" 
+    "${CMAKE_CURRENT_BINARY_DIR}/include/xtomic/config.hpp")
 
 include_directories(
     include
     utils
+    ${CMAKE_CURRENT_BINARY_DIR}/include
     )
 
 enable_testing()
 add_subdirectory(tests)
-if ( LFDS_USE_CPP11 )
-    add_subdirectory(demo)
-endif()
 add_subdirectory(perftest)
 add_subdirectory(doxy)
 

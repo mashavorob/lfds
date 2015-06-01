@@ -8,8 +8,7 @@
 #ifndef INCLUDE_RAW_HASH_TABLE_HPP_
 #define INCLUDE_RAW_HASH_TABLE_HPP_
 
-#include <xtomic/xtomic.hpp>
-
+#include <xtomic/quantum.hpp>
 #include <cstddef>
 
 namespace xtomic

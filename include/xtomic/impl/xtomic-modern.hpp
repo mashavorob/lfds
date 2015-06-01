@@ -176,7 +176,6 @@ inline T quantum<T>::operator--(int) volatile
 {
     return __atomic_fetch_sub(&m_val, static_cast<T>(1), __ATOMIC_SEQ_CST);
 }
-};
 
 }
 

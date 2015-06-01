@@ -18,7 +18,7 @@ PROJECT_NAME           = "@CMAKE_PROJECT_NAME@"
 # spaces.
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = @XTOMIC_PUBLIC_INTERFACE@
+INPUT                  = @XTOMIC_PUBLIC_INTERFACE@ @XTOMIC_MAIN_PAGE@
 
 # The EXCLUDE tag can be used to specify files and/or directories that should be
 # excluded from the INPUT source files. This way you can easily exclude a
@@ -78,7 +78,7 @@ DOXYFILE_ENCODING      = UTF-8
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         = 1
+PROJECT_NUMBER         = @XTOMIC_VERSION_MAJOR@.@XTOMIC_VERSION_MINOR@
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
@@ -351,7 +351,7 @@ IDL_PROPERTY_SUPPORT   = YES
 # all members of a group must be documented explicitly.
 # The default value is: NO.
 
-DISTRIBUTE_GROUP_DOC   = NO
+DISTRIBUTE_GROUP_DOC   = YES
 
 # Set the SUBGROUPING tag to YES to allow class member groups of the same type
 # (for instance a group of public functions) to be put as a subgroup of that
@@ -371,7 +371,7 @@ SUBGROUPING            = YES
 # SEPARATE_MEMBER_PAGES.
 # The default value is: NO.
 
-INLINE_GROUPED_CLASSES = NO
+INLINE_GROUPED_CLASSES = YES
 
 # When the INLINE_SIMPLE_STRUCTS tag is set to YES, structs, classes, and unions
 # with only public data fields or simple typedef fields will be shown inline in

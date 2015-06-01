@@ -8,8 +8,8 @@
 #ifndef INCLUDE_QUEUE_SPSCFS_HPP_
 #define INCLUDE_QUEUE_SPSCFS_HPP_
 
-#include <xtomic/xtomic.hpp>
 #include <xtomic/aux/cppbasics.hpp>
+#include <xtomic/quantum.hpp>
 
 #include <memory>
 #include <utility>
@@ -85,7 +85,7 @@ public:
         m_nodeAllocator.deallocate(m_buffer, m_capacity);
     }
 
-#if LFDS_USE_CPP11
+#if XTOMIC_USE_CPP11
     template<typename ... Args>
     bool push(Args&&... data)
 #else

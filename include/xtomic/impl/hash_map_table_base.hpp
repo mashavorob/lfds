@@ -55,12 +55,12 @@ public:
 
         return base_type::m_hashTable.find_impl(*ptr, key, value);
     }
-#if LFDS_USE_CPP11
+#if XTOMIC_USE_CPP11
     template<typename ... Args>
     bool insert(const key_type & key, const bool updateIfExists, Args&&... val)
-#else // LFDS_USE_CPP11
+#else // XTOMIC_USE_CPP11
     bool insert(const key_type & key, const bool updateIfExists, const mapped_type& val)
-#endif // LFDS_USE_CPP11
+#endif // XTOMIC_USE_CPP11
     {
         // the lock prevents overwhelming by big number of concurrent insertions
         scoped_reserver_type reserver(base_type::m_concurrentInsertions);

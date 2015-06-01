@@ -8,9 +8,9 @@
 #ifndef INCLUDE_QUEUE_BASE_HPP_
 #define INCLUDE_QUEUE_BASE_HPP_
 
+#include <xtomic/quantum.hpp>
 #include "stack_base_weak.hpp"
 #include "stack_base_aba.hpp"
-#include <xtomic/xtomic.hpp>
 
 namespace xtomic
 {

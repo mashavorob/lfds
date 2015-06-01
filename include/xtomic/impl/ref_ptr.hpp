@@ -9,9 +9,8 @@
 #define INCLUDE_REF_PTR_HPP_
 
 #include "cas.hpp"
-#include <xtomic/xtomic.hpp>
-
 #include <xtomic/aux/cppbasics.hpp>
+#include <xtomic/quantum.hpp>
 
 #include <cstddef>
 

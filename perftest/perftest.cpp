@@ -156,7 +156,7 @@ void runTests(const ids_type & ids)
 int main(int argc, const char** argv)
 {
     std::cout << "Lock Free Data Structures v" <<
-    LFDS_VERSION_MAJOR << "." << LFDS_VERSION_MINOR << " Performance Test"
+    XTOMIC_VERSION_MAJOR << "." << XTOMIC_VERSION_MINOR << " Performance Test"
             << std::endl;
 
     ids_type ids;

@@ -5,7 +5,12 @@
  *      Author: masha
  */
 
-/// \file inttypes.hpp
+/// @file inttypes.hpp
+///
+/// @brief Types and meta-types for integer types.
+///
+/// The header provides type definitions and meta-type definitions for better using integer types.
+///
 
 #ifndef INCLUDE_INTTYPES_HPP_
 #define INCLUDE_INTTYPES_HPP_
@@ -24,12 +29,21 @@ typedef unsigned int uint32_t;              ///< unsigned 4-byte (32-bit) intege
 typedef unsigned long long int uint64_t;    ///< unsigned 8-byte (64-bit) integer.
 
 ///
-/// \brief the helper instantiates signed integer of specified size (in bytes)
+/// @brief Instantiate integer of specified size.
+///
+/// Meta structure that instantiates signed integer of specified size in bytes.
+/// Supported sizes: 1-byte (8-bit), 2-bytes (16-bit), 4-bytes (32-bits), 8-bytes (64-bits).
+///
+/// Example:
+/// @code
+/// typedef get_int_by_size<8>::type signed_qword;
+/// typedef get_int_by_size<1>::type signed_byte;
+/// @endcode
 ///
 template<int size>
 struct get_int_by_size;
 
-/// \cond HIDDEN_SYMBOLS
+/// @cond HIDDEN_SYMBOLS
 template<>
 struct get_int_by_size<1>
 {
@@ -53,15 +67,24 @@ struct get_int_by_size<8>
 {
     typedef int64_t type;
 };
-/// \endcond
+/// @endcond
 
 ///
-/// \brief the helper instantiates unsigned integer of specified size (in bytes)
+/// @brief Instantiate unsigned integer of specified size.
+///
+/// Meta structure that instantiates unsigned integer of specified size in bytes.
+/// Supported sizes: 1-byte (8-bit), 2-bytes (16-bit), 4-bytes (32-bits), 8-bytes (64-bits).
+///
+/// Example:
+/// @code
+/// typedef get_int_by_size<8>::type qword_t;
+/// typedef get_uint_by_size<1>::type byte_t;
+/// @endcode
 ///
 template<int size>
 struct get_uint_by_size;
 
-/// \cond HIDDEN_SYMBOLS
+/// @cond HIDDEN_SYMBOLS
 template<>
 struct get_uint_by_size<1>
 {
@@ -85,7 +108,7 @@ struct get_uint_by_size<8>
 {
     typedef uint64_t type;
 };
-/// \endcond
+/// @endcond
 
 }
 

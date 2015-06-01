@@ -6,12 +6,16 @@
  */
 
 /// \file hash_trie.hpp
+///
+/// @brief `hash_trie<>`.
+///
 
 #ifndef INCLUDE_HASH_TRIE_HPP_
 #define INCLUDE_HASH_TRIE_HPP_
 
 /// \cond HIDDEN_SYMBOLS
 
+#include <xtomic/quantum.hpp>
 #include "impl/cas.hpp"
 #include "impl/pool_buffer.hpp"
 #include "impl/meta_utils.hpp"
@@ -19,8 +23,6 @@
 #include "aux/inttypes.hpp"
 #include "aux/xfunctional.hpp"
 #include "aux/cppbasics.hpp"
-#include "xtomic.hpp"
-
 #include <cassert>
 
 /// \endcond
@@ -572,7 +574,7 @@ public:
     /// - `false` if the container already had a value associated with the specified key.
     ///    The old value remains unchanged.
     ///
-#if LFDS_USE_CPP11
+#if XTOMIC_USE_CPP11
     template<typename ... Args>
     bool insert(const key_type & key, Args&&... val)
 #else
@@ -740,7 +742,7 @@ private:
         }
         return false;
     }
-#if LFDS_USE_CPP11
+#if XTOMIC_USE_CPP11
     template<typename ... Args>
     Return insertChain(b_lock& bn,
             ptr_lock& ptr,
@@ -801,7 +803,7 @@ private:
         }
         return ret;
     }
-#if LFDS_USE_CPP11
+#if XTOMIC_USE_CPP11
     template<typename ... Args>
     Return insertBranch(b_lock& bn,
             ptr_lock& ptr,

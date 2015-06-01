@@ -48,21 +48,21 @@ public:
         m_nodeAllocator.deallocate(p, count);
     }
 
-#if LFDS_USE_CPP11
+#if XTOMIC_USE_CPP11
     template<typename ... Args>
     void constructData(node_type* p, Args&&... data)
-#else // LFDS_USE_CPP11
+#else // XTOMIC_USE_CPP11
     void constructData(node_type* p, const value_type &data)
-#endif // LFDS_USE_CPP11
+#endif // XTOMIC_USE_CPP11
     {
         m_dataAllocator.construct(p->getData(), std_forward(Args, data));
     }
-#if !LFDS_USE_CPP11
+#if !XTOMIC_USE_CPP11
     void constructData(node_type* p)
     {
         ::new (static_cast<void*>(p->getData())) value_type();
     }
-#endif // LFDS_USE_CPP11
+#endif // XTOMIC_USE_CPP11
     void destroyData(node_type* p)
     {
         m_dataAllocator.destroy(p->getData());
@@ -75,7 +75,7 @@ public:
     {
         return m_freeNodes.atomic_pop();
     }
-#if LFDS_USE_CPP11
+#if XTOMIC_USE_CPP11
     template<typename ... Args>
     node_type* newNode(Args&&... data)
 #else
@@ -89,7 +89,7 @@ public:
         }
         return p;
     }
-#if !LFDS_USE_CPP11
+#if !XTOMIC_USE_CPP11
     node_type* newNode()
     {
         node_type* p = popFreeNode();

@@ -233,7 +233,7 @@ public:
     typedef typename hash_table_type::allocator_type allocator_type;
     typedef typename allocator_type::template rebind<node_type>::other node_allocator_type;
 
-    static const unsigned int HIGH_WATERMARK_MULT = 5;
+    static const unsigned int HIGH_WATERMARK_MULT = 7;
     static const unsigned int HIGH_WATERMARK_DIV = 10;
     static const unsigned int MIN_CAPACITY = 20;
 

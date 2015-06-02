@@ -236,7 +236,7 @@ void CommandLineParser::showHelp(const char* arg0)
             << std::endl
             << "    <groups> - comma separated list of objects' groups to run. Wild cards are supported."
             << std::endl
-            << "    <filters> - comma separated list of fully qualified tests' names to run. Wild cards are supported."
+            << "    <filter> - comma separated list of fully qualified tests' names to run. Wild cards are supported."
             << std::endl
             << "    [-] - optional minus sign indicates that the filter is to be inverted"
             << std::endl << "    list-tests - display list of available tests"

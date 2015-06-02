@@ -1,3 +1,5 @@
-Collection of Lock Free Data Structures
+Collection of Lock Free Data Structures:
 
-It was designed for learning purposes
+* queues
+* hash maps
+* hash trie

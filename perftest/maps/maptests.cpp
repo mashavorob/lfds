@@ -58,7 +58,7 @@ public:
 
     ir_registrar(const char* group, const char* name) :
             m_factory(group, name, "maximum insert time (with initial reserve)",
-                    "μs/op")
+                    "mcs/op")
     {
 
     }
@@ -158,11 +158,11 @@ public:
 public:
     registrar(const char* group, const char* name) :
             m_avg_insert(group, name, "average insert time", "ns/op"),
-            m_max_insert(group, name, "maximum insert time", "μs/op"),
+            m_max_insert(group, name, "maximum insert time", "mcs/op"),
             m_avg_erase(group, name, "average erase time", "ns/op"),
             m_avg_find(group, name, "average find time", "ns/op"),
             m_mt_avg_find(group, name, "mt average find time", "ns/op"),
-            m_mt_max_find(group, name, "mt maximum find time", "μs/op"),
+            m_mt_max_find(group, name, "mt maximum find time", "mcs/op"),
             m_ir_registrar(group, name),
             m_mem_registrar(group, name)
     {

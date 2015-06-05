@@ -17,6 +17,7 @@ add_executable( perftest
 	timeutils.cpp
 	wildcard.cpp
 	maps/maptests.cpp
+	queues/queuetest.cpp
 	)
 	
 target_link_libraries (

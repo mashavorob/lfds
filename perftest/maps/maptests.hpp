@@ -26,7 +26,7 @@ namespace maps
 static const unsigned int TYPICAL_SIZE = static_cast<unsigned int>(5e5);
 static const unsigned int NUMBER_OF_REPETITIONS = static_cast<unsigned int>(30e6);
 
-template<typename Map, bool InitialReserve, unsigned int Repetitions = TYPICAL_SIZE>
+template<typename Map, bool InitialReserve, unsigned int Repetitions = NUMBER_OF_REPETITIONS>
 class AvgInsertTester
 {
 public:

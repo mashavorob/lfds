@@ -101,23 +101,6 @@ public:
         return p;
     }
 
-    static void copy_upsidedown(stack_base_aba<T> & from,
-                                stack_base_aba<T> & to)
-    {
-        node_type* node = from.m_head.m_ptr;
-        node_type* newhead = to.m_head.m_ptr;
-        while (node)
-        {
-            node_type* next = node->m_next;
-            node->m_next = newhead;
-            newhead = node;
-            node = next;
-        }
-        to.m_head.m_ptr = newhead;
-        from.m_head.m_ptr = nullptr;
-        ++from.m_head.m_counter;
-        ++to.m_head.m_counter;
-    }
 private:
     volatile node_ptr m_head;
 };
